@@ -1,0 +1,10 @@
+{
+    "name": "connect-mongo",
+  , "version": "0.0.1",
+  , "description": "MongoDB session store for Connect",
+  , "keywords": [],
+  , "author": "Casey Banner <kcbanner@gmail.com>",
+  , "dependencies": {}
+  , "main": "index"
+  , "engines": { "node": "0.4.x" }
+}
