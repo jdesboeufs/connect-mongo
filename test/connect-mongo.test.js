@@ -37,7 +37,7 @@ exports.test_set = function(done) {
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
-        session.should.eql({foo: 'bar', _id: sid});
+        session.should.eql({session: JSON.stringify({foo: 'bar'}), _id: sid});
         cleanup(store, db, collection);
         done();
       });  
@@ -48,7 +48,7 @@ exports.test_set = function(done) {
 exports.test_get = function(done) {
   open_db(function(store, db, collection) {
     var sid = 'test_get-sid';
-    collection.insert({_id: sid, key1: 1, key2: 'two'}, function(error, ids) {
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
       store.get(sid, function(err, session) {
         session.should.eql({key1: 1, key2: 'two'});
         cleanup(store, db, collection);
