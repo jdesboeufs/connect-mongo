@@ -33,6 +33,14 @@ With express:
         })
       }));
 
+## Tests
+
+You need should and expresso.
+
+    make test
+
+The tests use a database called `connect-mongo-test`.
+
 ## License 
 
 (The MIT License)
