@@ -3,6 +3,34 @@
 
   MongoDB session store for Connect
 
+  connect-mongo supports only connect `>= 1.0.3`.
+
+## Installation
+
+via npm:
+
+    $ npm install connect-mongo
+
+## Options
+
+  - `db` Database 
+  - `collection` Collection (optional, default: `sessions`) 
+  - `host` MongoDB server hostname (optional, default: `127.0.0.1`)
+  - `port` MongoDB server port (optional, default: `27017`)
+  - `username` Username (optional)
+  - `password` Password (optional)
+
+## Example
+
+With express:
+
+    app.use(express.session({
+        secret: settings.cookie_secret,
+        store: new MongoStore({
+          db: settings.db
+        })
+      }));
+
 ## License 
 
 (The MIT License)
