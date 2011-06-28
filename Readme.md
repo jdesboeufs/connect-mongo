@@ -19,6 +19,8 @@ via npm:
   - `port` MongoDB server port (optional, default: `27017`)
   - `username` Username (optional)
   - `password` Password (optional)
+  - `url` Connection url of the form: `mongodb://user:pass@host:port/database/collection`.
+          If provided, information in the URL takes priority over the other options.
 
 ## Example
 
@@ -35,7 +37,7 @@ With express:
 
 ## Tests
 
-You need should and expresso.
+You need `expresso`.
 
     make test
 
