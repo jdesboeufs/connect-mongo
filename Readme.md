@@ -22,7 +22,7 @@ via npm:
   - `url` Connection url of the form: `mongodb://user:pass@host:port/database/collection`.
           If provided, information in the URL takes priority over the other options.
   - `clear_interval` Interval in seconds to clear expired sessions (optional, default: `-1`).
-          Values < 0 disable expired session clearing.
+          Values <= 0 disable expired session clearing.
 
 ## Example
 
