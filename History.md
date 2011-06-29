@@ -10,7 +10,7 @@
   * Added url support
 
 
-0.1.2 / 2010-03-18
+0.1.2 / 2010-05-18
 ==================
 
   * Added auto_reconnect option
