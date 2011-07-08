@@ -1,3 +1,9 @@
+0.1.5 / 2010-07-07
+==================
+
+  * Made collection setup more robust to avoid race condition
+
+
 0.1.4 / 2010-06-28
 ==================
 
