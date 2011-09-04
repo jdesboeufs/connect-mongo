@@ -1,4 +1,3 @@
-
 # connect-mongo
 
   MongoDB session store for Connect
@@ -13,7 +12,7 @@ via npm:
 
 ## Options
 
-  - `db` Database 
+  - `db` Database name
   - `collection` Collection (optional, default: `sessions`) 
   - `host` MongoDB server hostname (optional, default: `127.0.0.1`)
   - `port` MongoDB server port (optional, default: `27017`)
