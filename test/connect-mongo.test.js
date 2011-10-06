@@ -3,7 +3,9 @@
  * Module dependencies.
  */
 
-var MongoStore = require('connect-mongo');
+
+var connect = require('connect');
+var MongoStore = require('connect-mongo')(connect);
 var assert = require('assert');
 
 var options = {db: 'connect-mongo-test'};
