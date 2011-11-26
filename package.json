@@ -1,6 +1,6 @@
 {
   "name": "connect-mongo",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "MongoDB session store for Connect",
   "keywords": ["connect", "mongo", "mongodb", "session", "express"],
   "author": "Casey Banner <kcbanner@gmail.com>",
@@ -8,6 +8,5 @@
     "connect": ">=1.0.3",
     "mongodb": ">=0.8.0"
   },
-  "main": "index",
-  "engines": { "node": "0.4.x" }
+  "main": "index"
 }
