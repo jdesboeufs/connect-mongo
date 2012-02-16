@@ -23,6 +23,8 @@ via npm:
   - `clear_interval` Interval in seconds to clear expired sessions (optional, default: `-1`).
           Values <= 0 disable expired session clearing.
 
+  - if both `host` and `port` are arrays, a ReplicaSet will be used
+  - `rs_name` MongoDB ReplicaSet name
 ## Example
 
 With express:
