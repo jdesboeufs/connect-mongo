@@ -5,7 +5,7 @@
   "keywords": ["connect", "mongo", "mongodb", "session", "express"],
   "author": "Casey Banner <kcbanner@gmail.com>",
   "dependencies": {
-    "connect": ">=1.0.3",
+    "connect": "1.x",
     "mongodb": ">=0.8.0"
   },
   "main": "index",
