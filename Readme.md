@@ -18,7 +18,7 @@ via npm:
   - `port` MongoDB server port (optional, default: `27017`)
   - `username` Username (optional)
   - `password` Password (optional)
-  - `auto_reconnect` This is passed directly to the MondoDB `Server` constructor as the auto_reconnect
+  - `auto_reconnect` This is passed directly to the MongoDB `Server` constructor as the auto_reconnect
                      option (optional, default: false).
   - `url` Connection url of the form: `mongodb://user:pass@host:port/database/collection`.
           If provided, information in the URL takes priority over the other options.
