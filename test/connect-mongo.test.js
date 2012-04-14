@@ -159,6 +159,29 @@ exports.test_options_url = function(done) {
   });
 };
 
+exports.test_options_url_auth = function(done) {
+  var store = new MongoStore({
+    url: 'mongodb://test:test@127.0.0.1:27017/connect-mongo-test/sessions-test'
+  }, function() {
+    assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
+    assert.strictEqual(store.db.serverConfig.host, '127.0.0.1');
+    assert.equal(store.db.serverConfig.port, 27017);
+    assert.equal(store.collection.collectionName, 'sessions-test');
+    cleanup_store(store);
+    done();
+  });
+};
+
+exports.test_options_no_db = function(done) {
+  assert.throws(
+    function() {
+      var store = new MongoStore({}, function() {});
+    },
+    Error);
+
+  done();
+};
+
 exports.test_clear_expired = function(done) {
   open_db({db: options.db, clear_interval: 0.1}, function(store, db, collection) {
     var sid = 'test_clear_expired-sid';
