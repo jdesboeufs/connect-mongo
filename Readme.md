@@ -22,8 +22,8 @@ via npm:
           If provided, information in the URL takes priority over the other options.
   - `clear_interval` Interval in seconds to clear expired sessions (optional, default: `-1`).
           Values <= 0 disable expired session clearing.
-  - `stringify` If true, connect-mongo will serialize sessions using JSON.stringify before
-                setting them, and deserialize them with JSON.parse when getting them.
+  - `stringify` If true, connect-mongo will serialize sessions using `JSON.stringify` before
+                setting them, and deserialize them with `JSON.parse` when getting them.
                 (optional, default: true). This is useful if you are using types that 
                 MongoDB doesn't support.
 
