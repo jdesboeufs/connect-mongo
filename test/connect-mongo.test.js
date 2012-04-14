@@ -3,7 +3,8 @@
  * Module dependencies.
  */
 
-var MongoStore = require('connect-mongo');
+var connect = require('connect');
+var MongoStore = require('../')(connect);
 var assert = require('assert');
 
 var options = {db: 'connect-mongo-test'};
@@ -12,7 +13,7 @@ var mongo = require('mongodb');
 var open_db = function(options, callback) {
   var store = new MongoStore(options, function() {
     var db = new mongo.Db(options.db, new mongo.Server('127.0.0.1', 27017, {}));
-
+    
     db.open(function(err) {
       db.collection('sessions', function(err, collection) {
         callback(store, db, collection);
