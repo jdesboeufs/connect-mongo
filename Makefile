@@ -1,5 +1,5 @@
 
 test:
-	@expresso --serial -I lib 
+	@mocha -u exports -R spec
 
 .PHONY: test
