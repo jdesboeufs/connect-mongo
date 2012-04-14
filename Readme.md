@@ -27,7 +27,8 @@ via npm:
 
 With express:
 
-    var MongoStore = require('connect-mongo');
+    var express = require('express');
+    var MongoStore = require('connect-mongo')(express);
 
     app.use(express.session({
         secret: settings.cookie_secret,
@@ -35,6 +36,12 @@ With express:
           db: settings.db
         })
       }));
+
+With connect:
+
+    var connect = require('connect');
+    var MongoStore = require('connect-mongo')(connect);
+
 
 ## Tests
 
