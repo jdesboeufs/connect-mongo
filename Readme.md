@@ -38,7 +38,7 @@ With express:
 
 ## Tests
 
-You need `expresso`.
+You need `mocha`.
 
     make test
 
