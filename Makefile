@@ -1,5 +1,5 @@
 
 test:
-	@mocha -u exports -R spec
+	@mocha
 
 .PHONY: test
