@@ -58,6 +58,28 @@ exports.test_set = function(done) {
   });
 };
 
+exports.test_set_no_stringify = function(done) {
+  open_db({db: options.db, stringify: false}, function(store, db, collection) {
+    var sid = 'test_set-sid';
+    store.set(sid, {foo: 'bar'}, function(err, session) {
+      assert.strictEqual(err, null);
+
+      // Verify it was saved
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.deepEqual(session,
+                         {
+                           session: {foo: 'bar'},
+                           _id: sid
+                         });
+        
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });  
+    });
+  });
+};
+
 exports.test_set_expires = function(done) {
   open_db(options, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
@@ -198,3 +220,4 @@ exports.test_clear_expired = function(done) {
     });
   });
 };
+
