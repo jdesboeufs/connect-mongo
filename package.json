@@ -7,6 +7,10 @@
   "dependencies": {
     "mongodb": "0.9.x"
   },
+  "devDependencies": {
+    "mocha": "1.x"
+  },
+  "scripts" : { "test": "make test" },
   "main": "index",
   "engines": "node >= 0.4.x"
 }
