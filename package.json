@@ -10,7 +10,7 @@
   "devDependencies": {
     "mocha": "1.x"
   },
-  "scripts" : { "test": "make test-expresso" },
+  "scripts" : { "test": "make test" },
   "main": "index",
   "engines": "node >= 0.4.x"
 }

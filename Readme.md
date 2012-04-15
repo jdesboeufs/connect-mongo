@@ -2,9 +2,11 @@
 
   MongoDB session store for Connect
 
-  connect-mongo supports only connect `>= 1.0.3`.
+  [![Build Status](https://secure.travis-ci.org/kcbanner/connect-mongo.png?branch=master)](http://travis-ci.org/kcbanner/connect-mongo)
 
 ## Installation
+
+connect-mongo supports only connect `>= 1.0.3`.
 
 via npm:
 
