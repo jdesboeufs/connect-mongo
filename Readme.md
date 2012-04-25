@@ -31,6 +31,10 @@ via npm:
                 (optional, default: true). This is useful if you are using types that 
                 MongoDB doesn't support.
 
+The second parameter to the `MongoStore` constructor is a callback which will be called once the database connection is established.
+This is mainly used for the tests, however you can use this callback if you want to wait until the store has connected before
+starting your app.
+
 ## Example
 
 With express:
