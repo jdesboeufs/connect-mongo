@@ -24,7 +24,7 @@ via npm:
                      option (optional, default: false).
   - `url` Connection url of the form: `mongodb://user:pass@host:port/database/collection`.
           If provided, information in the URL takes priority over the other options.
-  - `mongooseConnection` someMongooseDb.connections[0] `to use an existing mongoose connection.` (optional)
+  - `mongooseConnection` in the form: `someMongooseDb.connections[0]` to use an existing mongoose connection. (optional)
   - `clear_interval` Interval in seconds to clear expired sessions (optional, default: `-1`).
           Values <= 0 disable expired session clearing.
   - `stringify` If true, connect-mongo will serialize sessions using `JSON.stringify` before
