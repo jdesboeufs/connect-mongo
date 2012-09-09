@@ -221,3 +221,17 @@ exports.test_clear_expired = function(done) {
   });
 };
 
+exports.test_options_url_and_db = function(done){
+  var store = new MongoStore({
+    url: 'mongodb://test:test@127.0.0.1:27017/',
+    db : 'connect-mongo-test',
+    collection:'sessions-test'
+  }, function() {
+    assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
+    assert.strictEqual(store.db.serverConfig.host, '127.0.0.1');
+    assert.equal(store.db.serverConfig.port, 27017);
+    assert.equal(store.collection.collectionName, 'sessions-test');
+    cleanup_store(store);
+    done();
+  });
+}
