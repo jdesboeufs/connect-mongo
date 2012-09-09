@@ -1,3 +1,9 @@
+0.2.0 / 2012-09-09
+==================
+
+  * Integrated pull request for `mongoose_connection` option
+  * Move to mongodb 1.0.x
+
 0.1.5 / 2010-07-07
 ==================
 
