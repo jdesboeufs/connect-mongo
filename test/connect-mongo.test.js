@@ -345,7 +345,9 @@ exports.test_get_with_raw_db = function(done) {
     var sid = 'test_get-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
       store.get(sid, function(err, session) {
-        assert.deepEqual(session, {key1: 1, key2: 'two'});        
+        assert.strictEqual(err, null);
+        assert.deepEqual(session, {key1: 1, key2: 'two'});
+          
         cleanup(store, db, collection, function() {
           done();
         });
@@ -361,6 +363,7 @@ exports.test_length_with_raw_db = function(done) {
       store.length(function(err, length) {
         assert.strictEqual(err, null);
         assert.strictEqual(length, 1);
+          
         cleanup(store, db, collection, function() {
           done();
         });
@@ -375,6 +378,7 @@ exports.test_destroy_ok_with_raw_db = function(done) {
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
       store.destroy(sid, function(err) {
         assert.strictEqual(err, undefined);
+          
         cleanup(store, db, collection, function() {
           done();
         });
@@ -389,6 +393,7 @@ exports.test_clear_with_raw_db = function(done) {
     collection.insert({_id: sid, key1: 1, key2: 'two'}, function(error, ids) {
       store.clear(function(err) {
         collection.count(function(err, count) {
+          assert.strictEqual(err, null);
           assert.strictEqual(count, 0);
 
           cleanup(store, db, collection, function() {
