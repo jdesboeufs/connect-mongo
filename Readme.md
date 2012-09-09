@@ -14,7 +14,7 @@ via npm:
 
 ## Options
 
-  - `db` Database name
+  - `db` Database name OR fully instantiated node-mongo-native object
   - `collection` Collection (optional, default: `sessions`) 
   - `host` MongoDB server hostname (optional, default: `127.0.0.1`)
   - `port` MongoDB server port (optional, default: `27017`)
