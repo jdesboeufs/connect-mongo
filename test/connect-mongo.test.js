@@ -12,7 +12,7 @@ var mongo = require('mongodb');
 
 var mongoose = require('mongoose');
 var testMongooseDb = mongoose.connect('mongodb://127.0.0.1:27017/connect-mongo-test');
-var options_with_mongoose_connection = { mongooseConnection: testMongooseDb.connections[0] };
+var options_with_mongoose_connection = { mongoose_connection: testMongooseDb.connections[0] };
 
 var auth_or_not = function(store, db, options, callback){
   if (options.username && options.password) {
@@ -31,11 +31,11 @@ var auth_or_not = function(store, db, options, callback){
 var open_db = function(options, callback) {
   var store = new MongoStore(options, function() {
     var db;
-    if (options.mongooseConnection) {
-      db = new mongo.Db(options.mongooseConnection.db.databaseName,
-        new mongo.Server(options.mongooseConnection.db.serverConfig.host,
-          options.mongooseConnection.db.serverConfig.port,
-          options.mongooseConnection.db.serverConfig.options
+    if (options.mongoose_connection) {
+      db = new mongo.Db(options.mongoose_connection.db.databaseName,
+        new mongo.Server(options.mongoose_connection.db.serverConfig.host,
+          options.mongoose_connection.db.serverConfig.port,
+          options.mongoose_connection.db.serverConfig.options
         ));
     } else {
       db = new mongo.Db(options.db, new mongo.Server('127.0.0.1', 27017, {}));
@@ -266,7 +266,7 @@ exports.test_options_url_and_db = function(done){
   });
 };
 
-/* options.mongooseConnection tests */
+/* options.mongoose_connection tests */
 
 exports.test_set_with_raw_db = function(done) {
   open_db(options_with_mongoose_connection, function(store, db, collection) {
@@ -291,7 +291,7 @@ exports.test_set_with_raw_db = function(done) {
 };
 
 exports.test_set_no_stringify_with_raw_db = function(done) {
-  open_db({mongooseConnection: options_with_mongoose_connection.mongooseConnection, stringify: false}, function(store, db, collection) {
+  open_db({mongoose_connection: options_with_mongoose_connection.mongoose_connection, stringify: false}, function(store, db, collection) {
     var sid = 'test_set-sid';
     store.set(sid, {foo: 'bar'}, function(err, session) {
       assert.strictEqual(err, null);
@@ -401,7 +401,7 @@ exports.test_clear_with_raw_db = function(done) {
 };
 
 exports.test_clear_expired_with_raw_db = function(done) {
-  open_db({mongooseConnection: options_with_mongoose_connection.mongooseConnection, clear_interval: 0.1}, function(store, db, collection) {
+  open_db({mongoose_connection: options_with_mongoose_connection.mongoose_connection, clear_interval: 0.1}, function(store, db, collection) {
     var sid = 'test_clear_expired-sid';
     store.set(sid, {foo:'bar', cookie: {_expires: '2011-04-26T03:10:12.890Z'}}, function(err, session) {
       setTimeout(function() {
@@ -420,7 +420,7 @@ exports.test_clear_expired_with_raw_db = function(done) {
 exports.test_options_bad_db_with_raw_db = function(done) {
   assert.throws(
     function() {
-      var store = new MongoStore({mongooseConnection: 'foobar'}, function() {});
+      var store = new MongoStore({mongoose_connection: 'foobar'}, function() {});
     },
     Error);
 
