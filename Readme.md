@@ -38,7 +38,7 @@ starting your app.
 
 ## Example
 
-With express:
+With express 2.x:
 
     var express = require('express');
     var MongoStore = require('connect-mongo')(express);
@@ -49,6 +49,19 @@ With express:
           db: settings.db
         })
       }));
+
+With express 3:
+
+    var express = require('express');
+    var MongoStore = require('connect-mongo')(express);
+
+    app.use(express.cookieParser(settings.cookie_secret));
+    app.use(express.session({
+        store: new MongoStore({
+          db: settings.db
+        })
+      }));
+
 
 With connect:
 
