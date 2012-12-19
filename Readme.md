@@ -25,8 +25,6 @@ via npm:
   - `url` Connection url of the form: `mongodb://user:pass@host:port/database/collection`.
           If provided, information in the URL takes priority over the other options.
   - `mongoose_connection` in the form: `someMongooseDb.connections[0]` to use an existing mongoose connection. (optional)
-  - `clear_interval` Interval in seconds to clear expired sessions (optional, default: `-1`).
-          Values <= 0 disable expired session clearing.
   - `stringify` If true, connect-mongo will serialize sessions using `JSON.stringify` before
                 setting them, and deserialize them with `JSON.parse` when getting them.
                 (optional, default: true). This is useful if you are using types that 
@@ -55,6 +53,21 @@ With connect:
     var connect = require('connect');
     var MongoStore = require('connect-mongo')(connect);
 
+## Removing expired sessions
+
+  connect-mongo uses MongoDB's TTL collection feature (2.2+) to
+  have mongod automatically remove expired sessions. (mongod runs this
+  check every minute.)
+
+  **Note:** By connect/express's default, session cookies are set to 
+  expire when the user closes their browser (maxAge: null). In accordance
+  with standard industry practices, connect-mongo will set these sessions
+  to expire two weeks from their last 'set'. You can override this 
+  behavior by manually setting the maxAge for your cookies -- just keep in
+  mind that any value less than 60 seconds is pointless, as mongod will
+  only delete expired documents in a TTL collection every minute.
+
+  For more information, consult connect's [session documentation](http://www.senchalabs.org/connect/session.html)
 
 ## Tests
 
