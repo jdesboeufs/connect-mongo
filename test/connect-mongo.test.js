@@ -53,7 +53,6 @@ var open_db = function(options, callback) {
 };
 
 var cleanup_store = function(store) {
-  clearInterval(store.clear_interval);
   store.db.close();
 };
 
@@ -234,23 +233,6 @@ exports.test_options_no_db = function(done) {
   done();
 };
 
-exports.test_clear_expired = function(done) {
-  open_db({db: options.db, clear_interval: 0.1}, function(store, db, collection) {
-    var sid = 'test_clear_expired-sid';
-    store.set(sid, {foo:'bar', cookie: {_expires: '2011-04-26T03:10:12.890Z'}}, function(err, session) {
-      setTimeout(function() {
-        collection.find({_id: sid}).toArray(function(err, results) {
-          assert.strictEqual(results.length, 0);
-
-          cleanup(store, db, collection, function() {
-            done();
-          });
-        });
-      }, 150);
-    });
-  });
-};
-
 exports.test_options_url_and_db = function(done){
   var store = new MongoStore({
     url: 'mongodb://test:test@127.0.0.1:27017/',
@@ -401,23 +383,6 @@ exports.test_clear_with_raw_db = function(done) {
           });
         });        
       });
-    });
-  });
-};
-
-exports.test_clear_expired_with_raw_db = function(done) {
-  open_db({mongoose_connection: options_with_mongoose_connection.mongoose_connection, clear_interval: 0.1}, function(store, db, collection) {
-    var sid = 'test_clear_expired-sid';
-    store.set(sid, {foo:'bar', cookie: {_expires: '2011-04-26T03:10:12.890Z'}}, function(err, session) {
-      setTimeout(function() {
-        collection.find({_id: sid}).toArray(function(err, results) {
-          assert.strictEqual(results.length, 0);
-
-          cleanup(store, db, collection, function() {
-            done();
-          });
-        });
-      }, 150);
     });
   });
 };
