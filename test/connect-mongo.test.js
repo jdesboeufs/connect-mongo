@@ -7,6 +7,7 @@ var connect = require('connect');
 var MongoStore = require('../')(connect);
 var assert = require('assert');
 
+var defaultOptions = {w: 1};
 var options = {db: 'connect-mongo-test'};
 var mongo = require('mongodb');
 
@@ -36,9 +37,10 @@ var open_db = function(options, callback) {
         new mongo.Server(options.mongoose_connection.db.serverConfig.host,
           options.mongoose_connection.db.serverConfig.port,
           options.mongoose_connection.db.serverConfig.options
-        ));
+        ),
+        { w: options.w || defaultOptions.w });
     } else {
-      db = new mongo.Db(options.db, new mongo.Server('127.0.0.1', 27017, {}));
+      db = new mongo.Db(options.db, new mongo.Server('127.0.0.1', 27017, {}), { w: options.w || defaultOptions.w });
     }
     
     if (db.openCalled) {
