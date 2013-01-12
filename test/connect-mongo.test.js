@@ -541,23 +541,6 @@ exports.test_clear_with_native_db = function(done) {
   });
 };
 
-exports.test_clear_expired_with_native_db = function(done) {
-  open_db({db: options_with_mongo_native_db.db, clear_interval: 0.1}, function(store, db, collection) {
-    var sid = 'test_clear_expired-sid';
-    store.set(sid, {foo:'bar', cookie: {_expires: '2011-04-26T03:10:12.890Z'}}, function(err, session) {
-      setTimeout(function() {
-        collection.find({_id: sid}).toArray(function(err, results) {
-          assert.strictEqual(results.length, 0);
-
-          cleanup(store, db, collection, function() {
-            done();
-          });
-        });
-      }, 150);
-    });
-  });
-};
-
 exports.test_options_bad_db_with_native_db = function(done) {
   assert.throws(
     function() {
