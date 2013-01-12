@@ -15,7 +15,7 @@ var mongoose = require('mongoose');
 var testMongooseDb = mongoose.connect('mongodb://127.0.0.1:27017/connect-mongo-test');
 var options_with_mongoose_connection = { mongoose_connection: testMongooseDb.connections[0] };
 
-var testMongoNativeDb = new mongo.Db("connect-mongo-test", new mongo.Server('127.0.0.1', 27017, {}));
+var testMongoNativeDb = new mongo.Db("connect-mongo-test", new mongo.Server('127.0.0.1', 27017, {}), { w: defaultOptions.w });
 var options_with_mongo_native_db = {db: testMongoNativeDb}
 
 var auth_or_not = function(store, db, options, callback){
