@@ -1,3 +1,9 @@
+0.3.0 / 2013-01-20
+==================
+
+  * Merged several changes by Ken Pratt, including Write Concern support
+  * Updated to `mongodb` version 1.2
+
 0.2.0 / 2012-09-09
 ==================
 
