@@ -8,7 +8,7 @@
     "mongodb": "1.2.x"
   },
   "files": [
-      'index.js'
+      "index.js"
   ],
   "devDependencies": {
     "mocha": "1.x",
