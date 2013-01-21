@@ -1,12 +1,15 @@
 {
   "name": "connect-mongo",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "MongoDB session store for Connect",
   "keywords": ["connect", "mongo", "mongodb", "session", "express"],
   "author": "Casey Banner <kcbanner@gmail.com>",
   "dependencies": {
     "mongodb": "1.2.x"
   },
+  "files": [
+      'index.js'
+  ],
   "devDependencies": {
     "mocha": "1.x",
     "connect": ">= 1.x",
