@@ -123,10 +123,10 @@ exports.test_set_expires = function(done) {
       foo:'bar',
       cookie:
       {
-        _expires: '2011-04-26T03:10:12.890Z'
+        expires: '2011-04-26T03:10:12.890Z'
       }
     };
-    
+
     store.set(sid, data, function(err, session) {
       assert.strictEqual(err, null);
 
@@ -134,7 +134,35 @@ exports.test_set_expires = function(done) {
       collection.findOne({_id: sid}, function(err, session) {
         assert.deepEqual(session.session, JSON.stringify(data));
         assert.strictEqual(session._id, sid);
-        assert.equal(session.expires.toJSON(), new Date(data.cookie._expires).toJSON());
+        assert.equal(session.expires.toJSON(), new Date(data.cookie.expires).toJSON());
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
+
+exports.test_set_expires_no_stringify = function(done) {
+  open_db({db: options.db, stringify: false}, function(store, db, collection) {
+    var sid = 'test_set_expires-sid';
+    var data = {
+      foo:'bar',
+      cookie:
+      {
+        expires: '2011-04-26T03:10:12.890Z'
+      }
+    };
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      // Verify it was saved
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.deepEqual(session.session, data);
+        assert.strictEqual(session._id, sid);
+        assert.equal(session.expires.toJSON(), new Date(data.cookie.expires).toJSON());
         
         cleanup(store, db, collection, function() {
           done();
@@ -296,7 +324,7 @@ exports.test_set_no_stringify_with_raw_db = function(done) {
         cleanup(store, db, collection, function() {
           done();
         });
-      });  
+      });
     });
   });
 };
@@ -308,7 +336,7 @@ exports.test_set_expires_with_raw_db = function(done) {
       foo:'bar',
       cookie:
       {
-        _expires: '2011-04-26T03:10:12.890Z'
+        expires: '2011-04-26T03:10:12.890Z'
       }
     };
     
@@ -319,12 +347,46 @@ exports.test_set_expires_with_raw_db = function(done) {
       collection.findOne({_id: sid}, function(err, session) {
         assert.deepEqual(session.session, JSON.stringify(data));
         assert.strictEqual(session._id, sid);
-        assert.equal(session.expires.toJSON(), new Date(data.cookie._expires).toJSON());
+        assert.equal(session.expires.toJSON(), new Date(data.cookie.expires).toJSON());
         
         cleanup(store, db, collection, function() {
           done();
         });
-      });  
+      });
+    });
+  });
+};
+
+
+exports.test_set_expires_no_stringify_with_raw_db = function(done) {
+  var options = {
+    mongoose_connection: options_with_mongoose_connection.mongoose_connection,
+    stringify: false
+  };
+
+  open_db(options, function(store, db, collection) {
+    var sid = 'test_set_expires-sid';
+    var data = {
+      foo:'bar',
+      cookie:
+      {
+        expires: '2011-04-26T03:10:12.890Z'
+      }
+    };
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      // Verify it was saved
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.deepEqual(session.session, data);
+        assert.strictEqual(session._id, sid);
+        assert.equal(session.expires.toJSON(), new Date(data.cookie.expires).toJSON());
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
     });
   });
 };
@@ -445,7 +507,7 @@ exports.test_set_no_stringify_with_native_db = function(done) {
         cleanup(store, db, collection, function() {
           done();
         });
-      });  
+      });
     });
   });
 };
@@ -457,7 +519,7 @@ exports.test_set_expires_with_native_db = function(done) {
       foo:'bar',
       cookie:
       {
-        _expires: '2011-04-26T03:10:12.890Z'
+        expires: '2011-04-26T03:10:12.890Z'
       }
     };
     
@@ -468,7 +530,41 @@ exports.test_set_expires_with_native_db = function(done) {
       collection.findOne({_id: sid}, function(err, session) {
         assert.deepEqual(session.session, JSON.stringify(data));
         assert.strictEqual(session._id, sid);
-        assert.equal(session.expires.toJSON(), new Date(data.cookie._expires).toJSON());
+        assert.equal(session.expires.toJSON(), new Date(data.cookie.expires).toJSON());
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
+
+
+exports.test_set_expires_no_stringify_with_native_db = function(done) {
+  var options = {
+    db: options_with_mongo_native_db.db,
+    stringify: false
+  };
+
+  open_db(options, function(store, db, collection) {
+    var sid = 'test_set_expires-sid';
+    var data = {
+      foo:'bar',
+      cookie:
+      {
+        expires: '2011-04-26T03:10:12.890Z'
+      }
+    };
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      // Verify it was saved
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.deepEqual(session.session, data);
+        assert.strictEqual(session._id, sid);
+        assert.equal(session.expires.toJSON(), new Date(data.cookie.expires).toJSON());
         
         cleanup(store, db, collection, function() {
           done();
