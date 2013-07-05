@@ -1,3 +1,9 @@
+0.3.3 / 2013-07-04
+==================
+
+  * Merged a change which reduces data duplication
+
+
 0.3.0 / 2013-01-20
 ==================
 
