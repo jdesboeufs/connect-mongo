@@ -32,6 +32,11 @@ var make_cookie = function() {
 var make_data = function() {
   return {
     foo: 'bar',
+    baz: {
+      cow: 'moo',
+      chicken: 'cluck'
+    },
+    num: 1,
     cookie: make_cookie()
   };
 };
@@ -51,7 +56,7 @@ var assert_session_equals = function(sid, data, session) {
         assert.deepEqual(session.session.cookie, data.cookie.toJSON());
       }
       else {
-        assert.strictEqual(session.session[prop], data[prop]);
+        assert.deepEqual(session.session[prop], data[prop]);
       }
     }
   }
