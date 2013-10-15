@@ -41,6 +41,18 @@ var make_data = function() {
   };
 };
 
+var make_data_no_cookie = function() {
+  return {
+    foo: 'bar',
+    baz: {
+      cow: 'moo',
+      fish: 'blub',
+      fox: 'nobody knows!'
+    },
+    num: 2
+  };
+};
+
 // Given a session id, input data, and session, make sure the stored data matches in the input data
 var assert_session_equals = function(sid, data, session) {
   if (typeof session.session === 'string') {
@@ -660,4 +672,67 @@ exports.test_options_bad_db_with_native_db = function(done) {
     Error);
 
   done();
+};
+
+exports.test_set_default_expiration = function(done) {
+  var defaultExpirationTime = 10101;
+  var optionsWithExpirationTime = JSON.parse(JSON.stringify(options));
+  optionsWithExpirationTime['defaultExpirationTime'] = defaultExpirationTime;
+
+  open_db(optionsWithExpirationTime, function(store, db, collection) {
+    var sid = 'test_set_expires-sid';
+    var data = make_data_no_cookie();
+
+    var timeBeforeSet = new Date().valueOf();
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      // Verify it was saved
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.deepEqual(session.session, JSON.stringify(data));
+        assert.strictEqual(session._id, sid);
+        assert.notEqual(session.expires, null);
+
+        var timeAfterSet = new Date().valueOf();
+
+        assert.ok(timeBeforeSet + defaultExpirationTime <= session.expires.valueOf());
+        assert.ok(session.expires.valueOf() <= timeAfterSet + defaultExpirationTime);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
+
+exports.test_set_witout_default_expiration = function(done) {
+  var defaultExpirationTime = 1000 * 60 * 60 * 24 * 14;
+  open_db(options, function(store, db, collection) {
+    var sid = 'test_set_expires-sid';
+    var data = make_data_no_cookie();
+
+    var timeBeforeSet = new Date().valueOf();
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      // Verify it was saved
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.deepEqual(session.session, JSON.stringify(data));
+        assert.strictEqual(session._id, sid);
+        assert.notEqual(session.expires, null);
+
+        var timeAfterSet = new Date().valueOf();
+
+        assert.ok(timeBeforeSet + defaultExpirationTime <= session.expires.valueOf());
+        assert.ok(session.expires.valueOf() <= timeAfterSet + defaultExpirationTime);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
 };
