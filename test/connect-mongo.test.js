@@ -92,30 +92,29 @@ var auth_or_not = function(store, db, options, callback){
 };
 
 var open_db = function(options, callback) {
-  var store = new MongoStore(options, function() {
-    var db;
-    if (options.mongoose_connection) {
-      db = new mongo.Db(options.mongoose_connection.db.databaseName,
-        new mongo.Server(options.mongoose_connection.db.serverConfig.host,
-          options.mongoose_connection.db.serverConfig.port,
-          options.mongoose_connection.db.serverConfig.options
-        ),
-        { w: options.w || defaultOptions.w });
-    } else if (typeof options.db == "object") {
-      db = options.db
-    } else {
-      db = new mongo.Db(options.db, new mongo.Server('127.0.0.1', 27017, {}), { w: options.w || defaultOptions.w });
-    }
-    
-    if (db.openCalled) {
+  var store = new MongoStore(options);
+  var db;
+  
+  if (options.mongoose_connection) {
+    db = new mongo.Db(options.mongoose_connection.db.databaseName,
+      new mongo.Server(options.mongoose_connection.db.serverConfig.host,
+        options.mongoose_connection.db.serverConfig.port,
+        options.mongoose_connection.db.serverConfig.options
+      ),
+      { w: options.w || defaultOptions.w });
+  } else if (typeof options.db == "object") {
+    db = options.db
+  } else {
+    db = new mongo.Db(options.db, new mongo.Server('127.0.0.1', 27017, {}), { w: options.w || defaultOptions.w });
+  }
+  
+  if (db.openCalled) {
+    auth_or_not(store, db, options, callback);
+  } else {
+    db.open(function(err) {
       auth_or_not(store, db, options, callback);
-    } else {
-      db.open(function(err) {
-        auth_or_not(store, db, options, callback);
-      });
-    }
-
-  });  
+    });
+  }
 };
 
 var cleanup_store = function(store) {
