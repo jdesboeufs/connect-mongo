@@ -20,6 +20,7 @@ via npm:
   - `port` MongoDB server port (optional, default: `27017`)
   - `username` Username (optional)
   - `password` Password (optional)
+  - `authdb` The database that holds the user's credentials. Defaults to `db` (optional)
   - `auto_reconnect` This is passed directly to the MongoDB `Server` constructor as the auto_reconnect
                      option (optional, default: false).
   - `ssl` Use SSL to connect to MongoDB (optional, default: false).
