@@ -30,6 +30,7 @@ via npm:
                 setting them, and deserialize them with `JSON.parse` when getting them.
                 (optional, default: true). This is useful if you are using types that 
                 MongoDB doesn't support.
+  - `transientProperties` Array of names of transient session properties that will not be persisted.
 
 The second parameter to the `MongoStore` constructor is a callback which will be called once the database connection is established.
 This is mainly used for the tests, however you can use this callback if you want to wait until the store has connected before

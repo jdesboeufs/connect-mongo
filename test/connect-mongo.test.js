@@ -736,13 +736,13 @@ exports.test_set_witout_default_expiration = function(done) {
   });
 };
 
-exports.test_with_default_ignored_properties_no_stringify = function(done) {
+exports.test_with_default_transient_properties_no_stringify = function(done) {
   var additionalProperties = ['test1','test2','test3'];
-  var optionsWithoutIgnoredProperties = JSON.parse(JSON.stringify(options));
-  optionsWithoutIgnoredProperties['stringify'] = false;
+  var optionsWithoutTransientProperties = JSON.parse(JSON.stringify(options));
+  optionsWithoutTransientProperties['stringify'] = false;
 
-  open_db(optionsWithoutIgnoredProperties, function(store, db, collection) {
-    var sid = 'test_default_ignored_properties_no_stringify-sid';
+  open_db(optionsWithoutTransientProperties, function(store, db, collection) {
+    var sid = 'test_default_transient_properties_no_stringify-sid';
     var data = make_data_no_cookie();
     additionalProperties.forEach(function(element) {
       data[element] = element;
@@ -763,13 +763,13 @@ exports.test_with_default_ignored_properties_no_stringify = function(done) {
   });
 };
 
-exports.test_with_default_ignored_properties_stringify = function(done) {
+exports.test_with_default_transient_properties_stringify = function(done) {
   var additionalProperties = ['test1','test2','test3'];
-  var optionsWithoutIgnoredProperties = JSON.parse(JSON.stringify(options));
-  optionsWithoutIgnoredProperties['stringify'] = true;
+  var optionsWithoutTransientProperties = JSON.parse(JSON.stringify(options));
+  optionsWithoutTransientProperties['stringify'] = true;
 
-  open_db(optionsWithoutIgnoredProperties, function(store, db, collection) {
-    var sid = 'test_default_ignored_properties_stringify-sid';
+  open_db(optionsWithoutTransientProperties, function(store, db, collection) {
+    var sid = 'test_default_transient_properties_stringify-sid';
     var data = make_data_no_cookie();
     additionalProperties.forEach(function(element) {
       data[element] = element;
@@ -790,16 +790,16 @@ exports.test_with_default_ignored_properties_stringify = function(done) {
   });
 };
 
-exports.test_with_ignored_properties_no_stringify = function(done) {
-  var ignoredProperties = ['test1','test2','test3'];
-  var optionsWithIgnoredProperties = JSON.parse(JSON.stringify(options));
-  optionsWithIgnoredProperties['ignoredProperties'] = ignoredProperties;
-  optionsWithIgnoredProperties['stringify'] = false;
+exports.test_with_transient_properties_no_stringify = function(done) {
+  var transientProperties = ['test1','test2','test3'];
+  var optionsWithTransientProperties = JSON.parse(JSON.stringify(options));
+  optionsWithTransientProperties['transientProperties'] = transientProperties;
+  optionsWithTransientProperties['stringify'] = false;
 
-  open_db(optionsWithIgnoredProperties, function(store, db, collection) {
-    var sid = 'test_set_ignored_properties_no_stringify-sid';
+  open_db(optionsWithTransientProperties, function(store, db, collection) {
+    var sid = 'test_set_transient_properties_no_stringify-sid';
     var data = make_data_no_cookie();
-    ignoredProperties.forEach(function(element) {
+    transientProperties.forEach(function(element) {
       data[element] = element;
     });
 
@@ -808,7 +808,7 @@ exports.test_with_ignored_properties_no_stringify = function(done) {
 
       collection.findOne({_id: sid}, function(err, session) {
         var expectedResult = JSON.parse(JSON.stringify(data));
-        ignoredProperties.forEach(function(element) {
+        transientProperties.forEach(function(element) {
           delete expectedResult[element];
         });
 
@@ -823,16 +823,16 @@ exports.test_with_ignored_properties_no_stringify = function(done) {
   });
 };
 
-exports.test_with_ignored_properties_stringify = function(done) {
-  var ignoredProperties = ['test1','test2','test3'];
-  var optionsWithIgnoredProperties = JSON.parse(JSON.stringify(options));
-  optionsWithIgnoredProperties['ignoredProperties'] = ignoredProperties;
-  optionsWithIgnoredProperties['stringify'] = true;
+exports.test_with_transient_properties_stringify = function(done) {
+  var transientProperties = ['test1','test2','test3'];
+  var optionsWithTransientProperties = JSON.parse(JSON.stringify(options));
+  optionsWithTransientProperties['transientProperties'] = transientProperties;
+  optionsWithTransientProperties['stringify'] = true;
 
-  open_db(optionsWithIgnoredProperties, function(store, db, collection) {
-    var sid = 'test_set_ignored_properties_no_stringify-sid';
+  open_db(optionsWithTransientProperties, function(store, db, collection) {
+    var sid = 'test_set_transient_properties_no_stringify-sid';
     var data = make_data_no_cookie();
-    ignoredProperties.forEach(function(element) {
+    transientProperties.forEach(function(element) {
       data[element] = element;
     });
 
@@ -841,7 +841,7 @@ exports.test_with_ignored_properties_stringify = function(done) {
 
       collection.findOne({_id: sid}, function(err, session) {
         var expectedResult = JSON.parse(JSON.stringify(data));
-        ignoredProperties.forEach(function(element) {
+        transientProperties.forEach(function(element) {
           delete expectedResult[element];
         });
 
