@@ -735,3 +735,123 @@ exports.test_set_witout_default_expiration = function(done) {
     });
   });
 };
+
+exports.test_with_default_ignored_properties_no_stringify = function(done) {
+  var additionalProperties = ['test1','test2','test3'];
+  var optionsWithoutIgnoredProperties = JSON.parse(JSON.stringify(options));
+  optionsWithoutIgnoredProperties['stringify'] = false;
+
+  open_db(optionsWithoutIgnoredProperties, function(store, db, collection) {
+    var sid = 'test_default_ignored_properties_no_stringify-sid';
+    var data = make_data_no_cookie();
+    additionalProperties.forEach(function(element) {
+      data[element] = element;
+    });
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.deepEqual(session.session, data);
+        assert.strictEqual(session._id, sid);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
+
+exports.test_with_default_ignored_properties_stringify = function(done) {
+  var additionalProperties = ['test1','test2','test3'];
+  var optionsWithoutIgnoredProperties = JSON.parse(JSON.stringify(options));
+  optionsWithoutIgnoredProperties['stringify'] = true;
+
+  open_db(optionsWithoutIgnoredProperties, function(store, db, collection) {
+    var sid = 'test_default_ignored_properties_stringify-sid';
+    var data = make_data_no_cookie();
+    additionalProperties.forEach(function(element) {
+      data[element] = element;
+    });
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.deepEqual(session.session, JSON.stringify(data));
+        assert.strictEqual(session._id, sid);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
+
+exports.test_with_ignored_properties_no_stringify = function(done) {
+  var ignoredProperties = ['test1','test2','test3'];
+  var optionsWithIgnoredProperties = JSON.parse(JSON.stringify(options));
+  optionsWithIgnoredProperties['ignoredProperties'] = ignoredProperties;
+  optionsWithIgnoredProperties['stringify'] = false;
+
+  open_db(optionsWithIgnoredProperties, function(store, db, collection) {
+    var sid = 'test_set_ignored_properties_no_stringify-sid';
+    var data = make_data_no_cookie();
+    ignoredProperties.forEach(function(element) {
+      data[element] = element;
+    });
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      collection.findOne({_id: sid}, function(err, session) {
+        var expectedResult = JSON.parse(JSON.stringify(data));
+        ignoredProperties.forEach(function(element) {
+          delete expectedResult[element];
+        });
+
+        assert.deepEqual(session.session, expectedResult);
+        assert.strictEqual(session._id, sid);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
+
+exports.test_with_ignored_properties_stringify = function(done) {
+  var ignoredProperties = ['test1','test2','test3'];
+  var optionsWithIgnoredProperties = JSON.parse(JSON.stringify(options));
+  optionsWithIgnoredProperties['ignoredProperties'] = ignoredProperties;
+  optionsWithIgnoredProperties['stringify'] = true;
+
+  open_db(optionsWithIgnoredProperties, function(store, db, collection) {
+    var sid = 'test_set_ignored_properties_no_stringify-sid';
+    var data = make_data_no_cookie();
+    ignoredProperties.forEach(function(element) {
+      data[element] = element;
+    });
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      collection.findOne({_id: sid}, function(err, session) {
+        var expectedResult = JSON.parse(JSON.stringify(data));
+        ignoredProperties.forEach(function(element) {
+          delete expectedResult[element];
+        });
+
+        assert.deepEqual(session.session, JSON.stringify(expectedResult));
+        assert.strictEqual(session._id, sid);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
