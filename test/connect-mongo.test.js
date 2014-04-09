@@ -8,14 +8,16 @@ var MongoStore = require('../')(connect);
 var assert = require('assert');
 
 var defaultOptions = {w: 1};
-var options = {db: 'connect-mongo-test'};
+var testDb = 'connect-mongo-test'
+var testHost = 'localdb'
+var options = {db: testDb, host: testHost};
 var mongo = require('mongodb');
 
 var mongoose = require('mongoose');
-var testMongooseDb = mongoose.connect('mongodb://127.0.0.1:27017/connect-mongo-test');
+var testMongooseDb = mongoose.connect('mongodb://' + testHost + ':27017/' + testDb + '');
 var options_with_mongoose_connection = { mongoose_connection: testMongooseDb.connections[0] };
 
-var testMongoNativeDb = new mongo.Db("connect-mongo-test", new mongo.Server('127.0.0.1', 27017, {}), { w: defaultOptions.w });
+var testMongoNativeDb = new mongo.Db(testDb, new mongo.Server(testHost, 27017, {}), { w: defaultOptions.w });
 var options_with_mongo_native_db = {db: testMongoNativeDb}
 
 // Create a connect cookie instance
@@ -94,7 +96,7 @@ var auth_or_not = function(store, db, options, callback){
 var open_db = function(options, callback) {
   var store = new MongoStore(options);
   var db;
-  
+
   if (options.mongoose_connection) {
     db = new mongo.Db(options.mongoose_connection.db.databaseName,
       new mongo.Server(options.mongoose_connection.db.serverConfig.host,
@@ -105,9 +107,9 @@ var open_db = function(options, callback) {
   } else if (typeof options.db == "object") {
     db = options.db
   } else {
-    db = new mongo.Db(options.db, new mongo.Server('127.0.0.1', 27017, {}), { w: options.w || defaultOptions.w });
+    db = new mongo.Db(options.db, new mongo.Server(testHost, 27017, {}), { w: options.w || defaultOptions.w });
   }
-  
+
   if (db.openCalled) {
     auth_or_not(store, db, options, callback);
   } else {
@@ -125,7 +127,7 @@ var cleanup = function(store, db, collection, callback) {
   collection.drop(function(err, result) {
     db.close();
     cleanup_store(store);
-    
+
     callback && callback();
   });
 };
@@ -145,13 +147,13 @@ exports.test_set = function(done) {
         cleanup(store, db, collection, function() {
           done();
         });
-      });  
+      });
     });
   });
 };
 
 exports.test_set_no_stringify = function(done) {
-  open_db({db: options.db, stringify: false}, function(store, db, collection) {
+  open_db({db: options.db, host: testHost, stringify: false}, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
@@ -161,11 +163,11 @@ exports.test_set_no_stringify = function(done) {
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
         assert_session_equals(sid, data, session);
-        
+
         cleanup(store, db, collection, function() {
           done();
         });
-      });  
+      });
     });
   });
 };
@@ -174,7 +176,7 @@ exports.test_session_cookie_overwrite_no_stringify = function(done) {
   var origSession = make_data();
   var cookie = origSession.cookie;
 
-  open_db({db: options.db, stringify: false}, function(store, db, collection) {
+  open_db({db: options.db, host: testHost, stringify: false}, function(store, db, collection) {
     var sid = 'test_set-sid';
     store.set(sid, origSession, function(err, session) {
       assert.strictEqual(err, null);
@@ -190,7 +192,7 @@ exports.test_session_cookie_overwrite_no_stringify = function(done) {
         cleanup(store, db, collection, function() {
           done();
         });
-      }); 
+      });
     });
   });
 };
@@ -217,7 +219,7 @@ exports.test_set_expires = function(done) {
 
 
 exports.test_set_expires_no_stringify = function(done) {
-  open_db({db: options.db, stringify: false}, function(store, db, collection) {
+  open_db({db: options.db, host: testHost, stringify: false}, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
@@ -227,11 +229,11 @@ exports.test_set_expires_no_stringify = function(done) {
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
         assert_session_equals(sid, data, session);
-        
+
         cleanup(store, db, collection, function() {
           done();
         });
-      });  
+      });
     });
   });
 };
@@ -241,7 +243,7 @@ exports.test_get = function(done) {
     var sid = 'test_get-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
       store.get(sid, function(err, session) {
-        assert.deepEqual(session, {key1: 1, key2: 'two'});        
+        assert.deepEqual(session, {key1: 1, key2: 'two'});
         cleanup(store, db, collection, function() {
           done();
         });
@@ -290,7 +292,7 @@ exports.test_clear = function(done) {
           cleanup(store, db, collection, function() {
             done();
           });
-        });        
+        });
       });
     });
   });
@@ -298,10 +300,10 @@ exports.test_clear = function(done) {
 
 exports.test_options_url = function(done) {
   var store = new MongoStore({
-    url: 'mongodb://127.0.0.1:27017/connect-mongo-test/sessions-test'
+    url: 'mongodb://' + testHost + ':27017/' + testDb + '/sessions-test'
   }, function() {
-    assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
-    assert.strictEqual(store.db.serverConfig.host, '127.0.0.1');
+    assert.strictEqual(store.db.databaseName, testDb);
+    assert.strictEqual(store.db.serverConfig.host, testHost);
     assert.equal(store.db.serverConfig.port, 27017);
     assert.equal(store.collection.collectionName, 'sessions-test');
     cleanup_store(store);
@@ -311,10 +313,10 @@ exports.test_options_url = function(done) {
 
 exports.test_options_url_auth = function(done) {
   var store = new MongoStore({
-    url: 'mongodb://test:test@127.0.0.1:27017/connect-mongo-test/sessions-test'
+    url: 'mongodb://test:test@' + testHost + ':27017/' + testDb + '/sessions-test'
   }, function() {
-    assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
-    assert.strictEqual(store.db.serverConfig.host, '127.0.0.1');
+    assert.strictEqual(store.db.databaseName, testDb);
+    assert.strictEqual(store.db.serverConfig.host, testHost);
     assert.equal(store.db.serverConfig.port, 27017);
     assert.equal(store.collection.collectionName, 'sessions-test');
     cleanup_store(store);
@@ -334,12 +336,12 @@ exports.test_options_no_db = function(done) {
 
 exports.test_options_url_and_db = function(done){
   var store = new MongoStore({
-    url: 'mongodb://test:test@127.0.0.1:27017/',
-    db : 'connect-mongo-test',
+    url: 'mongodb://test:test@' + testHost + ':27017/',
+    db : testDb,
     collection:'sessions-test'
   }, function() {
-    assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
-    assert.strictEqual(store.db.serverConfig.host, '127.0.0.1');
+    assert.strictEqual(store.db.databaseName, testDb);
+    assert.strictEqual(store.db.serverConfig.host, testHost);
     assert.equal(store.db.serverConfig.port, 27017);
     assert.equal(store.collection.collectionName, 'sessions-test');
     cleanup_store(store);
@@ -380,7 +382,7 @@ exports.test_set_no_stringify_with_raw_db = function(done) {
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
         assert_session_equals(sid, data, session);
-        
+
         cleanup(store, db, collection, function() {
           done();
         });
@@ -393,14 +395,14 @@ exports.test_set_expires_with_raw_db = function(done) {
   open_db(options_with_mongoose_connection, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
-    
+
     store.set(sid, data, function(err, session) {
       assert.strictEqual(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
         assert_session_equals(sid, data, session);
-        
+
         cleanup(store, db, collection, function() {
           done();
         });
@@ -442,7 +444,7 @@ exports.test_get_with_raw_db = function(done) {
       store.get(sid, function(err, session) {
         assert.strictEqual(err, null);
         assert.deepEqual(session, {key1: 1, key2: 'two'});
-          
+
         cleanup(store, db, collection, function() {
           done();
         });
@@ -458,7 +460,7 @@ exports.test_length_with_raw_db = function(done) {
       store.length(function(err, length) {
         assert.strictEqual(err, null);
         assert.strictEqual(length, 1);
-          
+
         cleanup(store, db, collection, function() {
           done();
         });
@@ -473,7 +475,7 @@ exports.test_destroy_ok_with_raw_db = function(done) {
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
       store.destroy(sid, function(err) {
         assert.strictEqual(err, undefined);
-          
+
         cleanup(store, db, collection, function() {
           done();
         });
@@ -494,7 +496,7 @@ exports.test_clear_with_raw_db = function(done) {
           cleanup(store, db, collection, function() {
             done();
           });
-        });        
+        });
       });
     });
   });
@@ -543,7 +545,7 @@ exports.test_set_no_stringify_with_native_db = function(done) {
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
         assert_session_equals(sid, data, session);
-        
+
         cleanup(store, db, collection, function() {
           done();
         });
@@ -556,7 +558,7 @@ exports.test_set_expires_with_native_db = function(done) {
   open_db(options_with_mongo_native_db, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
-    
+
     store.set(sid, data, function(err, session) {
       assert.strictEqual(err, null);
 
@@ -589,11 +591,11 @@ exports.test_set_expires_no_stringify_with_native_db = function(done) {
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
         assert_session_equals(sid, data, session);
-        
+
         cleanup(store, db, collection, function() {
           done();
         });
-      });  
+      });
     });
   });
 };
@@ -605,7 +607,7 @@ exports.test_get_with_native_db = function(done) {
       store.get(sid, function(err, session) {
         assert.strictEqual(err, null);
         assert.deepEqual(session, {key1: 1, key2: 'two'});
-          
+
         cleanup(store, db, collection, function() {
           done();
         });
@@ -621,7 +623,7 @@ exports.test_length_with_native_db = function(done) {
       store.length(function(err, length) {
         assert.strictEqual(err, null);
         assert.strictEqual(length, 1);
-          
+
         cleanup(store, db, collection, function() {
           done();
         });
@@ -636,7 +638,7 @@ exports.test_destroy_ok_with_native_db = function(done) {
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
       store.destroy(sid, function(err) {
         assert.strictEqual(err, undefined);
-          
+
         cleanup(store, db, collection, function() {
           done();
         });
@@ -657,7 +659,7 @@ exports.test_clear_with_native_db = function(done) {
           cleanup(store, db, collection, function() {
             done();
           });
-        });        
+        });
       });
     });
   });
