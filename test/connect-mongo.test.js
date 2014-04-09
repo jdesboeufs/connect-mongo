@@ -9,7 +9,7 @@ var assert = require('assert');
 
 var defaultOptions = {w: 1};
 var testDb = 'connect-mongo-test'
-var testHost = 'localdb'
+var testHost = '127.0.0.1'
 var options = {db: testDb, host: testHost};
 var mongo = require('mongodb');
 
