@@ -37,7 +37,19 @@ starting your app.
 
 ## Example
 
-With express:
+With express4:
+    
+    var session    = require('express-session');
+    var MongoStore = require('connect-mongo')(session);
+
+    app.use(session({
+        secret: settings.cookie_secret,
+        store: new MongoStore({
+          db : settings.db,
+        })
+      }));
+
+With express<4:
 
     var express = require('express');
     var MongoStore = require('connect-mongo')(express);
