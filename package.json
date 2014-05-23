@@ -1,6 +1,6 @@
 {
   "name": "connect-mongo",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "MongoDB session store for Connect",
   "keywords": ["connect", "mongo", "mongodb", "session", "express"],
   "author": "Casey Banner <kcbanner@gmail.com>",
@@ -12,7 +12,7 @@
       "url": "https://github.com/kcbanner/connect-mongo/issues"
   },
   "dependencies": {
-    "mongodb": "1.3.x"
+    "mongodb": "1.4.x"
   },
   "directories": {
       "lib":"./lib"
