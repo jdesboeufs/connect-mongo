@@ -309,6 +309,19 @@ exports.test_options_url = function(done) {
   });
 };
 
+exports.test_options_uri = function(done) {
+  var store = new MongoStore({
+    uri: 'mongodb://127.0.0.1:27017/connect-mongo-test'
+  }, function() {
+    assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
+    assert.strictEqual(store.db.serverConfig.host, '127.0.0.1');
+    assert.equal(store.db.serverConfig.port, 27017);
+    assert.equal(store.collection.collectionName, 'sessions');
+    cleanup_store(store);
+    done();
+  });
+};
+
 exports.test_options_url_auth = function(done) {
   var store = new MongoStore({
     url: 'mongodb://test:test@127.0.0.1:27017/connect-mongo-test/sessions-test'
