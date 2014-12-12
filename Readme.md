@@ -30,6 +30,13 @@ via npm:
                 setting them, and deserialize them with `JSON.parse` when getting them.
                 (optional, default: true). This is useful if you are using types that 
                 MongoDB doesn't support.
+  - `serialize` Custom hook for serializing sessions to MongoDB. This is helpful if you need
+                to modify the session before writing it out. It takes precedence over the
+                `stringify` option.
+  - `unserialize` Custom hook for unserializing sessions from MongoDB. This can be used in
+                scenarios where you need to support different types of serializations
+                (e.g., objects and JSON strings) or need to modify the session before using
+                it in your app. It takes precedence over the `stringify` option.
 
 The second parameter to the `MongoStore` constructor is a callback which will be called once the database connection is established.
 This is mainly used for the tests, however you can use this callback if you want to wait until the store has connected before
