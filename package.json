@@ -18,8 +18,8 @@
       "lib":"./lib"
   },
   "devDependencies": {
+    "connect": "2.27.6",
     "mocha": "1.x",
-    "connect": ">= 1.x",
     "mongoose": ">= 2.6.x"
   },
   "scripts" : { "test": "make test" },
