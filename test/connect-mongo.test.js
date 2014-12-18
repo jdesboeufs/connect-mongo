@@ -735,3 +735,123 @@ exports.test_set_witout_default_expiration = function(done) {
     });
   });
 };
+
+exports.test_with_default_transient_properties_no_stringify = function(done) {
+  var additionalProperties = ['test1','test2','test3'];
+  var optionsWithoutTransientProperties = JSON.parse(JSON.stringify(options));
+  optionsWithoutTransientProperties['stringify'] = false;
+
+  open_db(optionsWithoutTransientProperties, function(store, db, collection) {
+    var sid = 'test_default_transient_properties_no_stringify-sid';
+    var data = make_data_no_cookie();
+    additionalProperties.forEach(function(element) {
+      data[element] = element;
+    });
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.deepEqual(session.session, data);
+        assert.strictEqual(session._id, sid);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
+
+exports.test_with_default_transient_properties_stringify = function(done) {
+  var additionalProperties = ['test1','test2','test3'];
+  var optionsWithoutTransientProperties = JSON.parse(JSON.stringify(options));
+  optionsWithoutTransientProperties['stringify'] = true;
+
+  open_db(optionsWithoutTransientProperties, function(store, db, collection) {
+    var sid = 'test_default_transient_properties_stringify-sid';
+    var data = make_data_no_cookie();
+    additionalProperties.forEach(function(element) {
+      data[element] = element;
+    });
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.deepEqual(session.session, JSON.stringify(data));
+        assert.strictEqual(session._id, sid);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
+
+exports.test_with_transient_properties_no_stringify = function(done) {
+  var transientProperties = ['test1','test2','test3'];
+  var optionsWithTransientProperties = JSON.parse(JSON.stringify(options));
+  optionsWithTransientProperties['transientProperties'] = transientProperties;
+  optionsWithTransientProperties['stringify'] = false;
+
+  open_db(optionsWithTransientProperties, function(store, db, collection) {
+    var sid = 'test_set_transient_properties_no_stringify-sid';
+    var data = make_data_no_cookie();
+    transientProperties.forEach(function(element) {
+      data[element] = element;
+    });
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      collection.findOne({_id: sid}, function(err, session) {
+        var expectedResult = JSON.parse(JSON.stringify(data));
+        transientProperties.forEach(function(element) {
+          delete expectedResult[element];
+        });
+
+        assert.deepEqual(session.session, expectedResult);
+        assert.strictEqual(session._id, sid);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
+
+exports.test_with_transient_properties_stringify = function(done) {
+  var transientProperties = ['test1','test2','test3'];
+  var optionsWithTransientProperties = JSON.parse(JSON.stringify(options));
+  optionsWithTransientProperties['transientProperties'] = transientProperties;
+  optionsWithTransientProperties['stringify'] = true;
+
+  open_db(optionsWithTransientProperties, function(store, db, collection) {
+    var sid = 'test_set_transient_properties_no_stringify-sid';
+    var data = make_data_no_cookie();
+    transientProperties.forEach(function(element) {
+      data[element] = element;
+    });
+
+    store.set(sid, data, function(err, session) {
+      assert.strictEqual(err, null);
+
+      collection.findOne({_id: sid}, function(err, session) {
+        var expectedResult = JSON.parse(JSON.stringify(data));
+        transientProperties.forEach(function(element) {
+          delete expectedResult[element];
+        });
+
+        assert.deepEqual(session.session, JSON.stringify(expectedResult));
+        assert.strictEqual(session._id, sid);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
