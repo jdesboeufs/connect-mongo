@@ -737,3 +737,54 @@ exports.test_set_witout_default_expiration = function(done) {
     });
   });
 };
+
+exports.test_set_custom_serializer = function (done) {
+  open_db({
+    db: options.db,
+    serialize: function (obj) {
+      obj.ice = 'test-1';
+      return JSON.stringify(obj)
+    }
+  }, function (store, db, collection) {
+    var sid = 'test_set_custom_serializer-sid';
+    var data = make_data(),
+      dataWithIce = JSON.parse(JSON.stringify(data));
+
+    dataWithIce.ice = 'test-1';
+    store.set(sid, data, function (err, session) {
+      assert.strictEqual(err, null);
+
+      collection.findOne({_id: sid}, function (err, session) {
+        assert.deepEqual(session.session, JSON.stringify(dataWithIce));
+        assert.strictEqual(session._id, sid);
+
+        cleanup(store, db, collection, done);
+      });
+    });
+  });
+};
+
+exports.test_get_custom_unserializer = function (done) {
+  open_db({
+    db: options.db,
+    unserialize: function (str) {
+      var obj = JSON.parse(str);
+      obj.ice = 'test-2';
+      return obj;
+    }
+  }, function (store, db, collection) {
+    var sid = 'test_get_custom_unserializer-sid';
+    var data = make_data(),
+      dataWithIce = JSON.parse(JSON.stringify(data));
+
+    dataWithIce.ice = 'test-2';
+    store.set(sid, data, function (err, session) {
+      assert.strictEqual(err, null);
+      store.get(sid, function (err, session) {
+        assert.strictEqual(err, null);
+        assert.deepEqual(session, dataWithIce);
+        cleanup(store, db, collection, done);
+      });
+    });
+  });
+};
