@@ -767,22 +767,20 @@ exports.test_set_custom_serializer = function (done) {
 exports.test_get_custom_unserializer = function (done) {
   open_db({
     db: options.db,
-    unserialize: function (str) {
-      var obj = JSON.parse(str);
+    unserialize: function (obj) {
       obj.ice = 'test-2';
       return obj;
     }
   }, function (store, db, collection) {
     var sid = 'test_get_custom_unserializer-sid';
-    var data = make_data(),
-      dataWithIce = JSON.parse(JSON.stringify(data));
-
-    dataWithIce.ice = 'test-2';
+    var data = make_data();
     store.set(sid, data, function (err, session) {
       assert.strictEqual(err, null);
       store.get(sid, function (err, session) {
+        data.ice = 'test-2';
+        data.cookie = data.cookie.toJSON();
         assert.strictEqual(err, null);
-        assert.deepEqual(session, dataWithIce);
+        assert.deepEqual(session, data);
         cleanup(store, db, collection, done);
       });
     });
