@@ -1,3 +1,4 @@
+/*jshint -W030, unused: false */
 
 /**
  * Module dependencies.
@@ -8,8 +9,8 @@ var MongoStore = require('../')(connect);
 var assert = require('assert');
 
 var defaultOptions = {w: 1};
-var testDb = 'connect-mongo-test'
-var testHost = '127.0.0.1'
+var testDb = 'connect-mongo-test';
+var testHost = '127.0.0.1';
 var options = {db: testDb, host: testHost};
 var mongo = require('mongodb');
 
@@ -18,7 +19,7 @@ var testMongooseDb = mongoose.connect('mongodb://' + testHost + ':27017/' + test
 var options_with_mongoose_connection = { mongoose_connection: testMongooseDb.connections[0] };
 
 var testMongoNativeDb = new mongo.Db(testDb, new mongo.Server(testHost, 27017, {}), { w: defaultOptions.w });
-var options_with_mongo_native_db = {db: testMongoNativeDb}
+var options_with_mongo_native_db = {db: testMongoNativeDb};
 
 // Create a connect cookie instance
 var make_cookie = function() {
@@ -104,8 +105,8 @@ var open_db = function(options, callback) {
         options.mongoose_connection.db.serverConfig.options
       ),
       { w: options.w || defaultOptions.w });
-  } else if (typeof options.db == "object") {
-    db = options.db
+  } else if (typeof options.db === 'object') {
+    db = options.db;
   } else {
     db = new mongo.Db(options.db, new mongo.Server(testHost, 27017, {}), { w: options.w || defaultOptions.w });
   }
@@ -678,7 +679,7 @@ exports.test_options_bad_db_with_native_db = function(done) {
 exports.test_set_default_expiration = function(done) {
   var defaultExpirationTime = 10101;
   var optionsWithExpirationTime = JSON.parse(JSON.stringify(options));
-  optionsWithExpirationTime['defaultExpirationTime'] = defaultExpirationTime;
+  optionsWithExpirationTime.defaultExpirationTime = defaultExpirationTime;
 
   open_db(optionsWithExpirationTime, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
@@ -743,7 +744,7 @@ exports.test_set_custom_serializer = function (done) {
     db: options.db,
     serialize: function (obj) {
       obj.ice = 'test-1';
-      return JSON.stringify(obj)
+      return JSON.stringify(obj);
     }
   }, function (store, db, collection) {
     var sid = 'test_set_custom_serializer-sid';
