@@ -273,7 +273,7 @@ exports.test_destroy_ok = function(done) {
     var sid = 'test_destroy_ok-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
       store.destroy(sid, function(err) {
-        assert.strictEqual(err, undefined);
+        assert.strictEqual(err, null);
         cleanup(store, db, collection, function() {
           done();
         });
@@ -475,7 +475,7 @@ exports.test_destroy_ok_with_raw_db = function(done) {
     var sid = 'test_destroy_ok-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
       store.destroy(sid, function(err) {
-        assert.strictEqual(err, undefined);
+        assert.strictEqual(err, null);
 
         cleanup(store, db, collection, function() {
           done();
@@ -638,7 +638,7 @@ exports.test_destroy_ok_with_native_db = function(done) {
     var sid = 'test_destroy_ok-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
       store.destroy(sid, function(err) {
-        assert.strictEqual(err, undefined);
+        assert.strictEqual(err, null);
 
         cleanup(store, db, collection, function() {
           done();
