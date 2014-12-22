@@ -18,7 +18,7 @@
     "url": "https://github.com/kcbanner/connect-mongo/issues"
   },
   "dependencies": {
-    "debug": "^2.1.0",
+    "debug": ">= 0.7.0",
     "mongodb": "1.4.x"
   },
   "devDependencies": {
