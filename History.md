@@ -1,8 +1,15 @@
-0.4.2 / 2014-05-23
+0.4.3 / In development
 ==================
 
-  * Bumped mongodb version from 1.3.x to 1.4.x
-  * Add sid hash capability
+* Improve error management
+
+
+0.4.2 / 2014-12-18
+==================
+
+  * Bumped mongodb version from 1.3.x to 1.4.x (B0k0)
+  * Add `sid` hash capability (ZheFeng)
+  * Add `serialize` and `unserialize` options (ksheedlo)
 
 
 0.3.3 / 2013-07-04
