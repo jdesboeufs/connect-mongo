@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "debug": ">= 0.7.0",
-    "mongodb": "1.4.x"
+    "mongodb": ">= 1.2.0 <2.0.0"
   },
   "devDependencies": {
     "connect": "2.27.6",

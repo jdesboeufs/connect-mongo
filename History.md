@@ -2,6 +2,7 @@
 ==================
 
 * Improve error management
+* Compatibility with `mongodb` `>= 1.2.0` and `< 2.0.0`
 
 
 0.4.2 / 2014-12-18
