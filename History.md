@@ -1,6 +1,7 @@
-0.4.3 / In development
+0.5.0 / In development
 ==================
 
+* [BREAKING] `auto_reconnect` option is now `true` by default
 * Improve error management
 * Compatibility with `mongodb` `>= 1.2.0` and `< 2.0.0`
 
