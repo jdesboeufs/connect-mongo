@@ -1,3 +1,5 @@
+/* jshint camelcase: false */
+
 /**
  * Module dependencies.
  */

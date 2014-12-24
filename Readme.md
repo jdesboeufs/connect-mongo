@@ -23,12 +23,12 @@ via npm:
   - `port` MongoDB server port (optional, default: `27017`)
   - `username` Username (optional)
   - `password` Password (optional)
-  - `auto_reconnect` This is passed directly to the MongoDB `Server` constructor as the auto_reconnect
+  - `autoReconnect` This is passed directly to the MongoDB `Server` constructor as the auto_reconnect
                      option (optional, default: true).
   - `ssl` Use SSL to connect to MongoDB (optional, default: false).
   - `url` Connection url of the form: `mongodb://user:pass@host:port/database/collection`.
           If provided, information in the URL takes priority over the other options.
-  - `mongoose_connection` in the form: `someMongooseDb.connections[0]` to use an existing mongoose connection. (optional)
+  - `mongooseConnection` in the form: `someMongooseDb.connections[0]` to use an existing mongoose connection. (optional)
   - `stringify` If true, connect-mongo will serialize sessions using `JSON.stringify` before
                 setting them, and deserialize them with `JSON.parse` when getting them.
                 (optional, default: true). This is useful if you are using types that
