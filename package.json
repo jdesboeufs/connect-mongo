@@ -1,6 +1,6 @@
 {
   "name": "connect-mongo",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "MongoDB session store for Connect",
   "keywords": [
     "connect",
@@ -24,7 +24,7 @@
   "devDependencies": {
     "connect": "2.27.6",
     "mocha": "1.x",
-    "mongoose": ">= 2.6.x"
+    "mongoose": ">= 2.6.0 < 4.0.0"
   },
   "scripts": {
     "test": "make test"

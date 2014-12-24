@@ -1,5 +1,3 @@
-/*jshint -W030, unused: false */
-
 /**
  * Module dependencies.
  */
@@ -15,11 +13,6 @@ var options = {db: testDb, host: testHost};
 var mongo = require('mongodb');
 
 var mongoose = require('mongoose');
-var testMongooseDb = mongoose.connect('mongodb://' + testHost + ':27017/' + testDb + '');
-var options_with_mongoose_connection = { mongoose_connection: testMongooseDb.connections[0] };
-
-var testMongoNativeDb = new mongo.Db(testDb, new mongo.Server(testHost, 27017, {}), { w: defaultOptions.w });
-var options_with_mongo_native_db = {db: testMongoNativeDb};
 
 // Create a connect cookie instance
 var make_cookie = function() {
@@ -30,6 +23,14 @@ var make_cookie = function() {
 
   return cookie;
 };
+
+function getNativeDb() {
+  return new mongo.Db(testDb, new mongo.Server(testHost, 27017, {}), { w: defaultOptions.w });
+}
+
+function getMongooseConnection() {
+  return mongoose.createConnection('mongodb://' + testHost + ':27017/' + testDb);
+}
 
 // Create session data
 var make_data = function() {
@@ -80,44 +81,11 @@ var assert_session_equals = function(sid, data, session) {
   assert.strictEqual(session._id, sid);
 };
 
-var auth_or_not = function(store, db, options, callback){
-  if (options.username && options.password) {
-    db.authenticate(options.username, options.password, function () {
-      db.collection('sessions', function(err, collection) {
-        callback(store, db, collection);
-      });
-    });
-  } else {
-    db.collection('sessions', function(err, collection) {
-      callback(store, db, collection);
-    });
-  }
-};
-
 var open_db = function(options, callback) {
   var store = new MongoStore(options);
-  var db;
-
-  if (options.mongoose_connection) {
-    db = new mongo.Db(options.mongoose_connection.db.databaseName,
-      new mongo.Server(options.mongoose_connection.db.serverConfig.host,
-        options.mongoose_connection.db.serverConfig.port,
-        options.mongoose_connection.db.serverConfig.options
-      ),
-      { w: options.w || defaultOptions.w });
-  } else if (typeof options.db === 'object') {
-    db = options.db;
-  } else {
-    db = new mongo.Db(options.db, new mongo.Server(testHost, 27017, {}), { w: options.w || defaultOptions.w });
-  }
-
-  if (db.openCalled) {
-    auth_or_not(store, db, options, callback);
-  } else {
-    db.open(function(err) {
-      auth_or_not(store, db, options, callback);
-    });
-  }
+  store.once('connected', function () {
+    callback(this, this.db, this.collection);
+  });
 };
 
 var cleanup_store = function(store) {
@@ -125,11 +93,10 @@ var cleanup_store = function(store) {
 };
 
 var cleanup = function(store, db, collection, callback) {
-  collection.drop(function(err, result) {
+  collection.drop(function() {
     db.close();
     cleanup_store(store);
-
-    callback && callback();
+    callback();
   });
 };
 
@@ -138,8 +105,8 @@ exports.test_set = function(done) {
     var sid = 'test_set-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -158,8 +125,8 @@ exports.test_set_no_stringify = function(done) {
     var sid = 'test_set-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -179,8 +146,8 @@ exports.test_session_cookie_overwrite_no_stringify = function(done) {
 
   open_db({db: options.db, host: testHost, stringify: false}, function(store, db, collection) {
     var sid = 'test_set-sid';
-    store.set(sid, origSession, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, origSession, function(err) {
+      assert.equal(err, null);
 
       collection.findOne({_id: sid}, function(err, session) {
         // Make sure cookie came out intact
@@ -203,8 +170,8 @@ exports.test_set_expires = function(done) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -224,8 +191,8 @@ exports.test_set_expires_no_stringify = function(done) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -242,7 +209,7 @@ exports.test_set_expires_no_stringify = function(done) {
 exports.test_get = function(done) {
   open_db(options, function(store, db, collection) {
     var sid = 'test_get-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.get(sid, function(err, session) {
         assert.deepEqual(session, {key1: 1, key2: 'two'});
         cleanup(store, db, collection, function() {
@@ -256,9 +223,9 @@ exports.test_get = function(done) {
 exports.test_length = function(done) {
   open_db(options, function(store, db, collection) {
     var sid = 'test_length-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.length(function(err, length) {
-        assert.strictEqual(err, null);
+        assert.equal(err, null);
         assert.strictEqual(length, 1);
         cleanup(store, db, collection, function() {
           done();
@@ -271,9 +238,9 @@ exports.test_length = function(done) {
 exports.test_destroy_ok = function(done) {
   open_db(options, function(store, db, collection) {
     var sid = 'test_destroy_ok-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.destroy(sid, function(err) {
-        assert.strictEqual(err, null);
+        assert.equal(err, null);
         cleanup(store, db, collection, function() {
           done();
         });
@@ -285,8 +252,8 @@ exports.test_destroy_ok = function(done) {
 exports.test_clear = function(done) {
   open_db(options, function(store, db, collection) {
     var sid = 'test_length-sid';
-    collection.insert({_id: sid, key1: 1, key2: 'two'}, function(error, ids) {
-      store.clear(function(err) {
+    collection.insert({_id: sid, key1: 1, key2: 'two'}, function() {
+      store.clear(function() {
         collection.count(function(err, count) {
           assert.strictEqual(count, 0);
 
@@ -301,8 +268,9 @@ exports.test_clear = function(done) {
 
 exports.test_options_url = function(done) {
   var store = new MongoStore({
-    url: 'mongodb://' + testHost + ':27017/' + testDb + '/sessions-test'
-  }, function() {
+    url: 'mongodb://' + testHost + ':27017/' + testDb, collection: 'sessions-test'
+  });
+  store.once('connected', function() {
     assert.strictEqual(store.db.databaseName, testDb);
     assert.strictEqual(store.db.serverConfig.host, testHost);
     assert.equal(store.db.serverConfig.port, 27017);
@@ -314,8 +282,9 @@ exports.test_options_url = function(done) {
 
 exports.test_options_url_auth = function(done) {
   var store = new MongoStore({
-    url: 'mongodb://test:test@' + testHost + ':27017/' + testDb + '/sessions-test'
-  }, function() {
+    url: 'mongodb://test:test@' + testHost + ':27017/' + testDb, collection: 'sessions-test'
+  });
+  store.once('connected', function() {
     assert.strictEqual(store.db.databaseName, testDb);
     assert.strictEqual(store.db.serverConfig.host, testHost);
     assert.equal(store.db.serverConfig.port, 27017);
@@ -328,7 +297,7 @@ exports.test_options_url_auth = function(done) {
 exports.test_options_no_db = function(done) {
   assert.throws(
     function() {
-      var store = new MongoStore({}, function() {});
+      new MongoStore({});
     },
     Error);
 
@@ -337,10 +306,10 @@ exports.test_options_no_db = function(done) {
 
 exports.test_options_url_and_db = function(done){
   var store = new MongoStore({
-    url: 'mongodb://test:test@' + testHost + ':27017/',
-    db : testDb,
+    url: 'mongodb://test:test@' + testHost + ':27017/' + testDb,
     collection:'sessions-test'
-  }, function() {
+  });
+  store.once('connected', function() {
     assert.strictEqual(store.db.databaseName, testDb);
     assert.strictEqual(store.db.serverConfig.host, testHost);
     assert.equal(store.db.serverConfig.port, 27017);
@@ -353,12 +322,12 @@ exports.test_options_url_and_db = function(done){
 /* options.mongoose_connection tests */
 
 exports.test_set_with_raw_db = function(done) {
-  open_db(options_with_mongoose_connection, function(store, db, collection) {
+  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -373,12 +342,12 @@ exports.test_set_with_raw_db = function(done) {
 };
 
 exports.test_set_no_stringify_with_raw_db = function(done) {
-  open_db({mongoose_connection: options_with_mongoose_connection.mongoose_connection, stringify: false}, function(store, db, collection) {
+  open_db({mongoose_connection: getMongooseConnection(), stringify: false}, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -393,12 +362,12 @@ exports.test_set_no_stringify_with_raw_db = function(done) {
 };
 
 exports.test_set_expires_with_raw_db = function(done) {
-  open_db(options_with_mongoose_connection, function(store, db, collection) {
+  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -415,7 +384,7 @@ exports.test_set_expires_with_raw_db = function(done) {
 
 exports.test_set_expires_no_stringify_with_raw_db = function(done) {
   var options = {
-    mongoose_connection: options_with_mongoose_connection.mongoose_connection,
+    mongoose_connection: { mongoose_connection: getMongooseConnection() }.mongoose_connection,
     stringify: false
   };
 
@@ -423,8 +392,8 @@ exports.test_set_expires_no_stringify_with_raw_db = function(done) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -439,11 +408,11 @@ exports.test_set_expires_no_stringify_with_raw_db = function(done) {
 };
 
 exports.test_get_with_raw_db = function(done) {
-  open_db(options_with_mongoose_connection, function(store, db, collection) {
+  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_get-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.get(sid, function(err, session) {
-        assert.strictEqual(err, null);
+        assert.equal(err, null);
         assert.deepEqual(session, {key1: 1, key2: 'two'});
 
         cleanup(store, db, collection, function() {
@@ -455,11 +424,11 @@ exports.test_get_with_raw_db = function(done) {
 };
 
 exports.test_length_with_raw_db = function(done) {
-  open_db(options_with_mongoose_connection, function(store, db, collection) {
+  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_length-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.length(function(err, length) {
-        assert.strictEqual(err, null);
+        assert.equal(err, null);
         assert.strictEqual(length, 1);
 
         cleanup(store, db, collection, function() {
@@ -471,11 +440,11 @@ exports.test_length_with_raw_db = function(done) {
 };
 
 exports.test_destroy_ok_with_raw_db = function(done) {
-  open_db(options_with_mongoose_connection, function(store, db, collection) {
+  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_destroy_ok-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.destroy(sid, function(err) {
-        assert.strictEqual(err, null);
+        assert.equal(err, null);
 
         cleanup(store, db, collection, function() {
           done();
@@ -486,12 +455,12 @@ exports.test_destroy_ok_with_raw_db = function(done) {
 };
 
 exports.test_clear_with_raw_db = function(done) {
-  open_db(options_with_mongoose_connection, function(store, db, collection) {
+  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_length-sid';
-    collection.insert({_id: sid, key1: 1, key2: 'two'}, function(error, ids) {
-      store.clear(function(err) {
+    collection.insert({_id: sid, key1: 1, key2: 'two'}, function() {
+      store.clear(function() {
         collection.count(function(err, count) {
-          assert.strictEqual(err, null);
+          assert.equal(err, null);
           assert.strictEqual(count, 0);
 
           cleanup(store, db, collection, function() {
@@ -503,25 +472,25 @@ exports.test_clear_with_raw_db = function(done) {
   });
 };
 
-exports.test_options_bad_db_with_raw_db = function(done) {
-  assert.throws(
-    function() {
-      var store = new MongoStore({mongoose_connection: 'foobar'}, function() {});
-    },
-    Error);
+// exports.test_options_bad_db_with_raw_db = function(done) {
+//   assert.throws(
+//     function() {
+//       var store = new MongoStore({mongoose_connection: 'foobar'});
+//     },
+//     Error);
 
-  done();
-};
+//   done();
+// };
 
 /* tests with existing mongodb native db object */
 
 exports.test_set_with_native_db = function(done) {
-  open_db(options_with_mongo_native_db, function(store, db, collection) {
+  open_db({ db: getNativeDb() }, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -536,12 +505,12 @@ exports.test_set_with_native_db = function(done) {
 };
 
 exports.test_set_no_stringify_with_native_db = function(done) {
-  open_db({db: options_with_mongo_native_db.db, stringify: false}, function(store, db, collection) {
+  open_db({ db: getNativeDb(), stringify: false }, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -556,12 +525,12 @@ exports.test_set_no_stringify_with_native_db = function(done) {
 };
 
 exports.test_set_expires_with_native_db = function(done) {
-  open_db(options_with_mongo_native_db, function(store, db, collection) {
+  open_db({ db: getNativeDb() }, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -577,17 +546,14 @@ exports.test_set_expires_with_native_db = function(done) {
 
 
 exports.test_set_expires_no_stringify_with_native_db = function(done) {
-  var options = {
-    db: options_with_mongo_native_db.db,
-    stringify: false
-  };
+  var options = { db: getNativeDb(), stringify: false };
 
   open_db(options, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -602,11 +568,11 @@ exports.test_set_expires_no_stringify_with_native_db = function(done) {
 };
 
 exports.test_get_with_native_db = function(done) {
-  open_db(options_with_mongo_native_db, function(store, db, collection) {
+  open_db({ db: getNativeDb() }, function(store, db, collection) {
     var sid = 'test_get-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.get(sid, function(err, session) {
-        assert.strictEqual(err, null);
+        assert.equal(err, null);
         assert.deepEqual(session, {key1: 1, key2: 'two'});
 
         cleanup(store, db, collection, function() {
@@ -618,11 +584,11 @@ exports.test_get_with_native_db = function(done) {
 };
 
 exports.test_length_with_native_db = function(done) {
-  open_db(options_with_mongo_native_db, function(store, db, collection) {
+  open_db({ db: getNativeDb() }, function(store, db, collection) {
     var sid = 'test_length-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.length(function(err, length) {
-        assert.strictEqual(err, null);
+        assert.equal(err, null);
         assert.strictEqual(length, 1);
 
         cleanup(store, db, collection, function() {
@@ -634,11 +600,11 @@ exports.test_length_with_native_db = function(done) {
 };
 
 exports.test_destroy_ok_with_native_db = function(done) {
-  open_db(options_with_mongo_native_db, function(store, db, collection) {
+  open_db({ db: getNativeDb() }, function(store, db, collection) {
     var sid = 'test_destroy_ok-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function(error, ids) {
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.destroy(sid, function(err) {
-        assert.strictEqual(err, null);
+        assert.equal(err, null);
 
         cleanup(store, db, collection, function() {
           done();
@@ -649,12 +615,12 @@ exports.test_destroy_ok_with_native_db = function(done) {
 };
 
 exports.test_clear_with_native_db = function(done) {
-  open_db(options_with_mongo_native_db, function(store, db, collection) {
+  open_db({ db: getNativeDb() }, function(store, db, collection) {
     var sid = 'test_length-sid';
-    collection.insert({_id: sid, key1: 1, key2: 'two'}, function(error, ids) {
-      store.clear(function(err) {
+    collection.insert({_id: sid, key1: 1, key2: 'two'}, function() {
+      store.clear(function() {
         collection.count(function(err, count) {
-          assert.strictEqual(err, null);
+          assert.equal(err, null);
           assert.strictEqual(count, 0);
 
           cleanup(store, db, collection, function() {
@@ -669,7 +635,7 @@ exports.test_clear_with_native_db = function(done) {
 exports.test_options_bad_db_with_native_db = function(done) {
   assert.throws(
     function() {
-      var store = new MongoStore({db: {}}, function() {});
+      new MongoStore({db: {}});
     },
     Error);
 
@@ -687,8 +653,8 @@ exports.test_set_default_expiration = function(done) {
 
     var timeBeforeSet = new Date().valueOf();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -717,8 +683,8 @@ exports.test_set_witout_default_expiration = function(done) {
 
     var timeBeforeSet = new Date().valueOf();
 
-    store.set(sid, data, function(err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
 
       // Verify it was saved
       collection.findOne({_id: sid}, function(err, session) {
@@ -752,8 +718,8 @@ exports.test_set_custom_serializer = function (done) {
       dataWithIce = JSON.parse(JSON.stringify(data));
 
     dataWithIce.ice = 'test-1';
-    store.set(sid, data, function (err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function (err) {
+      assert.equal(err, null);
 
       collection.findOne({_id: sid}, function (err, session) {
         assert.deepEqual(session.session, JSON.stringify(dataWithIce));
@@ -775,12 +741,12 @@ exports.test_get_custom_unserializer = function (done) {
   }, function (store, db, collection) {
     var sid = 'test_get_custom_unserializer-sid';
     var data = make_data();
-    store.set(sid, data, function (err, session) {
-      assert.strictEqual(err, null);
+    store.set(sid, data, function (err) {
+      assert.equal(err, null);
       store.get(sid, function (err, session) {
         data.ice = 'test-2';
         data.cookie = data.cookie.toJSON();
-        assert.strictEqual(err, null);
+        assert.equal(err, null);
         assert.deepEqual(session, data);
         cleanup(store, db, collection, done);
       });
