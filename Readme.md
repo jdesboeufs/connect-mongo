@@ -2,7 +2,7 @@
 
   MongoDB session store for Connect
 
-  [![Build Status](https://secure.travis-ci.org/kcbanner/connect-mongo.png?branch=master)](http://travis-ci.org/kcbanner/connect-mongo)
+  [![Build Status](https://secure.travis-ci.org/kcbanner/connect-mongo.png?branch=master)](http://travis-ci.org/kcbanner/connect-mongo) [![Dependency Status](https://david-dm.org/kcbanner/connect-mongo.svg)](https://david-dm.org/kcbanner/connect-mongo)
 
 ## Installation
 
