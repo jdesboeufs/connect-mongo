@@ -1,4 +1,4 @@
-0.5.0 / In development
+0.5.0 / 2014-12-25
 ==================
 
 * Accept full-featured [MongoDB connection strings](http://docs.mongodb.org/manual/reference/connection-string/) as `url` + [advanced options](http://mongodb.github.io/node-mongodb-native/1.4/driver-articles/mongoclient.html)
@@ -6,7 +6,7 @@
 * [DEPRECATED] `mongoose_connection` is renamed `mongooseConnection`
 * [DEPRECATED] `auto_reconnect` is renamed `autoReconnect`
 * [BREAKING] `autoReconnect` option is now `true` by default
-* [BREAKING] Pass `collection` option in `url` in not possible any more
+* [BREAKING] Insert `collection` option in `url` in not possible any more
 * [BREAKING] Replace for-testing-purpose `callback` by `connected` event
 * Add debug (use with `DEBUG=connect-mongo`)
 * Improve error management
