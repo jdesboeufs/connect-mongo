@@ -1,3 +1,9 @@
+0.5.1 / 2014-12-28
+==================
+
+* [bugfix] #143 Missing Sessions from DB should still make callback (brekkehj)
+
+
 0.5.0 / 2014-12-25
 ==================
 
