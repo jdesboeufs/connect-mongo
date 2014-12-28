@@ -4,7 +4,7 @@
 * [bugfix] #143 Missing Sessions from DB should still make callback (brekkehj)
 
 
-0.5.0 / 2014-12-25
+0.5.0 (deprecated) / 2014-12-25
 ==================
 
 * Accept full-featured [MongoDB connection strings](http://docs.mongodb.org/manual/reference/connection-string/) as `url` + [advanced options](http://mongodb.github.io/node-mongodb-native/1.4/driver-articles/mongoclient.html)
