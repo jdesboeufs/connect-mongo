@@ -321,10 +321,10 @@ exports.test_options_no_db = function(done) {
 //   });
 // };
 
-/* options.mongoose_connection tests */
+/* options.mongooseConnection tests */
 
 exports.test_set_with_raw_db = function(done) {
-  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
+  open_db({ mongooseConnection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
@@ -344,7 +344,7 @@ exports.test_set_with_raw_db = function(done) {
 };
 
 exports.test_set_no_stringify_with_raw_db = function(done) {
-  open_db({mongoose_connection: getMongooseConnection(), stringify: false}, function(store, db, collection) {
+  open_db({mongooseConnection: getMongooseConnection(), stringify: false}, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
@@ -364,7 +364,7 @@ exports.test_set_no_stringify_with_raw_db = function(done) {
 };
 
 exports.test_set_expires_with_raw_db = function(done) {
-  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
+  open_db({ mongooseConnection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
@@ -386,7 +386,7 @@ exports.test_set_expires_with_raw_db = function(done) {
 
 exports.test_set_expires_no_stringify_with_raw_db = function(done) {
   var options = {
-    mongoose_connection: { mongoose_connection: getMongooseConnection() }.mongoose_connection,
+    mongooseConnection: { mongooseConnection: getMongooseConnection() }.mongooseConnection,
     stringify: false
   };
 
@@ -410,7 +410,7 @@ exports.test_set_expires_no_stringify_with_raw_db = function(done) {
 };
 
 exports.test_get_with_raw_db = function(done) {
-  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
+  open_db({ mongooseConnection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_get-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.get(sid, function(err, session) {
@@ -426,7 +426,7 @@ exports.test_get_with_raw_db = function(done) {
 };
 
 exports.test_length_with_raw_db = function(done) {
-  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
+  open_db({ mongooseConnection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_length-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.length(function(err, length) {
@@ -442,7 +442,7 @@ exports.test_length_with_raw_db = function(done) {
 };
 
 exports.test_destroy_ok_with_raw_db = function(done) {
-  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
+  open_db({ mongooseConnection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_destroy_ok-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.destroy(sid, function(err) {
@@ -457,7 +457,7 @@ exports.test_destroy_ok_with_raw_db = function(done) {
 };
 
 exports.test_clear_with_raw_db = function(done) {
-  open_db({ mongoose_connection: getMongooseConnection() }, function(store, db, collection) {
+  open_db({ mongooseConnection: getMongooseConnection() }, function(store, db, collection) {
     var sid = 'test_length-sid';
     collection.insert({_id: sid, key1: 1, key2: 'two'}, function() {
       store.clear(function() {
@@ -477,7 +477,7 @@ exports.test_clear_with_raw_db = function(done) {
 // exports.test_options_bad_db_with_raw_db = function(done) {
 //   assert.throws(
 //     function() {
-//       var store = new MongoStore({mongoose_connection: 'foobar'});
+//       var store = new MongoStore({mongooseConnection: 'foobar'});
 //     },
 //     Error);
 
