@@ -23,7 +23,7 @@
     "mongodb": ">= 1.2.0 <2.0.0"
   },
   "devDependencies": {
-    "connect": "2.27.6",
+    "express-session": ">= 1.0.0",
     "mocha": "~2.1.0",
     "mongoose": ">= 2.6.0 < 4.0.0"
   },

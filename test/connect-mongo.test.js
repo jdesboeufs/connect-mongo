@@ -4,8 +4,8 @@
  * Module dependencies.
  */
 
-var connect = require('connect');
-var MongoStore = require('../')(connect);
+var session = require('express-session');
+var MongoStore = require('../')(session);
 var assert = require('assert');
 
 var defaultOptions = {w: 1};
@@ -18,7 +18,7 @@ var mongoose = require('mongoose');
 
 // Create a connect cookie instance
 var make_cookie = function() {
-  var cookie = new connect.session.Cookie();
+  var cookie = new session.Cookie();
   cookie.maxAge = 10000; // This sets cookie.expire through a setter
   cookie.secure = true;
   cookie.domain = 'cow.com';
