@@ -20,7 +20,7 @@
   "dependencies": {
     "debug": ">= 0.7.0",
     "depd": ">= 0.4.0",
-    "mongodb": ">= 1.2.0"
+    "mongodb": ">= 1.2.0 <2.1.0"
   },
   "devDependencies": {
     "express-session": ">= 1.0.0",
