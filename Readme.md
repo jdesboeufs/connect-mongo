@@ -6,9 +6,8 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 
 ## Compatibility
 
-* Support Express `4.x` and Connect `3.x` through [express-session](https://github.com/expressjs/session)
+* Support Express `4.x`, `5.0` and Connect `3.x` through [express-session](https://github.com/expressjs/session)
 * Support Express `2.x`, `3.x` and Connect `>= 1.0.3`, `2.x`
-* May support upcoming Express `5.x`
 * Support [Mongoose](http://mongoosejs.com/index.html) `>= 2.6` and `3.x`
 * Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 1.2` and `2.0`
 * Support Node.js `0.8`, `0.10` and `0.11`
@@ -17,7 +16,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 
 ### Express or Connect integration
 
-Express `4.x` and Connect `3.x`:
+Express `4.x`, `5.0` and Connect `3.x`:
 
 ```js
 var session = require('express-session');
