@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "connect": "2.27.6",
-    "mocha": "1.x",
+    "mocha": "~2.1.0",
     "mongoose": ">= 2.6.0 < 4.0.0"
   },
   "scripts": {
