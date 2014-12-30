@@ -1,4 +1,4 @@
-0.5.3 / In development
+0.5.3 / 2014-12-30
 ==================
 
 * Make callbacks optional
