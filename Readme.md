@@ -171,7 +171,7 @@ The tests use a database called `connect-mongo-test`.
 
 (The MIT License)
 
-Copyright (c) 2011 Casey Banner &lt;kcbanner@gmail.com&gt;
+Copyright (c) 2011-2015 Casey Banner &lt;kcbanner@gmail.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

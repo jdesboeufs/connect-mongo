@@ -3,7 +3,6 @@
 /**
  * Module dependencies.
  */
-
 var session = require('express-session');
 var MongoStore = require('../')(session);
 var assert = require('assert');
