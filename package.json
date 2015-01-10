@@ -24,11 +24,13 @@
   },
   "devDependencies": {
     "express-session": ">= 1.0.0",
+    "grunt-contrib-jshint": "~0.10.0",
+    "jshint-stylish": "~1.0.0",
     "mocha": "~2.1.0",
     "mongoose": ">= 2.6.0 < 4.0.0"
   },
   "scripts": {
-    "test": "make test"
+    "test": "grunt && make test"
   },
   "main": "./lib/connect-mongo"
 }
