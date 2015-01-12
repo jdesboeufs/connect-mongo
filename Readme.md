@@ -128,9 +128,74 @@ app.use(session({
 }));
 ```
 
+## Session expiration
+
+When the session cookie has an expiration date, `connect-mongo` will use it.
+
+Otherwise, it will create a new one, using `ttl` option.
+
+```js
+app.use(session({
+    store: new MongoStore({
+      url: 'mongodb://localhost/test-app',
+      ttl: 14 * 3600 // = 14 days. Default
+    })
+}));
+```
+
+__Note:__ Each time an user interacts with the server, its session expiration date is refreshed.
+
+## Remove expired sessions
+
+By default, `connect-mongo` uses MongoDB's TTL collection feature (2.2+) to have mongod automatically remove expired sessions. But you can change this behavior.
+
+### Set MongoDB to clean expired sessions (default mode)
+
+`connect-mongo` will creates a TTL index for you at startup. You MUST have MongoDB 2.2+ and administration permissions.
+
+```js
+app.use(session({
+    store: new MongoStore({
+      url: 'mongodb://localhost/test-app',
+      autoRemove: 'native' // Default
+    })
+}));
+```
+
+__Note:__ If you use `connect-mongo` in a very concurrent environment, you should avoid this mode and prefer setting the index yourself, once!
+
+### Set the compatibility mode
+
+You have an older MongoDB version (compatible with connect-mongo) or you can't or don't want to create a TTL index.
+
+`connect-mongo` will take care of removing expired sessions, using defined interval.
+
+```js
+app.use(session({
+    store: new MongoStore({
+      url: 'mongodb://localhost/test-app',
+      autoRemove: 'interval',
+      autoRemoveInterval: 10 // In minutes. Default
+    })
+}));
+```
+
+### Disable expired sessions cleaning
+
+You are in production environnement and/or you manage the TTL index elsewhere.
+
+```js
+app.use(session({
+    store: new MongoStore({
+      url: 'mongodb://localhost/test-app',
+      autoRemove: 'disabled'
+    })
+}));
+```
+
 ## More options
 
-  - `collection` Collection (optional, default: `sessions`)
+  - `collection` Collection (default: `sessions`)
   - `stringify` If true, connect-mongo will serialize sessions using `JSON.stringify` before
                 setting them, and deserialize them with `JSON.parse` when getting them.
                 (optional, default: true). This is useful if you are using types that
@@ -144,20 +209,6 @@ app.use(session({
   - `hash` (optional) Hash is an object, which will determine wether hash the sid in mongo, since it's not undefined, means sid will be hashed
   - `hash.salt` Salt will be used to hash the sid in mongo, default salt is "connect-mongo"
   - `hash.algorithm` Hash algorithm, default algorithm is "sha1"
-
-## Removing expired sessions
-
-  connect-mongo uses MongoDB's TTL collection feature (2.2+) to
-  have mongod automatically remove expired sessions. (mongod runs this
-  check every minute.)
-
-  **Note:** By connect/express's default, session cookies are set to
-  expire when the user closes their browser (maxAge: null). In accordance
-  with standard industry practices, connect-mongo will set these sessions
-  to expire two weeks from their last 'set'. You can override this
-  behavior by manually setting the maxAge for your cookies -- just keep in
-  mind that any value less than 60 seconds is pointless, as mongod will
-  only delete expired documents in a TTL collection every minute.
 
 ## Tests
 

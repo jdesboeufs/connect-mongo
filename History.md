@@ -1,3 +1,11 @@
+0.6.0 / In development
+==================
+
+* __Add__ `ttl` option
+* __Add__ `autoRemove` option
+* __Deprecate__ `defaultExpirationTime` option. Use `ttl` instead (in seconds)
+
+
 0.5.3 / 2014-12-30
 ==================
 
