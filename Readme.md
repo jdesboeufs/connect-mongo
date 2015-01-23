@@ -138,7 +138,7 @@ Otherwise, it will create a new one, using `ttl` option.
 app.use(session({
     store: new MongoStore({
       url: 'mongodb://localhost/test-app',
-      ttl: 14 * 3600 // = 14 days. Default
+      ttl: 14 * 24 * 60 * 60 // = 14 days. Default
     })
 }));
 ```
