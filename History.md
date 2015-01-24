@@ -1,3 +1,9 @@
+0.7.0 / 2015-01-24
+==================
+
+* __Add__ `touch()` method to be fully compliant with `express-session` `>= 1.10` (rafaelcardoso)
+
+
 0.6.0 / 2015-01-12
 ==================
 
