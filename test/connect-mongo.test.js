@@ -754,3 +754,40 @@ exports.test_get_custom_unserializer = function (done) {
     });
   });
 };
+
+
+exports.test_session_touch = function(done) {
+  open_db(options, function(store, db, collection) {
+
+    var sid = 'test_touch-sid',
+      data = make_data();
+
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
+
+      // Verify it was saved
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.equal(err, null);
+        assert_session_equals(sid, data, session);
+
+        // touch the session
+        store.touch(sid, session, function(err) {
+          assert.equal(err, null);
+          
+          // find the touched session
+          collection.findOne({_id: sid}, function(err, session2) {
+            assert.equal(err, null);
+
+            // check if both expiry date are different
+            assert.notEqual(session.expires.toString(), session2.expires.toString());
+
+            cleanup(store, db, collection, function() {
+              done();
+            });
+
+          });
+        });
+      });
+    });
+  });
+};
