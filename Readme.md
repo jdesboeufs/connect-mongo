@@ -2,7 +2,9 @@
 
 MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [Express](http://expressjs.com/)
 
-[![Build Status](https://travis-ci.org/kcbanner/connect-mongo.svg?branch=master)](https://travis-ci.org/kcbanner/connect-mongo) [![Dependency Status](https://david-dm.org/kcbanner/connect-mongo.svg?style=flat)](https://david-dm.org/kcbanner/connect-mongo)
+[![npm version](https://badge.fury.io/js/connect-mongo.svg)](http://badge.fury.io/js/connect-mongo)
+[![Build Status](https://travis-ci.org/kcbanner/connect-mongo.svg?branch=master)](https://travis-ci.org/kcbanner/connect-mongo)
+[![Dependency Status](https://david-dm.org/kcbanner/connect-mongo.svg?style=flat)](https://david-dm.org/kcbanner/connect-mongo)
 
 ## Compatibility
 
