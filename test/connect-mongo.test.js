@@ -4,13 +4,28 @@
  * Module dependencies.
  */
 var session = require('express-session');
-var MongoStore = require('../')(session);
+var MongoStore = require('../index')(session);
 var assert = require('assert');
 
 var defaultOptions = {w: 1};
 var testDb = 'connect-mongo-test';
 var testHost = '127.0.0.1';
-var options = {db: testDb, host: testHost};
+var options = {db: testDb, host: testHost };
+var lazyOptions = {
+  db: testDb,
+  host: testHost,
+  touchAfter: 2000, // 5 seconds
+  serialize: function (session) {
+      var obj = {};
+      obj.lastModified = Date.now();
+      obj.cookie = session.cookie.toJSON ? session.cookie.toJSON() : session.cookie;
+      obj = JSON.stringify(obj);
+      return obj;
+  },
+  unserialize: function (session) {
+      return JSON.parse(session);
+  }
+} 
 var mongo = require('mongodb');
 
 var mongoose = require('mongoose');
@@ -771,7 +786,7 @@ exports.test_session_touch = function(done) {
         assert_session_equals(sid, data, session);
 
         // touch the session
-        store.touch(sid, session, function(err) {
+        store.touch(sid, session.session, function(err) {
           assert.equal(err, null);
           
           // find the touched session
@@ -779,7 +794,7 @@ exports.test_session_touch = function(done) {
             assert.equal(err, null);
 
             // check if both expiry date are different
-            assert.notEqual(session.expires.toString(), session2.expires.toString());
+            assert.ok(session2.expires.getTime() > session.expires.getTime());
 
             cleanup(store, db, collection, function() {
               done();
@@ -791,3 +806,94 @@ exports.test_session_touch = function(done) {
     });
   });
 };
+
+exports.test_session_lazy_touch_simultaneously = function(done) {
+  open_db(lazyOptions, function(store, db, collection) {
+
+    var sid = 'test_lazy_touch-sid',
+      data = make_data(),
+      lastModifiedBeforeTouch,
+      lastModifiedAfterTouch;
+
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
+
+      // Verify it was saved
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.equal(err, null);
+
+        session = JSON.parse(session.session);
+
+        var lastModifiedBeforeTouch = session.lastModified;
+
+        // touch the session
+        store.touch(sid, session, function(err) {
+          assert.equal(err, null);
+
+          collection.findOne({_id: sid}, function(err, session2) {
+            assert.equal(err, null);
+
+            session2 = JSON.parse(session2.session);
+            lastModifiedAfterTouch = session2.lastModified;
+
+            assert.strictEqual(lastModifiedBeforeTouch, lastModifiedAfterTouch)
+
+            cleanup(store, db, collection, function() {
+              done();
+            });
+
+          });
+        });
+      });
+    });
+  });
+};
+
+
+exports.test_session_lazy_touch_laziness = function(done) {
+  open_db(lazyOptions, function(store, db, collection) {
+
+    var sid = 'test_lazy_touch-sid',
+      data = make_data(),
+      lastModifiedBeforeTouch,
+      lastModifiedAfterTouch;
+
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
+
+      // Verify it was saved
+      collection.findOne({_id: sid}, function(err, session) {
+        assert.equal(err, null);
+
+        session = JSON.parse(session.session);
+
+        var lastModifiedBeforeTouch = session.lastModified;
+
+        setTimeout(function () {
+          
+          // touch the session
+          store.touch(sid, session, function(err) {
+            assert.equal(err, null);
+
+            collection.findOne({_id: sid}, function(err, session2) {
+              assert.equal(err, null);
+
+              session2 = JSON.parse(session2.session);
+              lastModifiedAfterTouch = session2.lastModified;
+
+              assert.ok(lastModifiedAfterTouch > lastModifiedBeforeTouch);
+
+              cleanup(store, db, collection, function() {
+                done();
+              });
+
+            });
+          });
+
+        }, 3000);
+        
+      });
+    });
+  });
+};
+
