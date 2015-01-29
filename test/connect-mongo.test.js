@@ -811,9 +811,7 @@ exports.test_session_lazy_touch_simultaneously = function(done) {
   open_db(lazyOptions, function(store, db, collection) {
 
     var sid = 'test_lazy_touch-sid',
-      data = make_data(),
-      lastModifiedBeforeTouch,
-      lastModifiedAfterTouch;
+      data = make_data();
 
     store.set(sid, data, function(err) {
       assert.equal(err, null);
@@ -834,7 +832,7 @@ exports.test_session_lazy_touch_simultaneously = function(done) {
             assert.equal(err, null);
 
             session2 = JSON.parse(session2.session);
-            lastModifiedAfterTouch = session2.lastModified;
+            var lastModifiedAfterTouch = session2.lastModified;
 
             assert.strictEqual(lastModifiedBeforeTouch, lastModifiedAfterTouch)
 
