@@ -198,7 +198,7 @@ app.use(session({
 ### Enable lazy session update
 
 
-If you are using [express-session](https://github.com/expressjs/session) >= [1.10.0](https://github.com/expressjs/session/releases/tag/v1.10.0) and don't want to update the database every single time that the user refresh the page, you can lazy update the session, by limiting how many updates you want to be made in a period of time.
+If you are using [express-session](https://github.com/expressjs/session) >= [1.10.0](https://github.com/expressjs/session/releases/tag/v1.10.0) and don't want to update the expires property on database every single time that the user refresh the page, you can lazy update the session, by limiting how many updates you want to be made in a period of time.
 
 ```js
 app.use(express.session({
@@ -222,7 +222,7 @@ app.use(express.session({
 }));
 ```
 
-by doing this, setting `touchAfter: 24 * 3600000` you are saying to the session be updated only one time in a period of 24 hours, does not matter how many request's are made (with the exception of those that update something on the session)
+by doing this, setting `touchAfter: 24 * 3600000` you are saying to the session be updated only one time in a period of 24 hours, does not matter how many request's are made (with the exception of those that update something on the session data)
 
 If you want to use this feature, remember this:
 
