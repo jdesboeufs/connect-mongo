@@ -153,7 +153,7 @@ By default, `connect-mongo` uses MongoDB's TTL collection feature (2.2+) to have
 
 ### Set MongoDB to clean expired sessions (default mode)
 
-`connect-mongo` will creates a TTL index for you at startup. You MUST have MongoDB 2.2+ and administration permissions.
+`connect-mongo` will create a TTL index for you at startup. You MUST have MongoDB 2.2+ and administration permissions.
 
 ```js
 app.use(session({
