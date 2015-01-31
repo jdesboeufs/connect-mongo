@@ -71,7 +71,7 @@ app.use(session({
 
 #### Re-use a native MongoDB driver connection
 
-In this case, you juste have to give your `Db` instance to `connect-mongo`.
+In this case, you just have to give your `Db` instance to `connect-mongo`.
 If the connection is not opened, `connect-mongo` will do it for you.
 
 ```js
