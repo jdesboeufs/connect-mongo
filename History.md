@@ -1,3 +1,10 @@
+0.8.0 / In development
+==================
+
+* __Add__ `touchAfter` option to enable lazy update behavior on `touch()` method (rafaelcardoso)
+* __Add__ `fallbackMemory` option to switch to `MemoryStore` in some case.
+
+
 0.7.0 / 2015-01-24
 ==================
 
