@@ -195,6 +195,25 @@ app.use(session({
 }));
 ```
 
+### Lazy session update
+
+
+If you are using [express-session](https://github.com/expressjs/session) >= [1.10.0](https://github.com/expressjs/session/releases/tag/v1.10.0) and don't want to resave all the session on database every single time that the user refresh the page, you can lazy update the session, by limiting a period of time.
+
+```js
+app.use(express.session({
+    secret: 'keyboard cat',
+    saveUninitialized: false, // don't create session until something stored
+	resave: false, //don't save session if unmodified
+	store: new mongoStore({
+		url: 'mongodb://localhost/test-app',
+		touchAfter: 24 * 3600000 // time period in ms
+	})
+}));
+```
+
+by doing this, setting `touchAfter: 24 * 3600000` you are saying to the session be updated only one time in a period of 24 hours, does not matter how many request's are made (with the exception of those that change something on the session data)
+
 ## More options
 
   - `collection` Collection (default: `sessions`)
