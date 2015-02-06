@@ -10,7 +10,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 
 * Support Express `4.x`, `5.0` and Connect `3.x` through [express-session](https://github.com/expressjs/session)
 * Support Express `2.x`, `3.x` and Connect `>= 1.0.3`, `2.x`
-* Support [Mongoose](http://mongoosejs.com/index.html) `>= 2.6` and `3.x`
+* Support [Mongoose](http://mongoosejs.com/index.html) `>= 2.6`, `3.x` and `4.0`
 * Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 1.2` and `2.0`
 * Support Node.js `0.8`, `0.10`, `0.11` and [io.js](https://iojs.org)
 
