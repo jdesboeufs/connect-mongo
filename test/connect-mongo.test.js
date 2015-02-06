@@ -14,7 +14,7 @@ var options = {db: testDb, host: testHost };
 var lazyOptions = {
   db: testDb,
   host: testHost,
-  touchAfter: 2000 // 2 seconds
+  touchAfter: 2 // 2 seconds
 };
 var mongo = require('mongodb');
 
