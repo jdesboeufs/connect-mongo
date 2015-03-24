@@ -1,4 +1,4 @@
-0.8.0 / In development
+0.8.0 / 2015-03-24
 ==================
 
 * __Add__ `touchAfter` option to enable lazy update behavior on `touch()` method (rafaelcardoso)
