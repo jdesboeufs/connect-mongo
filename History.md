@@ -1,3 +1,9 @@
+0.8.1 / 2015-04-21
+==================
+
+* __Fix__ initialization when a connecting `mongodb` `2.0.x` instance is given (1999)
+
+
 0.8.0 / 2015-03-24
 ==================
 
