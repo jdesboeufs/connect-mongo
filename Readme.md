@@ -218,6 +218,7 @@ by doing this, setting `touchAfter: 24 * 3600` you are saying to the session be 
 
   - `collection` Collection (default: `sessions`)
   - `fallbackMemory` Fallback to `MemoryStore`. Useful if you want to use MemoryStore in some case, like in development environment.
+  - `eventEmitters` If true, everytime set(), destroy() or get() is called, they will emit events 'set', 'destroy' or 'get' respectively.
   - `stringify` If true, connect-mongo will serialize sessions using `JSON.stringify` before
                 setting them, and deserialize them with `JSON.parse` when getting them.
                 (optional, default: true). This is useful if you are using types that
