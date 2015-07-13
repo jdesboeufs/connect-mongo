@@ -7,7 +7,7 @@ var session = require('express-session');
 var MongoStore = require('../index')(session);
 var assert = require('assert');
 
-var defaultOptions = {w: 1};
+var connectionString = 'mongodb://localhost/connect-mongo-test';
 var testDb = 'connect-mongo-test';
 var testHost = '127.0.0.1';
 var options = {db: testDb, host: testHost };
@@ -17,6 +17,7 @@ var lazyOptions = {
   touchAfter: 2 // 2 seconds
 };
 var mongo = require('mongodb');
+var _ = require('lodash');
 
 var mongoose = require('mongoose');
 
@@ -30,12 +31,8 @@ var make_cookie = function() {
   return cookie;
 };
 
-function getNativeDb() {
-  return new mongo.Db(testDb, new mongo.Server(testHost, 27017, {}), { w: defaultOptions.w });
-}
-
 function getMongooseConnection() {
-  return mongoose.createConnection('mongodb://' + testHost + ':27017/' + testDb);
+  return mongoose.createConnection(connectionString);
 }
 
 // Create session data
@@ -105,6 +102,13 @@ var cleanup = function(store, db, collection, callback) {
     callback();
   });
 };
+
+function getNativeDbConnection(options, done) {
+  mongo.MongoClient.connect(connectionString, function (err, db) {
+    if (err) return done(err);
+    open_db(_.assign(options, { db: db }), done);
+  });
+}
 
 exports.test_set = function(done) {
   open_db(options, function(store, db, collection) {
@@ -491,7 +495,7 @@ exports.test_clear_with_raw_db = function(done) {
 /* tests with existing mongodb native db object */
 
 exports.test_set_with_native_db = function(done) {
-  open_db({ db: getNativeDb() }, function(store, db, collection) {
+  getNativeDbConnection({}, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
@@ -511,7 +515,7 @@ exports.test_set_with_native_db = function(done) {
 };
 
 exports.test_set_no_stringify_with_native_db = function(done) {
-  open_db({ db: getNativeDb(), stringify: false }, function(store, db, collection) {
+  getNativeDbConnection({ stringify: false }, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
@@ -531,7 +535,7 @@ exports.test_set_no_stringify_with_native_db = function(done) {
 };
 
 exports.test_set_expires_with_native_db = function(done) {
-  open_db({ db: getNativeDb() }, function(store, db, collection) {
+  getNativeDbConnection({}, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
@@ -552,9 +556,7 @@ exports.test_set_expires_with_native_db = function(done) {
 
 
 exports.test_set_expires_no_stringify_with_native_db = function(done) {
-  var options = { db: getNativeDb(), stringify: false };
-
-  open_db(options, function(store, db, collection) {
+  getNativeDbConnection({ stringify: false }, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
@@ -574,7 +576,7 @@ exports.test_set_expires_no_stringify_with_native_db = function(done) {
 };
 
 exports.test_get_with_native_db = function(done) {
-  open_db({ db: getNativeDb() }, function(store, db, collection) {
+  getNativeDbConnection({}, function(store, db, collection) {
     var sid = 'test_get-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.get(sid, function(err, session) {
@@ -590,7 +592,7 @@ exports.test_get_with_native_db = function(done) {
 };
 
 exports.test_length_with_native_db = function(done) {
-  open_db({ db: getNativeDb() }, function(store, db, collection) {
+  getNativeDbConnection({}, function(store, db, collection) {
     var sid = 'test_length-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.length(function(err, length) {
@@ -606,7 +608,7 @@ exports.test_length_with_native_db = function(done) {
 };
 
 exports.test_destroy_ok_with_native_db = function(done) {
-  open_db({ db: getNativeDb() }, function(store, db, collection) {
+  getNativeDbConnection({}, function(store, db, collection) {
     var sid = 'test_destroy_ok-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.destroy(sid, function(err) {
@@ -621,7 +623,7 @@ exports.test_destroy_ok_with_native_db = function(done) {
 };
 
 exports.test_clear_with_native_db = function(done) {
-  open_db({ db: getNativeDb() }, function(store, db, collection) {
+  getNativeDbConnection({}, function(store, db, collection) {
     var sid = 'test_length-sid';
     collection.insert({_id: sid, key1: 1, key2: 'two'}, function() {
       store.clear(function() {
