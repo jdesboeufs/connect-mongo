@@ -1,3 +1,9 @@
+0.8.2 / 2015-07-14
+==================
+
+* Bug fixes and improvements (whitef0x0, TimothyGu, behcet-li)
+
+
 0.8.1 / 2015-04-21
 ==================
 
