@@ -9,7 +9,11 @@
     "session",
     "express"
   ],
-  "author": "Casey Banner <kcbanner@gmail.com>",
+  "contributors": [
+    "Casey Banner <kcbanner@gmail.com>",
+    "Jerome Desboeufs <jerome.desboeufs@gmail.com>"
+  ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/kcbanner/connect-mongo.git"
