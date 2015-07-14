@@ -7,4 +7,3 @@ node_js:
 services: mongodb
 before_install:
   - npm install npm -g # For node 0.8
-  - npm install grunt-cli -g

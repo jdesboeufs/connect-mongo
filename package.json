@@ -25,13 +25,15 @@
   },
   "devDependencies": {
     "express-session": ">= 1.0.0",
-    "grunt-contrib-jshint": "~0.10.0",
-    "jshint-stylish": "~1.0.0",
+    "istanbul": "^0.3.17",
+    "jshint": "^2.8.0",
     "mocha": "~2.1.0",
     "mongoose": ">= 2.6.0 < 4.1.0"
   },
   "scripts": {
-    "test": "grunt && make test"
+    "test": "mocha --ui exports --timeout 6000 -R spec -b --recursive test",
+    "cover": "istanbul cover -- _mocha --ui exports --timeout 6000 -R spec -b --recursive test",
+    "jshint": "jshint --config .jshintrc --show-non-errors lib/ test/"
   },
   "main": "./lib/connect-mongo"
 }

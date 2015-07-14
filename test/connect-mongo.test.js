@@ -1,3 +1,4 @@
+'use strict';
 /* jshint camelcase: false */
 
 /**
@@ -780,7 +781,7 @@ exports.test_session_touch = function(done) {
         // touch the session
         store.touch(sid, session.session, function(err) {
           assert.equal(err, null);
-          
+
           // find the touched session
           collection.findOne({_id: sid}, function(err, session2) {
             assert.equal(err, null);
@@ -857,7 +858,7 @@ exports.test_session_lazy_touch_async = function(done) {
         lastModifiedBeforeTouch = session.lastModified.getTime();
 
         setTimeout(function () {
-          
+
           // touch the session
           store.touch(sid, session, function(err) {
             assert.equal(err, null);
@@ -877,7 +878,7 @@ exports.test_session_lazy_touch_async = function(done) {
           });
 
         }, 3000);
-        
+
       });
     });
   });
