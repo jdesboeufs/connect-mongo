@@ -73,16 +73,10 @@ export default function connectMongo(connect) {
 
             var self = this;
 
-            function changeState(newState) {
-                debug('switched to state: %s', newState);
-                self.state = newState;
-                self.emit(newState);
-            }
-
             function connectionReady(err) {
                 if (err) {
                     debug('not able to connect to the database');
-                    changeState('disconnected');
+                    self.changeState('disconnected');
                     throw err;
                 }
 
@@ -95,7 +89,7 @@ export default function connectMongo(connect) {
                             if (indexCreationError) {
                                 throw indexCreationError;
                             }
-                            changeState('connected');
+                            self.changeState('connected');
                         });
                         break;
 
@@ -104,11 +98,11 @@ export default function connectMongo(connect) {
                             self.collection.remove({ expires: { $lt: new Date() } }, { w: 0 });
                         }, options.autoRemoveInterval * 1000 * 60);
                         self.timer.unref();
-                        changeState('connected');
+                        self.changeState('connected');
                         break;
 
                     default:
-                        changeState('connected');
+                        self.changeState('connected');
                         break;
 
                 }
@@ -145,7 +139,7 @@ export default function connectMongo(connect) {
                 }
             }
 
-            changeState('init');
+            this.changeState('init');
 
             if (options.url) {
                 debug('use strategy: `url`');
@@ -160,8 +154,16 @@ export default function connectMongo(connect) {
                 throw new Error('Connection strategy not found');
             }
 
-            changeState('connecting');
+            this.changeState('connecting');
 
+        }
+
+        changeState(newState) {
+            if (newState !== this.state) {
+                debug('switched to state: %s', newState);
+                this.state = newState;
+                this.emit(newState);
+            }
         }
 
         setCollection(collection) {
