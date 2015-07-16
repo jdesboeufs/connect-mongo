@@ -103,10 +103,7 @@ module.exports = function(connect) {
                         self.timer = setInterval(function () {
                             self.collection.remove({ expires: { $lt: new Date() } }, { w: 0 });
                         }, options.autoRemoveInterval * 1000 * 60);
-                        // node <0.8 compatibility
-                        if (typeof self.timer.unref === 'function') {
-                            self.timer.unref();
-                        }
+                        self.timer.unref();
                         changeState('connected');
                         break;
 
