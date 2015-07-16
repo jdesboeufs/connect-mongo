@@ -5,16 +5,10 @@ import { defaults, assign, identity } from 'lodash';
 
 const debug = debugFactory('connect-mongo');
 
-
-/**
- * Default options
- */
-var defaultOptions = {
+const defaultOptions = {
     collection: 'sessions',
     stringify: true,
-    ttl: 60 * 60 * 24 * 14, // 14 days
-    autoRemove: 'native',
-    autoRemoveInterval: 10
+    ttl: 60 * 60 * 24 * 14 // 14 days
 };
 
 var defaultSerializationOptions = {
@@ -80,32 +74,10 @@ export default function connectMongo(connect) {
                     throw err;
                 }
 
-                self.collection = self.db.collection(options.collection);
+                self.setCollection(self.db.collection(options.collection));
 
-                switch (options.autoRemove) {
-
-                    case 'native':
-                        self.collection.ensureIndex({ expires: 1 }, { expireAfterSeconds: 0 }, function (indexCreationError) {
-                            if (indexCreationError) {
-                                throw indexCreationError;
-                            }
-                            self.changeState('connected');
-                        });
-                        break;
-
-                    case 'interval':
-                        self.timer = setInterval(function () {
-                            self.collection.remove({ expires: { $lt: new Date() } }, { w: 0 });
-                        }, options.autoRemoveInterval * 1000 * 60);
-                        self.timer.unref();
-                        self.changeState('connected');
-                        break;
-
-                    default:
-                        self.changeState('connected');
-                        break;
-
-                }
+                self.setAutoRemove(self.collection)
+                    .then(() => self.changeState('connected'));
             }
 
             function initWithUrl() {
@@ -158,6 +130,25 @@ export default function connectMongo(connect) {
 
         }
 
+        setAutoRemove(collection) {
+            defaults(this.options, { autoRemove: 'native', autoRemoveInterval: 10 });
+
+            switch (this.options.autoRemove) {
+                case 'native':
+                    return this.collection.ensureIndexAsync({ expires: 1 }, { expireAfterSeconds: 0 });
+                    break;
+                case 'interval':
+                    let removeQuery = { expires: { $lt: new Date() } };
+                    this.timer = setInterval(() => this.collection.remove(removeQuery, { w: 0 }), options.autoRemoveInterval * 1000 * 60);
+                    this.timer.unref();
+                    return Promise.resolve();
+                    break;
+                default:
+                    return Promise.resolve();
+                    break;
+            }
+        }
+
         changeState(newState) {
             if (newState !== this.state) {
                 debug('switched to state: %s', newState);
@@ -167,6 +158,9 @@ export default function connectMongo(connect) {
         }
 
         setCollection(collection) {
+            if (this.timer) {
+                clearInterval(this.timer);
+            }
             this.collectionReadyPromise = undefined;
             this.collection = collection;
 
@@ -183,10 +177,10 @@ export default function connectMongo(connect) {
                 this.collectionReadyPromise = new Promise((resolve, reject) => {
                     switch (this.state) {
                         case 'connected':
-                            resolve(this.setCollection(this.collection));
+                            resolve(this.collection);
                             break;
                         case 'connecting':
-                            this.once('connected', () => resolve(this.setCollection(this.collection)));
+                            this.once('connected', () => resolve(this.collection));
                             break;
                         case 'disconnected':
                             reject(new Error('Not connected'));
