@@ -5,18 +5,12 @@
  * Module dependencies.
  */
 var session = require('express-session');
-var MongoStore = require('..')(session);
+var MongoStore = require('../src/connect-mongo')(session);
 var assert = require('assert');
+var _ = require('lodash');
 
 var connectionString = 'mongodb://localhost/connect-mongo-test';
-var testDb = 'connect-mongo-test';
-var testHost = '127.0.0.1';
-var options = {db: testDb, host: testHost };
-var lazyOptions = {
-  db: testDb,
-  host: testHost,
-  touchAfter: 2 // 2 seconds
-};
+
 var mongo = require('mongodb');
 var _ = require('lodash');
 
@@ -105,6 +99,10 @@ var cleanup = function(store, db, collection, callback) {
 };
 
 function getNativeDbConnection(options, done) {
+  if (!done) {
+    done = options;
+    options = {};
+  }
   mongo.MongoClient.connect(connectionString, function (err, db) {
     if (err) return done(err);
     open_db(_.assign(options, { db: db }), done);
@@ -112,7 +110,7 @@ function getNativeDbConnection(options, done) {
 }
 
 exports.test_set = function(done) {
-  open_db(options, function(store, db, collection) {
+  getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
@@ -132,7 +130,7 @@ exports.test_set = function(done) {
 };
 
 exports.test_set_no_stringify = function(done) {
-  open_db({db: options.db, host: testHost, stringify: false}, function(store, db, collection) {
+  getNativeDbConnection({ stringify: false }, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
@@ -155,7 +153,7 @@ exports.test_session_cookie_overwrite_no_stringify = function(done) {
   var origSession = make_data();
   var cookie = origSession.cookie;
 
-  open_db({db: options.db, host: testHost, stringify: false}, function(store, db, collection) {
+  getNativeDbConnection({ stringify: false }, function(store, db, collection) {
     var sid = 'test_set-sid';
     store.set(sid, origSession, function(err) {
       assert.equal(err, null);
@@ -177,7 +175,7 @@ exports.test_session_cookie_overwrite_no_stringify = function(done) {
 };
 
 exports.test_set_expires = function(done) {
-  open_db(options, function(store, db, collection) {
+  getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
@@ -198,7 +196,7 @@ exports.test_set_expires = function(done) {
 
 
 exports.test_set_expires_no_stringify = function(done) {
-  open_db({db: options.db, host: testHost, stringify: false}, function(store, db, collection) {
+  getNativeDbConnection({ stringify: false }, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data();
 
@@ -218,7 +216,7 @@ exports.test_set_expires_no_stringify = function(done) {
 };
 
 exports.test_get = function(done) {
-  open_db(options, function(store, db, collection) {
+  getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_get-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.get(sid, function(err, session) {
@@ -232,7 +230,7 @@ exports.test_get = function(done) {
 };
 
 exports.test_length = function(done) {
-  open_db(options, function(store, db, collection) {
+  getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_length-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.length(function(err, length) {
@@ -247,7 +245,7 @@ exports.test_length = function(done) {
 };
 
 exports.test_destroy_ok = function(done) {
-  open_db(options, function(store, db, collection) {
+  getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_destroy_ok-sid';
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
       store.destroy(sid, function(err) {
@@ -261,7 +259,7 @@ exports.test_destroy_ok = function(done) {
 };
 
 exports.test_clear = function(done) {
-  open_db(options, function(store, db, collection) {
+  getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_length-sid';
     collection.insert({_id: sid, key1: 1, key2: 'two'}, function() {
       store.clear(function() {
@@ -279,31 +277,17 @@ exports.test_clear = function(done) {
 
 exports.test_options_url = function(done) {
   var store = new MongoStore({
-    url: 'mongodb://' + testHost + ':27017/' + testDb, collection: 'sessions-test'
+    url: 'mongodb://localhost:27017/connect-mongo-test', collection: 'sessions-test'
   });
   store.once('connected', function() {
-    assert.strictEqual(store.db.databaseName, testDb);
-    assert.strictEqual(store.db.serverConfig.host, testHost);
+    assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
+    assert.strictEqual(store.db.serverConfig.host, 'localhost');
     assert.equal(store.db.serverConfig.port, 27017);
     assert.equal(store.collection.collectionName, 'sessions-test');
     cleanup_store(store);
     done();
   });
 };
-
-// exports.test_options_url_auth = function(done) {
-//   var store = new MongoStore({
-//     url: 'mongodb://test:test@' + testHost + ':27017/' + testDb, collection: 'sessions-test'
-//   });
-//   store.once('connected', function() {
-//     assert.strictEqual(store.db.databaseName, testDb);
-//     assert.strictEqual(store.db.serverConfig.host, testHost);
-//     assert.equal(store.db.serverConfig.port, 27017);
-//     assert.equal(store.collection.collectionName, 'sessions-test');
-//     cleanup_store(store);
-//     done();
-//   });
-// };
 
 exports.test_options_no_db = function(done) {
   assert.throws(
@@ -340,7 +324,7 @@ exports.test_set_with_mongoose_db = function(done) {
 /* tests with existing mongodb native db object */
 
 exports.test_set_with_native_db = function(done) {
-  getNativeDbConnection({}, function(store, db, collection) {
+  getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
@@ -361,11 +345,8 @@ exports.test_set_with_native_db = function(done) {
 
 
 exports.test_set_default_expiration = function(done) {
-  var defaultExpirationTime = 10101;
-  var optionsWithExpirationTime = JSON.parse(JSON.stringify(options));
-  optionsWithExpirationTime.defaultExpirationTime = defaultExpirationTime;
-
-  open_db(optionsWithExpirationTime, function(store, db, collection) {
+  var defaultTTL = 10;
+  getNativeDbConnection({ ttl: defaultTTL }, function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data_no_cookie();
 
@@ -382,8 +363,8 @@ exports.test_set_default_expiration = function(done) {
 
         var timeAfterSet = new Date().valueOf();
 
-        assert.ok(timeBeforeSet + defaultExpirationTime <= session.expires.valueOf());
-        assert.ok(session.expires.valueOf() <= timeAfterSet + defaultExpirationTime);
+        assert.ok(timeBeforeSet + defaultTTL * 1000 <= session.expires.valueOf());
+        assert.ok(session.expires.valueOf() <= timeAfterSet + defaultTTL * 1000);
 
         cleanup(store, db, collection, function() {
           done();
@@ -393,9 +374,9 @@ exports.test_set_default_expiration = function(done) {
   });
 };
 
-exports.test_set_witout_default_expiration = function(done) {
+exports.test_set_without_default_expiration = function(done) {
   var defaultExpirationTime = 1000 * 60 * 60 * 24 * 14;
-  open_db(options, function(store, db, collection) {
+  getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_set_expires-sid';
     var data = make_data_no_cookie();
 
@@ -424,8 +405,7 @@ exports.test_set_witout_default_expiration = function(done) {
 };
 
 exports.test_set_custom_serializer = function (done) {
-  open_db({
-    db: options.db,
+  getNativeDbConnection({
     serialize: function (obj) {
       obj.ice = 'test-1';
       return JSON.stringify(obj);
@@ -450,8 +430,7 @@ exports.test_set_custom_serializer = function (done) {
 };
 
 exports.test_get_custom_unserializer = function (done) {
-  open_db({
-    db: options.db,
+  getNativeDbConnection({
     unserialize: function (obj) {
       obj.ice = 'test-2';
       return obj;
@@ -474,7 +453,7 @@ exports.test_get_custom_unserializer = function (done) {
 
 
 exports.test_session_touch = function(done) {
-  open_db(options, function(store, db, collection) {
+  getNativeDbConnection(function(store, db, collection) {
 
     var sid = 'test_touch-sid',
       data = make_data();
@@ -510,7 +489,7 @@ exports.test_session_touch = function(done) {
 };
 
 exports.test_session_lazy_touch_sync = function(done) {
-  open_db(lazyOptions, function(store, db, collection) {
+  getNativeDbConnection({ touchAfter: 2 }, function(store, db, collection) {
 
     var sid = 'test_lazy_touch-sid-sync',
       data = make_data(),
@@ -550,7 +529,7 @@ exports.test_session_lazy_touch_sync = function(done) {
 
 
 exports.test_session_lazy_touch_async = function(done) {
-  open_db(lazyOptions, function(store, db, collection) {
+  getNativeDbConnection({ touchAfter: 2 }, function(store, db, collection) {
 
     var sid = 'test_lazy_touch-sid',
       data = make_data(),

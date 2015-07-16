@@ -1,6 +1,6 @@
 {
   "name": "connect-mongo",
-  "version": "0.8.2",
+  "version": "1.0.0-dev",
   "description": "MongoDB session store for Express and Connect",
   "keywords": [
     "connect",
@@ -22,22 +22,24 @@
     "url": "https://github.com/kcbanner/connect-mongo/issues"
   },
   "dependencies": {
+    "bluebird": ">= 1.0",
     "debug": ">= 0.7.0",
-    "depd": ">= 0.4.0",
     "lodash": "*",
     "mongodb": ">= 1.2.0 <2.1.0"
   },
   "devDependencies": {
+    "babel": "^5.6.23",
+    "babel-istanbul": "^0.2.10",
+    "eslint": "^0.24.1",
     "express-session": ">= 1.0.0",
-    "istanbul": "^0.3.17",
-    "jshint": "^2.8.0",
     "mocha": "~2.1.0",
     "mongoose": ">= 2.6.0 < 4.1.0"
   },
   "scripts": {
-    "test": "mocha --ui exports --timeout 6000 -R spec -b --recursive test",
-    "cover": "istanbul cover -- _mocha --ui exports --timeout 6000 -R spec -b --recursive test",
-    "jshint": "jshint --config .jshintrc --show-non-errors lib/ test/"
+    "test": "mocha --compilers js:babel/register --ui exports --timeout 6000 -R spec -b --recursive test",
+    "cover": "babel-istanbul cover _mocha -- --ui exports --timeout 6000 -R spec -b --recursive test",
+    "lint": "eslint src/",
+    "prepublish": "babel src --out-dir lib"
   },
   "main": "./lib/connect-mongo"
 }
