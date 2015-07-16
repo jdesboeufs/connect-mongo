@@ -38,8 +38,8 @@ var stringifySerializationOptions = {
 };
 
 export default function connectMongo(connect) {
-    var Store = connect.Store || connect.session.Store;
-    var MemoryStore = connect.MemoryStore || connect.session.MemoryStore;
+    const Store = connect.Store || connect.session.Store;
+    const MemoryStore = connect.MemoryStore || connect.session.MemoryStore;
 
     class MongoStore extends Store {
 
@@ -76,7 +76,7 @@ export default function connectMongo(connect) {
 
                 self.setCollection(self.db.collection(options.collection));
 
-                self.setAutoRemove(self.collection)
+                self.setAutoRemoveAsync(self.collection)
                     .then(() => self.changeState('connected'));
             }
 
@@ -130,7 +130,7 @@ export default function connectMongo(connect) {
 
         }
 
-        setAutoRemove(collection) {
+        setAutoRemoveAsync(collection) {
             defaults(this.options, { autoRemove: 'native', autoRemoveInterval: 10 });
 
             switch (this.options.autoRemove) {
