@@ -63,71 +63,56 @@ export default function connectMongo(connect) {
                 options = assign(options, stringifySerializationOptions);
             }
 
-            this.options = options;
-
-            var self = this;
-
-            function connectionReady(err) {
-                if (err) {
-                    debug('not able to connect to the database');
-                    self.changeState('disconnected');
-                    throw err;
-                }
-
-                self
-                    .setCollection(self.db.collection(options.collection))
-                    .setAutoRemoveAsync()
-                        .then(() => self.changeState('connected'));
-            }
-
-            function initWithUrl() {
-                MongoClient.connect(options.url, options.mongoOptions || {}, function(err, db) {
-                    if (!err) {
-                        self.db = db;
-                    }
-                    connectionReady(err);
-                });
-            }
-
-            function initWithMongooseConnection() {
-                if (options.mongooseConnection.readyState === 1) {
-                    self.db = options.mongooseConnection.db;
-                    process.nextTick(connectionReady);
-                } else {
-                    options.mongooseConnection.once('open', function() {
-                        self.db = options.mongooseConnection.db;
-                        connectionReady();
-                    });
-                }
-            }
-
-            function initWithNativeDb() {
-                self.db = options.db;
-
-                if (options.db.openCalled || options.db.openCalled === undefined) { // openCalled is undefined in mongodb@2.x
-                    options.db.collection(options.collection, connectionReady);
-                } else {
-                    options.db.open(connectionReady);
-                }
-            }
-
             this.changeState('init');
 
+            const newConnectionCallback = (err, db) => {
+                if (err) {
+                    this.connectionFailed(err);
+                } else {
+                    this.handleNewConnectionAsync(db);
+                }
+            };
+
             if (options.url) {
+                // New native connection using url + mongoOptions
                 debug('use strategy: `url`');
-                initWithUrl();
+                MongoClient.connect(options.url, options.mongoOptions || {}, newConnectionCallback);
             } else if (options.mongooseConnection) {
+                // Re-use existing or upcoming mongoose connection
                 debug('use strategy: `mongoose_connection`');
-                initWithMongooseConnection();
+                if (options.mongooseConnection.readyState === 1) {
+                    this.handleNewConnectionAsync(options.mongooseConnection.db);
+                } else {
+                    options.mongooseConnection.once('open', () => this.handleNewConnectionAsync(options.mongooseConnection.db));
+                }
             } else if (options.db && options.db.listCollections) {
+                // Re-use existing or upcoming native connection
                 debug('use strategy: `native_db`');
-                process.nextTick(initWithNativeDb);
+                if (options.db.openCalled || options.db.openCalled === undefined) { // openCalled is undefined in mongodb@2.x
+                    this.handleNewConnectionAsync(options.db);
+                } else {
+                    options.db.open(newConnectionCallback);
+                }
             } else {
                 throw new Error('Connection strategy not found');
             }
 
             this.changeState('connecting');
 
+        }
+
+        connectionFailed(err) {
+            debug('not able to connect to the database');
+            this.changeState('disconnected');
+            throw err;
+        }
+
+        handleNewConnectionAsync(db) {
+            this.db = db;
+            return this
+                .setCollection(db.collection(this.options.collection))
+                .setAutoRemoveAsync()
+                    .then(() => this.changeState('connected'));
         }
 
         setAutoRemoveAsync() {
@@ -195,6 +180,8 @@ export default function connectMongo(connect) {
                 return sessionId;
             }
         }
+
+        /* Public API */
 
         get(sid, callback) {
             return this.collectionReady()
