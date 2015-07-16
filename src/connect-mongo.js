@@ -55,7 +55,7 @@ export default function connectMongo(connect) {
 
             /* Options */
 
-            options = assign({}, defaultOptions, options);
+            this.options = defaults(options, defaultOptions);
 
             if (!options.stringify || options.serialize || options.unserialize) {
                 options = defaults(options, defaultSerializationOptions);
@@ -74,10 +74,10 @@ export default function connectMongo(connect) {
                     throw err;
                 }
 
-                self.setCollection(self.db.collection(options.collection));
-
-                self.setAutoRemoveAsync(self.collection)
-                    .then(() => self.changeState('connected'));
+                self
+                    .setCollection(self.db.collection(options.collection))
+                    .setAutoRemoveAsync()
+                        .then(() => self.changeState('connected'));
             }
 
             function initWithUrl() {
@@ -130,22 +130,19 @@ export default function connectMongo(connect) {
 
         }
 
-        setAutoRemoveAsync(collection) {
+        setAutoRemoveAsync() {
             defaults(this.options, { autoRemove: 'native', autoRemoveInterval: 10 });
 
             switch (this.options.autoRemove) {
                 case 'native':
                     return this.collection.ensureIndexAsync({ expires: 1 }, { expireAfterSeconds: 0 });
-                    break;
                 case 'interval':
                     let removeQuery = { expires: { $lt: new Date() } };
-                    this.timer = setInterval(() => this.collection.remove(removeQuery, { w: 0 }), options.autoRemoveInterval * 1000 * 60);
+                    this.timer = setInterval(() => this.collection.remove(removeQuery, { w: 0 }), this.options.autoRemoveInterval * 1000 * 60);
                     this.timer.unref();
                     return Promise.resolve();
-                    break;
                 default:
                     return Promise.resolve();
-                    break;
             }
         }
 
@@ -169,7 +166,7 @@ export default function connectMongo(connect) {
                 collection[method + 'Async'] = Promise.promisify(collection[method], collection);
             });
 
-            return collection;
+            return this;
         }
 
         collectionReady() {
@@ -321,4 +318,4 @@ export default function connectMongo(connect) {
     }
 
     return MongoStore;
-};
+}
