@@ -43,14 +43,15 @@ var stringifySerializationOptions = {
     unserialize: JSON.parse
 };
 
-export function promisifyCollection(collection) {
+function promisifyCollection(collection) {
     ['count', 'findOne', 'remove', 'drop', 'update', 'ensureIndex'].forEach(method => {
         collection[method + 'Async'] = Promise.promisify(collection[method], collection);
     });
     return collection;
 };
 
-module.exports = function(connect) {
+
+export default function connectMongo(connect) {
     var Store = connect.Store || connect.session.Store;
     var MemoryStore = connect.MemoryStore || connect.session.MemoryStore;
 
