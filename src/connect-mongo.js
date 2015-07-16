@@ -43,14 +43,6 @@ var stringifySerializationOptions = {
     unserialize: JSON.parse
 };
 
-function promisifyCollection(collection) {
-    ['count', 'findOne', 'remove', 'drop', 'update', 'ensureIndex'].forEach(method => {
-        collection[method + 'Async'] = Promise.promisify(collection[method], collection);
-    });
-    return collection;
-};
-
-
 export default function connectMongo(connect) {
     var Store = connect.Store || connect.session.Store;
     var MemoryStore = connect.MemoryStore || connect.session.MemoryStore;
@@ -172,15 +164,27 @@ export default function connectMongo(connect) {
 
         }
 
+        setCollection(collection) {
+            this.collectionReadyPromise = undefined;
+            this.collection = collection;
+
+            // Promisify used collection methods
+            ['count', 'findOne', 'remove', 'drop', 'update', 'ensureIndex'].forEach(method => {
+                collection[method + 'Async'] = Promise.promisify(collection[method], collection);
+            });
+
+            return collection;
+        }
+
         collectionReady() {
             if (!this.collectionReadyPromise) {
                 this.collectionReadyPromise = new Promise((resolve, reject) => {
                     switch (this.state) {
                         case 'connected':
-                            resolve(promisifyCollection(this.collection));
+                            resolve(this.setCollection(this.collection));
                             break;
                         case 'connecting':
-                            this.once('connected', () => resolve(promisifyCollection(this.collection)));
+                            this.once('connected', () => resolve(this.setCollection(this.collection)));
                             break;
                         case 'disconnected':
                             reject(new Error('Not connected'));
