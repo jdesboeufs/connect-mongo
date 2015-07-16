@@ -43,6 +43,13 @@ var stringifySerializationOptions = {
     unserialize: JSON.parse
 };
 
+export function promisifyCollection(collection) {
+    ['count', 'findOne', 'remove', 'drop', 'update', 'ensureIndex'].forEach(method => {
+        collection[method + 'Async'] = Promise.promisify(collection[method], collection);
+    });
+    return collection;
+};
+
 module.exports = function(connect) {
     var Store = connect.Store || connect.session.Store;
     var MemoryStore = connect.MemoryStore || connect.session.MemoryStore;
@@ -162,34 +169,25 @@ module.exports = function(connect) {
 
             changeState('connecting');
 
-            function promisifyCollection(collection) {
-                ['count', 'findOne', 'remove', 'drop', 'update', 'ensureIndex'].forEach((method) => {
-                    collection[method + 'Async'] = Promise.promisify(collection[method], collection);
-                });
-                return collection;
+        }
+
+        collectionReady() {
+            if (!this.collectionReadyPromise) {
+                this.collectionReadyPromise = new Promise((resolve, reject) => {
+                    switch (this.state) {
+                        case 'connected':
+                            resolve(promisifyCollection(this.collection));
+                            break;
+                        case 'connecting':
+                            this.once('connected', () => resolve(promisifyCollection(this.collection)));
+                            break;
+                        case 'disconnected':
+                            reject(new Error('Not connected'));
+                            break;
+                    }
+                }).bind(this);
             }
-
-            this.collectionReady = function () {
-                if (!this.collectionReadyPromise) {
-                    this.collectionReadyPromise = new Promise(function (resolve, reject) {
-                        switch (self.state) {
-                            case 'connected':
-                                resolve(promisifyCollection(self.collection));
-                                break;
-                            case 'connecting':
-                                self.once('connected', function () {
-                                    resolve(promisifyCollection(self.collection));
-                                });
-                                break;
-                            case 'disconnected':
-                                reject(new Error('Not connected'));
-                                break;
-                        }
-                    }).bind(this);
-                }
-                return this.collectionReadyPromise;
-            };
-
+            return this.collectionReadyPromise;
         }
 
         computeStorageId(sessionId) {
