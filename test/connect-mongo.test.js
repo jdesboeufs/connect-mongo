@@ -289,6 +289,18 @@ exports.test_options_url = function(done) {
   });
 };
 
+exports.new_connection_failure = function(done) {
+    var originalException = process.listeners('uncaughtException').pop();
+    process.removeListener('uncaughtException', originalException);
+    new MongoStore({
+      url: 'mongodb://localhost:27018/connect-mongo-test', collection: 'sessions-test'
+    });
+    process.once('uncaughtException', function (err) {
+      process.listeners('uncaughtException').push(originalException);
+      done();
+    });
+};
+
 exports.test_options_no_db = function(done) {
   assert.throws(
     function() {
