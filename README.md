@@ -6,13 +6,16 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 [![Build Status](https://travis-ci.org/kcbanner/connect-mongo.svg?branch=master)](https://travis-ci.org/kcbanner/connect-mongo)
 [![Dependency Status](https://david-dm.org/kcbanner/connect-mongo.svg?style=flat)](https://david-dm.org/kcbanner/connect-mongo)
 
+This documentation is about the upcoming version `v1.0.0`.
+Last stable revision is [here](https://github.com/kcbanner/connect-mongo/tree/v0.x).
+
 ## Compatibility
 
 * Support Express `4.x`, `5.0` and Connect `3.x` through [express-session](https://github.com/expressjs/session)
 * Support Express `2.x`, `3.x` and Connect `>= 1.0.3`, `2.x`
 * Support [Mongoose](http://mongoosejs.com/index.html) `>= 2.6`, `3.x` and `4.0`
 * Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 1.2` and `2.0`
-* Support Node.js `0.8`, `0.10`, `0.12` and [io.js](https://iojs.org)
+* Support Node.js `0.10`, `0.12` and [io.js](https://iojs.org)
 
 ## Usage
 
@@ -100,32 +103,6 @@ app.use(session({
     store: new MongoStore({
         url: 'mongodb://user12345:foobar@localhost/test-app?authSource=admins&w=1',
         mongoOptions: advancedOptions // See below for details
-    })
-}));
-```
-
-#### Create a new connection from legacy options
-
-For compatibility purpose, `connect-mongo` can create a basic connection string and set some options for you.
-
-You can't use `mongoOptions` if you choose this mode.
-
-```js
-app.use(session({
-    store: new MongoStore({
-        // Basic usage
-        host: 'localhost', // Default, optional
-        port: 27017, // Default, optional
-        db: 'test-app', // Required
-
-        // Basic authentication (optional)
-        username: 'user12345',
-        password: 'foobar',
-
-        // Advanced options (optional)
-        autoReconnect: true, // Default
-        w: 1, // Default,
-        ssl: false // Default
     })
 }));
 ```
@@ -228,15 +205,11 @@ by doing this, setting `touchAfter: 24 * 3600` you are saying to the session be 
                 scenarios where you need to support different types of serializations
                 (e.g., objects and JSON strings) or need to modify the session before using
                 it in your app.
-  - `hash` (optional) Hash is an object, which will determine wether hash the sid in mongo, since it's not undefined, means sid will be hashed
-  - `hash.salt` Salt will be used to hash the sid in mongo, default salt is "connect-mongo"
-  - `hash.algorithm` Hash algorithm, default algorithm is "sha1"
+  - `transformId` (optional) Transform original sessionId in whatever you want to use as storage key.
 
 ## Tests
 
-You need `mocha`.
-
-    make test
+    npm test
 
 The tests use a database called `connect-mongo-test`.
 
