@@ -5,3 +5,5 @@ node_js:
   - iojs
 services: mongodb
 sudo: false
+script: "npm run test && npm run cover"
+after_script: "npm install coveralls@2.11 && cat ./coverage/lcov.info | coveralls"
