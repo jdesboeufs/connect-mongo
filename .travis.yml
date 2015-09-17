@@ -1,9 +1,15 @@
 language: node_js
+
 node_js:
   - 0.10
   - 0.12
-  - iojs
+  - iojs-v2
+  - iojs-v3
+  - 4
+
 services: mongodb
+
 sudo: false
+
 script: "npm run test && npm run cover"
 after_script: "npm install coveralls@2.11 && cat ./coverage/lcov.info | coveralls"
