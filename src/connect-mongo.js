@@ -260,13 +260,13 @@ export default function connectMongo(connect) {
                 if(timeElapsed < touchAfter){
                     return callback();
                 } else {
-                    updateFields.lastModified = currentDate;
+                    updateFields.lastModified = session.lastModified = currentDate;
                 }
 
             }
 
             if (session && session.cookie && session.cookie.expires) {
-                updateFields.expires = new Date(session.cookie.expires);
+                updateFields['session.cookie.expires'] = updateFields.expires = new Date(session.cookie.expires);
             } else {
                 updateFields.expires = new Date(Date.now() + this.options.ttl * 1000);
             }
