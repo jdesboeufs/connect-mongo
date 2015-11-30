@@ -119,15 +119,15 @@ export default function connectMongo(connect) {
             defaults(this.options, { autoRemove: 'native', autoRemoveInterval: 10 });
 
             switch (this.options.autoRemove) {
-                case 'native':
-                    return this.collection.ensureIndexAsync({ expires: 1 }, { expireAfterSeconds: 0 });
-                case 'interval':
-                    let removeQuery = { expires: { $lt: new Date() } };
-                    this.timer = setInterval(() => this.collection.remove(removeQuery, { w: 0 }), this.options.autoRemoveInterval * 1000 * 60);
-                    this.timer.unref();
-                    return Promise.resolve();
-                default:
-                    return Promise.resolve();
+            case 'native':
+                return this.collection.ensureIndexAsync({ expires: 1 }, { expireAfterSeconds: 0 });
+            case 'interval':
+                let removeQuery = { expires: { $lt: new Date() } };
+                this.timer = setInterval(() => this.collection.remove(removeQuery, { w: 0 }), this.options.autoRemoveInterval * 1000 * 60);
+                this.timer.unref();
+                return Promise.resolve();
+            default:
+                return Promise.resolve();
             }
         }
 
@@ -158,15 +158,15 @@ export default function connectMongo(connect) {
             if (!this.collectionReadyPromise) {
                 this.collectionReadyPromise = new Promise((resolve, reject) => {
                     switch (this.state) {
-                        case 'connected':
-                            resolve(this.collection);
-                            break;
-                        case 'connecting':
-                            this.once('connected', () => resolve(this.collection));
-                            break;
-                        case 'disconnected':
-                            reject(new Error('Not connected'));
-                            break;
+                    case 'connected':
+                        resolve(this.collection);
+                        break;
+                    case 'connecting':
+                        this.once('connected', () => resolve(this.collection));
+                        break;
+                    case 'disconnected':
+                        reject(new Error('Not connected'));
+                        break;
                     }
                 }).bind(this);
             }

@@ -5,7 +5,7 @@
  * Module dependencies.
  */
 var session = require('express-session');
-var MongoStore = require('../src/connect-mongo')(session);
+var MongoStore = require('../src/connect-mongo').default(session);
 var assert = require('assert');
 var _ = require('lodash');
 
@@ -104,7 +104,9 @@ function getNativeDbConnection(options, done) {
     options = {};
   }
   mongo.MongoClient.connect(connectionString, function (err, db) {
-    if (err) return done(err);
+    if (err) {
+        return done(err);
+    }
     open_db(_.assign(options, { db: db }), done);
   });
 }
@@ -295,7 +297,7 @@ exports.new_connection_failure = function(done) {
     new MongoStore({
       url: 'mongodb://localhost:27018/connect-mongo-test', collection: 'sessions-test'
     });
-    process.once('uncaughtException', function (err) {
+    process.once('uncaughtException', function () {
       process.listeners('uncaughtException').push(originalException);
       done();
     });
@@ -583,4 +585,3 @@ exports.test_session_lazy_touch_async = function(done) {
     });
   });
 };
-
