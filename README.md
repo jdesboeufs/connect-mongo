@@ -2,8 +2,10 @@
 
 MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [Express](http://expressjs.com/)
 
-[![npm version](https://badge.fury.io/js/connect-mongo.svg)](http://badge.fury.io/js/connect-mongo)
+[![npm version](https://img.shields.io/npm/v/connect-mongo.svg)](https://www.npmjs.com/package/connect-mongo)
+[![downloads](https://img.shields.io/npm/dm/connect-mongo.svg)](https://www.npmjs.com/package/connect-mongo)
 [![Build Status](https://travis-ci.org/kcbanner/connect-mongo.svg?branch=master)](https://travis-ci.org/kcbanner/connect-mongo)
+[![Coverage Status](https://coveralls.io/repos/kcbanner/connect-mongo/badge.svg?branch=master&service=github)](https://coveralls.io/github/kcbanner/connect-mongo?branch=master)
 [![Dependency Status](https://david-dm.org/kcbanner/connect-mongo.svg?style=flat)](https://david-dm.org/kcbanner/connect-mongo)
 
 This documentation is about the upcoming version `v1.0.0`.
