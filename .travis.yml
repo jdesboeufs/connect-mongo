@@ -1,15 +1,17 @@
 language: node_js
 
 node_js:
-  - 0.10
   - 0.12
-  - iojs-v2
-  - iojs-v3
   - 4
+  - 5
 
 services: mongodb
 
 sudo: false
 
-script: "npm run test && npm run cover"
-after_script: "npm install coveralls@2.11 && cat ./coverage/lcov.info | coveralls"
+script:
+    - if [[ $TRAVIS_NODE_VERSION == "0.12" ]]; then npm run test-es5; fi;
+    - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then npm run test; fi;
+
+after_script:
+    - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then npm install coveralls && cat ./coverage/lcov.info | coveralls; fi;
