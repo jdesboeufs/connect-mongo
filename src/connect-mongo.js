@@ -23,7 +23,7 @@ function defaultSerializeFunction(session) {
 
 function computeTransformFunctions(options, defaultStringify) {
     if (options.serialize || options.unserialize) {
-        return  {
+        return {
             serialize: options.serialize || defaultSerializeFunction,
             unserialize: options.unserialize || (x => x),
         };
@@ -32,7 +32,7 @@ function computeTransformFunctions(options, defaultStringify) {
     if (options.stringify === false || defaultStringify === false) {
         return {
             serialize: defaultSerializeFunction,
-            unserialize: (x => x)
+            unserialize: x => x,
         };
     }
 
@@ -188,8 +188,8 @@ module.exports = function connectMongo(connect) {
                     _id: this.computeStorageId(sid),
                     $or: [
                         { expires: { $exists: false } },
-                        { expires: { $gt: new Date() } }
-                    ]
+                        { expires: { $gt: new Date() } },
+                    ],
                 }))
                 .then(session => {
                     if (session) {
