@@ -1,5 +1,7 @@
-import Promise from 'bluebird';
-import MongoClient from 'mongodb';
+'use strict';
+
+const Promise = require('bluebird');
+const MongoClient = require('mongodb');
 
 function defaultSerializeFunction(session) {
     // Copy each property of the session to a new object
@@ -42,13 +44,14 @@ function computeTransformFunctions(options, defaultStringify) {
     }
 }
 
-export default function connectMongo(connect) {
+module.exports = function connectMongo(connect) {
     const Store = connect.Store || connect.session.Store;
     const MemoryStore = connect.MemoryStore || connect.session.MemoryStore;
 
     class MongoStore extends Store {
 
-        constructor(options = {}) {
+        constructor(options) {
+            options = options || {};
 
             /* Fallback */
             if (options.fallbackMemory && MemoryStore) {
@@ -300,4 +303,4 @@ export default function connectMongo(connect) {
     }
 
     return MongoStore;
-}
+};
