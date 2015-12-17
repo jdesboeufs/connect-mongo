@@ -1,6 +1,6 @@
 {
   "name": "connect-mongo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MongoDB session store for Express and Connect",
   "keywords": [
     "connect",
@@ -47,5 +47,5 @@
     "test-es5": "npm run test-unit-es5",
     "prepublish": "babel src --out-dir es5"
   },
-  "main": "./lib"
+  "main": "./src"
 }

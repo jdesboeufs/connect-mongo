@@ -5,7 +5,7 @@
  * Module dependencies.
  */
 var session = require('express-session');
-var MongoStore = require('../src')(session);
+var MongoStore = require('../')(session);
 var assert = require('assert');
 var _ = require('lodash');
 
