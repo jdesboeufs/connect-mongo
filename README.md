@@ -8,16 +8,16 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 [![Coverage Status](https://coveralls.io/repos/kcbanner/connect-mongo/badge.svg?branch=master&service=github)](https://coveralls.io/github/kcbanner/connect-mongo?branch=master)
 [![Dependency Status](https://david-dm.org/kcbanner/connect-mongo.svg?style=flat)](https://david-dm.org/kcbanner/connect-mongo)
 
-This documentation is about the upcoming version `v1.0.0`.
-Last stable revision is [here](https://github.com/kcbanner/connect-mongo/tree/v0.x).
-
 ## Compatibility
 
-* Support Express `4.x`, `5.0` and Connect `3.x` through [express-session](https://github.com/expressjs/session)
-* Support Express `2.x`, `3.x` and Connect `>= 1.0.3`, `2.x`
-* Support [Mongoose](http://mongoosejs.com/index.html) `>= 2.6`, `3.x` and `4.0`
+* Support Express up to `5.0`
+* Support all Connect versions
+* Support [Mongoose](http://mongoosejs.com/index.html) `>= 2.6`, `3.x` and `4.x`
 * Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 1.2` and `2.0`
-* Support Node.js `0.10`, `0.12` and [io.js](https://iojs.org)
+* Support Node.js `0.10`, `0.12`, `4.x`, `5.x` and all [io.js](https://iojs.org) versions
+* Support [MongoDB](https://www.mongodb.com/) up to `3.2`
+
+For older Node.js versions `0.10`, `0.12` and io.js, please read the [Node.js compatibility section](#old-node-js-versions-compatibility)
 
 ## Usage
 
@@ -26,8 +26,8 @@ Last stable revision is [here](https://github.com/kcbanner/connect-mongo/tree/v0
 Express `4.x`, `5.0` and Connect `3.x`:
 
 ```js
-var session = require('express-session');
-var MongoStore = require('connect-mongo')(session);
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 
 app.use(session({
     secret: 'foo',
@@ -38,7 +38,7 @@ app.use(session({
 Express `2.x`, `3.x` and Connect `1.x`, `2.x`:
 
 ```js
-var MongoStore = require('connect-mongo')(express);
+const MongoStore = require('connect-mongo')(express);
 
 app.use(express.session({
     secret: 'foo',
@@ -57,7 +57,7 @@ Alternatively, you can configure `connect-mongo` to establish a new connection.
 #### Re-use a Mongoose connection
 
 ```js
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 // Basic usage
 mongoose.connect(connectionOptions);
@@ -67,7 +67,7 @@ app.use(session({
 }));
 
 // Advanced usage
-var connection = mongoose.createConnection(connectionOptions);
+const connection = mongoose.createConnection(connectionOptions);
 
 app.use(session({
     store: new MongoStore({ mongooseConnection: connection })
@@ -107,6 +107,13 @@ app.use(session({
         mongoOptions: advancedOptions // See below for details
     })
 }));
+```
+
+## Old Node.js versions compatibility
+
+For versions `0.10`, `0.12` and io.js, you must use the ES5 fallback:
+```js
+var MongoStore = require('connect-mongo/es5')(session);
 ```
 
 ## Session expiration

@@ -1,6 +1,6 @@
 {
   "name": "connect-mongo",
-  "version": "1.0.0-dev",
+  "version": "1.0.0",
   "description": "MongoDB session store for Express and Connect",
   "keywords": [
     "connect",

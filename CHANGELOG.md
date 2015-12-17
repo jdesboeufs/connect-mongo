@@ -1,3 +1,16 @@
+1.0.0 / 2015-12-17
+==================
+
+__Breaking changes:__
+* __For older Node.js version (`< 4.0`), the module must be loaded using `require('connect-mongo/es5')`__
+* __Drop__ `hash` option (advanced)
+
+__Others changes:__
+* __Add__ `transformId` option to allow custom transformation on session id (advanced)
+* __Rewrite in ES6__ (w/ fallback)
+* Update dependencies
+* Improve compatibility
+
 0.8.2 / 2015-07-14
 ==================
 
