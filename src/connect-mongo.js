@@ -1,41 +1,46 @@
 import Promise from 'bluebird';
 import MongoClient from 'mongodb';
-import debugFactory from 'debug';
-import { defaults, assign, identity } from 'lodash';
 
-const debug = debugFactory('connect-mongo');
+function defaultSerializeFunction(session) {
+    // Copy each property of the session to a new object
+    const obj = {};
+    let prop;
 
-const defaultOptions = {
-    collection: 'sessions',
-    stringify: true,
-    ttl: 60 * 60 * 24 * 14 // 14 days
-};
-
-var defaultSerializationOptions = {
-    serialize: function (session) {
-        // Copy each property of the session to a new object
-        var obj = {};
-        for (var prop in session) {
-            if (prop === 'cookie') {
-
+    for (prop in session) {
+        if (prop === 'cookie') {
             // Convert the cookie instance to an object, if possible
             // This gets rid of the duplicate object under session.cookie.data property
-
-                obj.cookie = session.cookie.toJSON ? session.cookie.toJSON() : session.cookie;
-            } else {
-                obj[prop] = session[prop];
-            }
+            obj.cookie = session.cookie.toJSON ? session.cookie.toJSON() : session.cookie;
+        } else {
+            obj[prop] = session[prop];
         }
+    }
 
-        return obj;
-    },
-    unserialize: identity
-};
+    return obj;
+}
 
-var stringifySerializationOptions = {
-    serialize: JSON.stringify,
-    unserialize: JSON.parse
-};
+function computeTransformFunctions(options, defaultStringify) {
+    if (options.serialize || options.unserialize) {
+        return  {
+            serialize: options.serialize || defaultSerializeFunction,
+            unserialize: options.unserialize || (x => x),
+        };
+    }
+
+    if (options.stringify === false || defaultStringify === false) {
+        return {
+            serialize: defaultSerializeFunction,
+            unserialize: (x => x)
+        };
+    }
+
+    if (options.stringify === true || defaultStringify === true) {
+        return {
+            serialize: JSON.stringify,
+            unserialize: JSON.parse,
+        };
+    }
+}
 
 export default function connectMongo(connect) {
     const Store = connect.Store || connect.session.Store;
@@ -46,7 +51,6 @@ export default function connectMongo(connect) {
         constructor(options = {}) {
 
             /* Fallback */
-
             if (options.fallbackMemory && MemoryStore) {
                 return new MemoryStore();
             }
@@ -54,14 +58,13 @@ export default function connectMongo(connect) {
             super(options);
 
             /* Options */
+            this.ttl = options.ttl || 1209600; // 14 days
+            this.collectionName = options.collection || 'sessions';
+            this.autoRemove = options.autoRemove || 'native';
+            this.autoRemoveInterval = options.autoRemoveInterval || 10;
+            this.transformFunctions = computeTransformFunctions(options, true);
 
-            this.options = defaults(options, defaultOptions);
-
-            if (!options.stringify || options.serialize || options.unserialize) {
-                options = defaults(options, defaultSerializationOptions);
-            } else {
-                options = assign(options, stringifySerializationOptions);
-            }
+            this.options = options;
 
             this.changeState('init');
 
@@ -75,11 +78,9 @@ export default function connectMongo(connect) {
 
             if (options.url) {
                 // New native connection using url + mongoOptions
-                debug('use strategy: `url`');
                 MongoClient.connect(options.url, options.mongoOptions || {}, newConnectionCallback);
             } else if (options.mongooseConnection) {
                 // Re-use existing or upcoming mongoose connection
-                debug('use strategy: `mongoose_connection`');
                 if (options.mongooseConnection.readyState === 1) {
                     this.handleNewConnectionAsync(options.mongooseConnection.db);
                 } else {
@@ -87,7 +88,6 @@ export default function connectMongo(connect) {
                 }
             } else if (options.db && options.db.listCollections) {
                 // Re-use existing or upcoming native connection
-                debug('use strategy: `native_db`');
                 if (options.db.openCalled || options.db.openCalled === undefined) { // openCalled is undefined in mongodb@2.x
                     this.handleNewConnectionAsync(options.db);
                 } else {
@@ -102,7 +102,6 @@ export default function connectMongo(connect) {
         }
 
         connectionFailed(err) {
-            debug('not able to connect to the database');
             this.changeState('disconnected');
             throw err;
         }
@@ -110,30 +109,27 @@ export default function connectMongo(connect) {
         handleNewConnectionAsync(db) {
             this.db = db;
             return this
-                .setCollection(db.collection(this.options.collection))
+                .setCollection(db.collection(this.collectionName))
                 .setAutoRemoveAsync()
                     .then(() => this.changeState('connected'));
         }
 
         setAutoRemoveAsync() {
-            defaults(this.options, { autoRemove: 'native', autoRemoveInterval: 10 });
-
-            switch (this.options.autoRemove) {
-                case 'native':
-                    return this.collection.ensureIndexAsync({ expires: 1 }, { expireAfterSeconds: 0 });
-                case 'interval':
-                    let removeQuery = { expires: { $lt: new Date() } };
-                    this.timer = setInterval(() => this.collection.remove(removeQuery, { w: 0 }), this.options.autoRemoveInterval * 1000 * 60);
-                    this.timer.unref();
-                    return Promise.resolve();
-                default:
-                    return Promise.resolve();
+            switch (this.autoRemove) {
+            case 'native':
+                return this.collection.ensureIndexAsync({ expires: 1 }, { expireAfterSeconds: 0 });
+            case 'interval':
+                let removeQuery = { expires: { $lt: new Date() } };
+                this.timer = setInterval(() => this.collection.remove(removeQuery, { w: 0 }), this.autoRemoveInterval * 1000 * 60);
+                this.timer.unref();
+                return Promise.resolve();
+            default:
+                return Promise.resolve();
             }
         }
 
         changeState(newState) {
             if (newState !== this.state) {
-                debug('switched to state: %s', newState);
                 this.state = newState;
                 this.emit(newState);
             }
@@ -158,15 +154,15 @@ export default function connectMongo(connect) {
             if (!this.collectionReadyPromise) {
                 this.collectionReadyPromise = new Promise((resolve, reject) => {
                     switch (this.state) {
-                        case 'connected':
-                            resolve(this.collection);
-                            break;
-                        case 'connecting':
-                            this.once('connected', () => resolve(this.collection));
-                            break;
-                        case 'disconnected':
-                            reject(new Error('Not connected'));
-                            break;
+                    case 'connected':
+                        resolve(this.collection);
+                        break;
+                    case 'connecting':
+                        this.once('connected', () => resolve(this.collection));
+                        break;
+                    case 'disconnected':
+                        reject(new Error('Not connected'));
+                        break;
                     }
                 }).bind(this);
             }
@@ -194,7 +190,7 @@ export default function connectMongo(connect) {
                 }))
                 .then(session => {
                     if (session) {
-                        var s = this.options.unserialize(session.session);
+                        var s = this.transformFunctions.unserialize(session.session);
                         if(this.options.touchAfter > 0 && session.lastModified){
                             s.lastModified = session.lastModified;
                         }
@@ -215,9 +211,8 @@ export default function connectMongo(connect) {
             var s;
 
             try {
-                s = { _id: this.computeStorageId(sid), session: this.options.serialize(session)};
+                s = { _id: this.computeStorageId(sid), session: this.transformFunctions.serialize(session)};
             } catch (err) {
-                debug('unable to serialize session');
                 return callback(err);
             }
 
@@ -231,7 +226,7 @@ export default function connectMongo(connect) {
                 // So we set the expiration to two-weeks from now
                 // - as is common practice in the industry (e.g Django) -
                 // or the default specified in the options.
-                s.expires = new Date(Date.now() + this.options.ttl * 1000);
+                s.expires = new Date(Date.now() + this.ttl * 1000);
             }
 
             if(this.options.touchAfter > 0){
@@ -268,7 +263,7 @@ export default function connectMongo(connect) {
             if (session && session.cookie && session.cookie.expires) {
                 updateFields.expires = new Date(session.cookie.expires);
             } else {
-                updateFields.expires = new Date(Date.now() + this.options.ttl * 1000);
+                updateFields.expires = new Date(Date.now() + this.ttl * 1000);
             }
 
             return this.collectionReady()

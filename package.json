@@ -22,9 +22,7 @@
     "url": "https://github.com/kcbanner/connect-mongo/issues"
   },
   "dependencies": {
-    "bluebird": ">= 1.0",
-    "debug": ">= 0.7.0",
-    "lodash": "*",
+    "bluebird": ">= 2.0",
     "mongodb": ">= 1.2.0 <2.1.0"
   },
   "devDependencies": {
@@ -32,6 +30,7 @@
     "babel-istanbul": "^0.2.10",
     "eslint": "^0.24.1",
     "express-session": ">= 1.0.0",
+    "lodash": "^3.10.1",
     "mocha": "~2.1.0",
     "mongoose": ">= 2.6.0 < 4.1.0"
   },
