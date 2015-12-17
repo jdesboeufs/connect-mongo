@@ -5,7 +5,7 @@
  * Module dependencies.
  */
 var session = require('express-session');
-var MongoStore = require('../src/connect-mongo')(session);
+var MongoStore = require('../src')(session);
 var assert = require('assert');
 var _ = require('lodash');
 
@@ -583,4 +583,3 @@ exports.test_session_lazy_touch_async = function(done) {
     });
   });
 };
-
