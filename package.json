@@ -27,17 +27,17 @@
   },
   "devDependencies": {
     "babel": "^5.6.23",
-    "babel-istanbul": "^0.2.10",
     "eslint": "^0.24.1",
     "express-session": ">= 1.0.0",
+    "istanbul": "^0.4.1",
     "lodash": "^3.10.1",
-    "mocha": "~2.1.0",
+    "mocha": "^2.3.4",
     "mongoose": ">= 2.6.0 < 4.1.0"
   },
   "scripts": {
-    "test": "mocha --compilers js:babel/register --ui exports --timeout 6000 -R spec -b --recursive test",
-    "cover": "babel-istanbul cover _mocha -- --ui exports --timeout 6000 -R spec -b --recursive test",
+    "test-unit": "istanbul cover _mocha -- --ui exports -t 6000",
     "lint": "eslint src/",
+    "test": "npm run lint && npm run test-unit",
     "prepublish": "babel src --out-dir lib"
   },
   "main": "./lib/connect-mongo"
