@@ -40,12 +40,12 @@
     "mongoose": ">= 2.6.0 < 4.1.0"
   },
   "scripts": {
-    "test-unit-es5": "mocha --compilers js:babel-register",
-    "test-unit": "istanbul cover _mocha",
+    "test-unit-es5": "mocha --compilers js:babel-register && mocha --compilers js:babel-register test/es5/load.js",
+    "test-unit": "istanbul cover _mocha && mocha test/es5/load.js",
     "lint": "eslint src/",
-    "test": "npm run lint && npm run test-unit",
-    "test-es5": "npm run test-unit-es5",
-    "prepublish": "babel src --out-dir es5"
-  },
-  "main": "./src"
+    "test": "npm run lint && npm run transpile && npm run test-unit",
+    "test-es5": "npm run transpile && npm run test-unit-es5",
+    "transpile": "babel src --out-dir src-es5",
+    "prepublish": "npm run transpile"
+  }
 }
