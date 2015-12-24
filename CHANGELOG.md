@@ -1,4 +1,4 @@
-1.0.3 / In development
+1.1.0 / 2015-12-24
 =================
 
 * Support mongodb `2.1.x`
