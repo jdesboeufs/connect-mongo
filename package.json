@@ -37,7 +37,7 @@
     "istanbul": "^0.4.1",
     "lodash": "^3.10.1",
     "mocha": "^2.3.4",
-    "mongoose": ">= 2.6.0 < 4.1.0"
+    "mongoose": ">= 2.6.0 < 5.0"
   },
   "scripts": {
     "test-unit-es5": "mocha --compilers js:babel-register && mocha --compilers js:babel-register test/es5/load.js",
