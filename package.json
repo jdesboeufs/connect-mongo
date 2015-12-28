@@ -32,7 +32,7 @@
     "babel-plugin-transform-es2015-classes": "^6.3.15",
     "babel-plugin-transform-es2015-object-super": "^6.3.13",
     "babel-register": "^6.3.13",
-    "eslint": "^0.24.1",
+    "eslint": "^1.10.3",
     "express-session": ">= 1.0.0",
     "istanbul": "^0.4.1",
     "lodash": "^3.10.1",
