@@ -300,6 +300,9 @@ module.exports = function connectMongo(connect) {
                 .nodeify(callback);
         }
 
+        close() {
+            this.db.close();
+        }
     }
 
     return MongoStore;
