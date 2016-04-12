@@ -17,7 +17,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 * Support Node.js `0.10`, `0.12`, `4.x`, `5.x` and all [io.js](https://iojs.org) versions
 * Support [MongoDB](https://www.mongodb.com/) up to `3.2`
 
-For older Node.js versions `0.10`, `0.12` and io.js, please read the [Node.js compatibility section](#old-nodejs-versions-compatibility)
+For older Node.js versions `0.10`, `0.12` and io.js, please read the [Node.js compatibility section](#old-node-js-versions-compatibility)
 
 ## Usage
 
