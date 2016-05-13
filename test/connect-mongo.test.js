@@ -30,6 +30,15 @@ function getMongooseConnection() {
   return mongoose.createConnection(connectionString);
 }
 
+function getDbPromise() {
+  return new Promise(function (resolve, reject) {
+    mongo.MongoClient.connect(connectionString, function (err, db) {
+      if (err) return reject(err);
+      resolve(db);
+    });
+  });
+}
+
 // Create session data
 var make_data = function() {
   return {
@@ -315,6 +324,28 @@ exports.test_options_no_db = function(done) {
 
 exports.test_set_with_mongoose_db = function(done) {
   open_db({ mongooseConnection: getMongooseConnection() }, function(store, db, collection) {
+    var sid = 'test_set-sid';
+    var data = make_data();
+
+    store.set(sid, data, function(err) {
+      assert.equal(err, null);
+
+      // Verify it was saved
+      collection.findOne({_id: sid}, function(err, session) {
+        assert_session_equals(sid, data, session);
+
+        cleanup(store, db, collection, function() {
+          done();
+        });
+      });
+    });
+  });
+};
+
+/* options.dbPromise tests */
+
+exports.test_set_with_promise_db = function(done) {
+  open_db({ dbPromise: getDbPromise() }, function(store, db, collection) {
     var sid = 'test_set-sid';
     var data = make_data();
 
