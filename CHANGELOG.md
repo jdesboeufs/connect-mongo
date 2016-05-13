@@ -1,3 +1,9 @@
+1.2.0 / In development
+=================
+
+* Accept `dbPromise` as connection param
+* _Add_ `close()` method to close current connection
+
 1.1.0 / 2015-12-24
 =================
 
