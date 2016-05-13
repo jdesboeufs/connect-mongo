@@ -96,6 +96,10 @@ module.exports = function connectMongo(connect) {
                 } else {
                     options.db.open(newConnectionCallback);
                 }
+            } else if (options.dbPromise) {
+                options.dbPromise
+                    .then(db => this.handleNewConnectionAsync(db))
+                    .catch(err => this.connectionFailed(err));
             } else {
                 throw new Error('Connection strategy not found');
             }
