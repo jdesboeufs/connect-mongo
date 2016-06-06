@@ -172,7 +172,7 @@ module.exports = function connectMongo(connect) {
                         reject(new Error('Not connected'));
                         break;
                     }
-                }).bind(this);
+                });
                 this.collectionReadyPromise = promise;
             }
             return promise;
