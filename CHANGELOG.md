@@ -1,4 +1,9 @@
-1.2.0 / In development
+1.2.1 / 2016-06-20
+=================
+
+* __Fix__ bluebird warning (Awk34)
+
+1.2.0 / 2016-05-13
 =================
 
 * Accept `dbPromise` as connection param
