@@ -158,8 +158,9 @@ module.exports = function connectMongo(connect) {
         }
 
         collectionReady() {
-            if (!this.collectionReadyPromise) {
-                this.collectionReadyPromise = new Promise((resolve, reject) => {
+            let promise = this.collectionReadyPromise;
+            if (!promise) {
+                promise = new Promise((resolve, reject) => {
                     switch (this.state) {
                     case 'connected':
                         resolve(this.collection);
@@ -171,9 +172,10 @@ module.exports = function connectMongo(connect) {
                         reject(new Error('Not connected'));
                         break;
                     }
-                }).bind(this);
+                });
+                this.collectionReadyPromise = promise;
             }
-            return this.collectionReadyPromise;
+            return promise;
         }
 
         computeStorageId(sessionId) {
