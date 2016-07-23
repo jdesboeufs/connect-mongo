@@ -1,4 +1,5 @@
 'use strict';
+/* eslint indent: [error, 4] */
 
 const Promise = require('bluebird');
 const MongoClient = require('mongodb');
