@@ -1,3 +1,4 @@
+'use strict';
 const legacyTests = require('./legacy-tests');
 
 describe('Legacy tests', function () {
