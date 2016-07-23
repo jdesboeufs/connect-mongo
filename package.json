@@ -48,8 +48,5 @@
     "test-es5": "npm run transpile && npm run test-unit-es5",
     "transpile": "babel src --out-dir src-es5",
     "prepublish": "npm run transpile"
-  },
-  "engines": {
-    "node": ">= 0.12"
   }
 }
