@@ -122,11 +122,11 @@ module.exports = function connectMongo(connect) {
         }
 
         setAutoRemoveAsync() {
+            let removeQuery = { expires: { $lt: new Date() } };
             switch (this.autoRemove) {
             case 'native':
                 return this.collection.ensureIndexAsync({ expires: 1 }, { expireAfterSeconds: 0 });
             case 'interval':
-                let removeQuery = { expires: { $lt: new Date() } };
                 this.timer = setInterval(() => this.collection.remove(removeQuery, { w: 0 }), this.autoRemoveInterval * 1000 * 60);
                 this.timer.unref();
                 return Promise.resolve();
@@ -200,7 +200,7 @@ module.exports = function connectMongo(connect) {
                 .then(session => {
                     if (session) {
                         var s = this.transformFunctions.unserialize(session.session);
-                        if(this.options.touchAfter > 0 && session.lastModified){
+                        if (this.options.touchAfter > 0 && session.lastModified) {
                             s.lastModified = session.lastModified;
                         }
                         this.emit('touch', sid);
@@ -213,14 +213,14 @@ module.exports = function connectMongo(connect) {
         set(sid, session, callback) {
 
             // removing the lastModified prop from the session object before update
-            if(this.options.touchAfter > 0 && session && session.lastModified){
+            if (this.options.touchAfter > 0 && session && session.lastModified) {
                 delete session.lastModified;
             }
 
             var s;
 
             try {
-                s = { _id: this.computeStorageId(sid), session: this.transformFunctions.serialize(session)};
+                s = { _id: this.computeStorageId(sid), session: this.transformFunctions.serialize(session) };
             } catch (err) {
                 return callback(err);
             }
@@ -238,7 +238,7 @@ module.exports = function connectMongo(connect) {
                 s.expires = new Date(Date.now() + this.ttl * 1000);
             }
 
-            if(this.options.touchAfter > 0){
+            if (this.options.touchAfter > 0) {
                 s.lastModified = new Date();
             }
 
@@ -257,11 +257,11 @@ module.exports = function connectMongo(connect) {
             // if the given options has a touchAfter property, check if the
             // current timestamp - lastModified timestamp is bigger than
             // the specified, if it's not, don't touch the session
-            if(touchAfter > 0 && lastModified > 0){
+            if (touchAfter > 0 && lastModified > 0) {
 
                 var timeElapsed = currentDate.getTime() - session.lastModified;
 
-                if(timeElapsed < touchAfter){
+                if (timeElapsed < touchAfter) {
                     return callback();
                 } else {
                     updateFields.lastModified = currentDate;
