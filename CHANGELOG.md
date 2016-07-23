@@ -1,3 +1,9 @@
+1.3.0 / 2016-07-23
+=================
+
+* __Add__ `create` and `update` events ([#215](https://github.com/kcbanner/connect-mongo/issues/215))
+* Extend `mongodb` compatibility to `2.x`
+
 1.2.1 / 2016-06-20
 =================
 
@@ -7,7 +13,7 @@
 =================
 
 * Accept `dbPromise` as connection param
-* _Add_ `close()` method to close current connection
+* __Add__ `close()` method to close current connection
 
 1.1.0 / 2015-12-24
 =================
