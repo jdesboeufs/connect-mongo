@@ -1,11 +1,11 @@
 'use strict';
-/* jshint camelcase: false */
+/* eslint indent: [2, 2], camelcase: 0 */
 
 /**
  * Module dependencies.
  */
-var session = require('express-session');
-var MongoStore = require('../')(session);
+const expressSession = require('express-session');
+const MongoStore = require('../')(expressSession);
 var assert = require('assert');
 
 var connectionString = 'mongodb://localhost/connect-mongo-test';
@@ -15,7 +15,7 @@ var mongoose = require('mongoose');
 
 // Create a connect cookie instance
 var make_cookie = function() {
-  var cookie = new session.Cookie();
+  var cookie = new expressSession.Cookie();
   cookie.maxAge = 10000; // This sets cookie.expire through a setter
   cookie.secure = true;
   cookie.domain = 'cow.com';
@@ -42,10 +42,10 @@ var make_data = function() {
     foo: 'bar',
     baz: {
       cow: 'moo',
-      chicken: 'cluck'
+      chicken: 'cluck',
     },
     num: 1,
-    cookie: make_cookie()
+    cookie: make_cookie(),
   };
 };
 
@@ -55,9 +55,9 @@ var make_data_no_cookie = function() {
     baz: {
       cow: 'moo',
       fish: 'blub',
-      fox: 'nobody knows!'
+      fox: 'nobody knows!',
     },
-    num: 2
+    num: 2,
   };
 };
 
@@ -124,7 +124,7 @@ exports.test_set = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         assert_session_equals(sid, data, session);
 
         cleanup(store, db, collection, function() {
@@ -144,7 +144,7 @@ exports.test_set_no_stringify = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         assert_session_equals(sid, data, session);
 
         cleanup(store, db, collection, function() {
@@ -164,7 +164,7 @@ exports.test_session_cookie_overwrite_no_stringify = function(done) {
     store.set(sid, origSession, function(err) {
       assert.equal(err, null);
 
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         // Make sure cookie came out intact
         assert.strictEqual(origSession.cookie, cookie);
 
@@ -189,7 +189,7 @@ exports.test_set_expires = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         assert_session_equals(sid, data, session);
 
         cleanup(store, db, collection, function() {
@@ -210,7 +210,7 @@ exports.test_set_expires_no_stringify = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         assert_session_equals(sid, data, session);
 
         cleanup(store, db, collection, function() {
@@ -224,9 +224,9 @@ exports.test_set_expires_no_stringify = function(done) {
 exports.test_get = function(done) {
   getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_get-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
+    collection.insert({ _id: sid, session: JSON.stringify({ key1: 1, key2: 'two' }) }, function() {
       store.get(sid, function(err, session) {
-        assert.deepEqual(session, {key1: 1, key2: 'two'});
+        assert.deepEqual(session, { key1: 1, key2: 'two' });
         cleanup(store, db, collection, function() {
           done();
         });
@@ -238,7 +238,7 @@ exports.test_get = function(done) {
 exports.test_length = function(done) {
   getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_length-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
+    collection.insert({ _id: sid, session: JSON.stringify({ key1: 1, key2: 'two' }) }, function () {
       store.length(function(err, length) {
         assert.equal(err, null);
         assert.strictEqual(length, 1);
@@ -253,7 +253,7 @@ exports.test_length = function(done) {
 exports.test_destroy_ok = function(done) {
   getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_destroy_ok-sid';
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, function() {
+    collection.insert({ _id: sid, session: JSON.stringify({ key1: 1, key2: 'two' }) }, function() {
       store.destroy(sid, function(err) {
         assert.equal(err, null);
         cleanup(store, db, collection, function() {
@@ -267,7 +267,7 @@ exports.test_destroy_ok = function(done) {
 exports.test_clear = function(done) {
   getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_length-sid';
-    collection.insert({_id: sid, key1: 1, key2: 'two'}, function() {
+    collection.insert({ _id: sid, key1: 1, key2: 'two' }, function() {
       store.clear(function() {
         collection.count(function(err, count) {
           assert.strictEqual(count, 0);
@@ -283,7 +283,8 @@ exports.test_clear = function(done) {
 
 exports.test_options_url = function(done) {
   var store = new MongoStore({
-    url: 'mongodb://localhost:27017/connect-mongo-test', collection: 'sessions-test'
+    url: 'mongodb://localhost:27017/connect-mongo-test',
+    collection: 'sessions-test',
   });
   store.once('connected', function() {
     assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
@@ -296,15 +297,18 @@ exports.test_options_url = function(done) {
 };
 
 exports.new_connection_failure = function(done) {
-    var originalException = process.listeners('uncaughtException').pop();
-    process.removeListener('uncaughtException', originalException);
-    new MongoStore({
-      url: 'mongodb://localhost:27018/connect-mongo-test', collection: 'sessions-test'
+  var originalException = process.listeners('uncaughtException').pop();
+  process.removeListener('uncaughtException', originalException);
+  (function () {
+    return new MongoStore({
+      url: 'mongodb://localhost:27018/connect-mongo-test',
+      collection: 'sessions-test',
     });
-    process.once('uncaughtException', function (err) {
-      process.listeners('uncaughtException').push(originalException);
-      done();
-    });
+  })();
+  process.once('uncaughtException', function () {
+    process.listeners('uncaughtException').push(originalException);
+    done();
+  });
 };
 
 exports.test_options_no_db = function(done) {
@@ -328,7 +332,7 @@ exports.test_set_with_mongoose_db = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function (err, session) {
         assert_session_equals(sid, data, session);
 
         cleanup(store, db, collection, function() {
@@ -350,7 +354,7 @@ exports.test_set_with_promise_db = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function (err, session) {
         assert_session_equals(sid, data, session);
 
         cleanup(store, db, collection, function() {
@@ -372,7 +376,7 @@ exports.test_set_with_native_db = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         assert_session_equals(sid, data, session);
 
         cleanup(store, db, collection, function() {
@@ -396,7 +400,7 @@ exports.test_set_default_expiration = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         assert.deepEqual(session.session, JSON.stringify(data));
         assert.strictEqual(session._id, sid);
         assert.notEqual(session.expires, null);
@@ -426,7 +430,7 @@ exports.test_set_without_default_expiration = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         assert.deepEqual(session.session, JSON.stringify(data));
         assert.strictEqual(session._id, sid);
         assert.notEqual(session.expires, null);
@@ -459,7 +463,7 @@ exports.test_set_custom_serializer = function (done) {
     store.set(sid, data, function (err) {
       assert.equal(err, null);
 
-      collection.findOne({_id: sid}, function (err, session) {
+      collection.findOne({ _id: sid }, function (err, session) {
         assert.deepEqual(session.session, JSON.stringify(dataWithIce));
         assert.strictEqual(session._id, sid);
 
@@ -502,7 +506,7 @@ exports.test_session_touch = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         assert.equal(err, null);
         assert_session_equals(sid, data, session);
 
@@ -511,7 +515,7 @@ exports.test_session_touch = function(done) {
           assert.equal(err, null);
 
           // find the touched session
-          collection.findOne({_id: sid}, function(err, session2) {
+          collection.findOne({ _id: sid }, function(err, session2) {
             assert.equal(err, null);
 
             // check if both expiry date are different
@@ -540,7 +544,7 @@ exports.test_session_lazy_touch_sync = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         assert.equal(err, null);
 
         lastModifiedBeforeTouch = session.lastModified.getTime();
@@ -549,7 +553,7 @@ exports.test_session_lazy_touch_sync = function(done) {
         store.touch(sid, session, function(err) {
           assert.equal(err, null);
 
-          collection.findOne({_id: sid}, function(err, session2) {
+          collection.findOne({ _id: sid }, function(err, session2) {
             assert.equal(err, null);
 
             lastModifiedAfterTouch = session2.lastModified.getTime();
@@ -580,7 +584,7 @@ exports.test_session_lazy_touch_async = function(done) {
       assert.equal(err, null);
 
       // Verify it was saved
-      collection.findOne({_id: sid}, function(err, session) {
+      collection.findOne({ _id: sid }, function(err, session) {
         assert.equal(err, null);
 
         lastModifiedBeforeTouch = session.lastModified.getTime();
@@ -591,7 +595,7 @@ exports.test_session_lazy_touch_async = function(done) {
           store.touch(sid, session, function(err) {
             assert.equal(err, null);
 
-            collection.findOne({_id: sid}, function(err, session2) {
+            collection.findOne({ _id: sid }, function(err, session2) {
               assert.equal(err, null);
 
               lastModifiedAfterTouch = session2.lastModified.getTime();
