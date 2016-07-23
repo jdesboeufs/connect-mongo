@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "bluebird": ">= 2.0",
-    "mongodb": ">= 1.2.0 <2.2.0"
+    "mongodb": ">= 1.2.0 <3.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.3.17",
