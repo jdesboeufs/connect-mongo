@@ -152,7 +152,7 @@ module.exports = function connectMongo(connect) {
 
             // Promisify used collection methods
             ['count', 'findOne', 'remove', 'drop', 'update', 'ensureIndex'].forEach(method => {
-                collection[method + 'Async'] = Promise.promisify(collection[method], collection);
+                collection[method + 'Async'] = Promise.promisify(collection[method], { context: collection });
             });
 
             return this;
