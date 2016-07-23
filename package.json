@@ -34,6 +34,7 @@
     "babel-plugin-transform-object-assign": "^6.8.0",
     "babel-register": "^6.3.13",
     "eslint": "^3.1.1",
+    "expect.js": "^0.3.1",
     "express-session": ">= 1.0.0",
     "istanbul": "^0.4.1",
     "mocha": "^2.3.4",

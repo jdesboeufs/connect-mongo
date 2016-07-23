@@ -117,6 +117,18 @@ app.use(session({
 }));
 ```
 
+## Events
+
+A `MongoStore` instance will emit the following events:
+
+| Event name | Description | Payload
+| ----- | ----- | ----- |
+| `create` | A session has been created | `sessionId` |
+| `touch` | A session has been touched (but not modified) | `sessionId` |
+| `update` | A session has been updated | `sessionId` |
+| `set` | A session has been created OR updated _(for compatibility purpose)_ | `sessionId` |
+| `destroy` | A session has been destroyed | `sessionId` |
+
 ## Old Node.js versions compatibility
 
 For versions `0.10`, `0.12` and io.js, you must use the ES5 fallback:
