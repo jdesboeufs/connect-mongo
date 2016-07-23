@@ -208,7 +208,7 @@ module.exports = function connectMongo(connect) {
                         return s;
                     }
                 })
-                .nodeify(callback);
+                .asCallback(callback);
         }
 
         set(sid, session, callback) {
@@ -253,7 +253,7 @@ module.exports = function connectMongo(connect) {
                     }
                     this.emit('set', sid);
                 })
-                .nodeify(callback);
+                .asCallback(callback);
         }
 
         touch(sid, session, callback) {
@@ -292,26 +292,26 @@ module.exports = function connectMongo(connect) {
                         this.emit('touch', sid);
                     }
                 })
-                .nodeify(callback);
+                .asCallback(callback);
         }
 
         destroy(sid, callback) {
             return this.collectionReady()
                 .then(collection => collection.removeAsync({ _id: this.computeStorageId(sid) }))
                 .then(() => this.emit('destroy', sid))
-                .nodeify(callback);
+                .asCallback(callback);
         }
 
         length(callback) {
             return this.collectionReady()
                 .then(collection => collection.countAsync({}))
-                .nodeify(callback);
+                .asCallback(callback);
         }
 
         clear(callback) {
             return this.collectionReady()
                 .then(collection => collection.dropAsync())
-                .nodeify(callback);
+                .asCallback(callback);
         }
 
         close() {
