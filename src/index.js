@@ -200,7 +200,7 @@ module.exports = function connectMongo(connect) {
                 }))
                 .then(session => {
                     if (session) {
-                        var s = this.transformFunctions.unserialize(session.session);
+                        const s = this.transformFunctions.unserialize(session.session);
                         if (this.options.touchAfter > 0 && session.lastModified) {
                             s.lastModified = session.lastModified;
                         }
@@ -218,7 +218,7 @@ module.exports = function connectMongo(connect) {
                 delete session.lastModified;
             }
 
-            var s;
+            let s;
 
             try {
                 s = { _id: this.computeStorageId(sid), session: this.transformFunctions.serialize(session) };
@@ -245,12 +245,19 @@ module.exports = function connectMongo(connect) {
 
             return this.collectionReady()
                 .then(collection => collection.updateAsync({ _id: this.computeStorageId(sid) }, s, { upsert: true }))
-                .then(() => this.emit('set', sid))
+                .then(rawResponse => {
+                    if (rawResponse.result.upserted) {
+                        this.emit('create', sid);
+                    } else {
+                        this.emit('update', sid);
+                    }
+                    this.emit('set', sid);
+                })
                 .nodeify(callback);
         }
 
         touch(sid, session, callback) {
-            var updateFields = {},
+            const updateFields = {},
                 touchAfter = this.options.touchAfter * 1000,
                 lastModified = session.lastModified ? session.lastModified.getTime() : 0,
                 currentDate = new Date();
@@ -260,7 +267,7 @@ module.exports = function connectMongo(connect) {
             // the specified, if it's not, don't touch the session
             if (touchAfter > 0 && lastModified > 0) {
 
-                var timeElapsed = currentDate.getTime() - session.lastModified;
+                const timeElapsed = currentDate.getTime() - session.lastModified;
 
                 if (timeElapsed < touchAfter) {
                     return callback();

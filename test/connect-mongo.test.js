@@ -1,5 +1,5 @@
 'use strict';
-/* eslint camelcase: 0 */
+/* eslint camelcase: off, no-var: off */
 
 /**
  * Module dependencies.

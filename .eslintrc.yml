@@ -44,3 +44,5 @@ rules:
     - warn
   no-console:
     - warn
+  no-var:
+    - error
