@@ -7,13 +7,10 @@
 var session = require('express-session');
 var MongoStore = require('../')(session);
 var assert = require('assert');
-var _ = require('lodash');
 
 var connectionString = 'mongodb://localhost/connect-mongo-test';
 
 var mongo = require('mongodb');
-var _ = require('lodash');
-
 var mongoose = require('mongoose');
 
 // Create a connect cookie instance
@@ -114,7 +111,7 @@ function getNativeDbConnection(options, done) {
   }
   mongo.MongoClient.connect(connectionString, function (err, db) {
     if (err) return done(err);
-    open_db(_.assign(options, { db: db }), done);
+    open_db(Object.assign(options, { db: db }), done);
   });
 }
 
