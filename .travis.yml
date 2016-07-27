@@ -1,3 +1,5 @@
+sudo: required
+
 language: node_js
 
 node_js:
@@ -5,13 +7,21 @@ node_js:
   - 4
   - 6
 
-services: mongodb
+services:
+  - docker
 
-sudo: false
+before_script:
+  - docker run -d -p 27017:20002 mongo:2
+  - docker run -d -p 27017:20003 mongo:3
+  - docker ps -a
 
 script:
-    - if [[ $TRAVIS_NODE_VERSION == "0.12" ]]; then npm run test-es5; fi;
-    - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then npm run test; fi;
+  - if [[ $TRAVIS_NODE_VERSION == "0.12" ]]; then npm run test-es5; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm t; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm t; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then npm install mongodb@1.x; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm t; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm t; fi;
 
 after_script:
-    - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then npm install coveralls && cat ./coverage/lcov.info | coveralls; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then npm install coveralls && cat ./coverage/lcov.info | coveralls; fi;
