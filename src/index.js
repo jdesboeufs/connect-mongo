@@ -151,9 +151,10 @@ module.exports = function connectMongo(connect) {
             this.collection = collection;
 
             // Promisify used collection methods
-            ['count', 'findOne', 'remove', 'drop', 'update', 'ensureIndex'].forEach(method => {
+            ['count', 'findOne', 'remove', 'drop', 'ensureIndex'].forEach(method => {
                 collection[method + 'Async'] = Promise.promisify(collection[method], { context: collection });
             });
+            collection.updateAsync = Promise.promisify(collection.update, { context: collection, multiArgs: true });
 
             return this;
         }
@@ -245,8 +246,9 @@ module.exports = function connectMongo(connect) {
 
             return this.collectionReady()
                 .then(collection => collection.updateAsync({ _id: this.computeStorageId(sid) }, s, { upsert: true }))
-                .then(rawResponse => {
-                    if (rawResponse.result.upserted) {
+                .then(responseArray => {
+                    const rawResponse = responseArray.length === 2 ? responseArray[1] : responseArray[0].result;
+                    if (rawResponse.upserted) {
                         this.emit('create', sid);
                     } else {
                         this.emit('update', sid);
