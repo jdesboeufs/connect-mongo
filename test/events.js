@@ -6,13 +6,15 @@ const expressSession = require('express-session');
 const MongoStore = require('../')(expressSession);
 const futureDate = new Date(2030, 1);
 
+const connectionString = process.env.MONGODB_URL || 'mongodb://localhost/connect-mongo-test';
+
 function noop() {}
 
 describe('Events', () => {
   let store, collection;
   beforeEach(done => {
     store = new MongoStore({
-      url: 'mongodb://localhost/connect-mongo-test',
+      url: connectionString,
       collection: 'sessions-test',
     });
     store.once('connected', () => {

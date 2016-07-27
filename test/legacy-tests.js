@@ -8,7 +8,7 @@ const expressSession = require('express-session');
 const MongoStore = require('../')(expressSession);
 var assert = require('assert');
 
-var connectionString = 'mongodb://localhost/connect-mongo-test';
+var connectionString = process.env.MONGODB_URL || 'mongodb://localhost/connect-mongo-test';
 
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
@@ -283,7 +283,7 @@ exports.test_clear = function(done) {
 
 exports.test_options_url = function(done) {
   var store = new MongoStore({
-    url: 'mongodb://localhost:27017/connect-mongo-test',
+    url: connectionString,
     collection: 'sessions-test',
   });
   store.once('connected', function() {
