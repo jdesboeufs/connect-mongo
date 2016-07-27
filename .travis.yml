@@ -16,12 +16,14 @@ before_script:
   - docker ps -a
 
 script:
-  - if [[ $TRAVIS_NODE_VERSION == "0.12" ]]; then npm run test-es5; fi;
-  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm t; fi;
-  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm t; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then npm run lint; fi;
+  - npm run transpile
+  - if [[ $TRAVIS_NODE_VERSION == "0.12" ]]; then npm run test-unit-es5; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm run cover; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm run test-unit; fi;
   - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then npm install mongodb@1.x; fi;
-  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm t; fi;
-  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm t; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm run test-unit; fi;
+  - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm run test-unit; fi;
 
 after_script:
   - if [[ $TRAVIS_NODE_VERSION != "0.12" ]]; then npm install coveralls && cat ./coverage/lcov.info | coveralls; fi;

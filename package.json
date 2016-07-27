@@ -42,9 +42,10 @@
   },
   "scripts": {
     "test-unit-es5": "mocha --compilers js:babel-register",
-    "test-unit": "istanbul cover -x 'src-es5/**' _mocha",
+    "test-unit": "mocha",
+    "cover": "istanbul cover -x 'src-es5/**' _mocha",
     "lint": "eslint src test",
-    "test": "npm run lint && npm run transpile && npm run test-unit",
+    "test": "npm run lint && npm run transpile && npm run cover",
     "test-es5": "npm run transpile && npm run test-unit-es5",
     "transpile": "babel src --out-dir src-es5",
     "prepublish": "npm run transpile"
