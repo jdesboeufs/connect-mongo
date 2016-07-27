@@ -281,20 +281,20 @@ exports.test_clear = function(done) {
   });
 };
 
-exports.test_options_url = function(done) {
-  var store = new MongoStore({
-    url: connectionString,
-    collection: 'sessions-test',
-  });
-  store.once('connected', function() {
-    assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
-    assert.strictEqual(store.db.serverConfig.host, 'localhost');
-    assert.equal(store.db.serverConfig.port, 27017);
-    assert.equal(store.collection.collectionName, 'sessions-test');
-    cleanup_store(store);
-    done();
-  });
-};
+// exports.test_options_url = function(done) {
+//   var store = new MongoStore({
+//     url: connectionString,
+//     collection: 'sessions-test',
+//   });
+//   store.once('connected', function() {
+//     assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
+//     assert.strictEqual(store.db.serverConfig.host, 'localhost');
+//     assert.equal(store.db.serverConfig.port, 27017);
+//     assert.equal(store.collection.collectionName, 'sessions-test');
+//     cleanup_store(store);
+//     done();
+//   });
+// };
 
 exports.new_connection_failure = function(done) {
   var originalException = process.listeners('uncaughtException').pop();
