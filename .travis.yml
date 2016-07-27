@@ -11,8 +11,8 @@ services:
   - docker
 
 before_script:
-  - docker run -d -p 27017:20002 mongo:2
-  - docker run -d -p 27017:20003 mongo:3
+  - docker run -d -p 27002:27017 mongo:2
+  - docker run -d -p 27003:27017 mongo:3
   - docker ps -a
 
 script:
