@@ -211,7 +211,7 @@ app.use(express.session({
     secret: 'keyboard cat',
     saveUninitialized: false, // don't create session until something stored
 	resave: false, //don't save session if unmodified
-	store: new mongoStore({
+	store: new MongoStore({
 		url: 'mongodb://localhost/test-app',
 		touchAfter: 24 * 3600 // time period in seconds
 	})
