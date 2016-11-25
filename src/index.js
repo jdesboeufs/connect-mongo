@@ -205,7 +205,7 @@ module.exports = function connectMongo(connect) {
                         if (this.options.touchAfter > 0 && session.lastModified) {
                             s.lastModified = session.lastModified;
                         }
-                        this.emit('touch', sid);
+                        this.emit('get', sid);
                         return s;
                     }
                 })
