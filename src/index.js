@@ -248,7 +248,7 @@ module.exports = function connectMongo(connect) {
                 .then(collection => collection.updateAsync({ _id: this.computeStorageId(sid) }, s, { upsert: true }))
                 .then(responseArray => {
                     const rawResponse = responseArray.length === 2 ? responseArray[1] : responseArray[0].result;
-                    if (rawResponse.upserted) {
+                    if (rawResponse && rawResponse.upserted) {
                         this.emit('create', sid);
                     } else {
                         this.emit('update', sid);
