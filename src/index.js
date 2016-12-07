@@ -291,7 +291,7 @@ module.exports = function connectMongo(connect) {
                     if (result.nModified === 0) {
                         throw new Error('Unable to find the session to touch');
                     } else {
-                        this.emit('touch', sid);
+                        this.emit('touch', sid, session);
                     }
                 })
                 .asCallback(callback);
