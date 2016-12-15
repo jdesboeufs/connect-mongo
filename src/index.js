@@ -303,11 +303,11 @@ module.exports = function connectMongo(connect) {
                     return this.computeStorageId(s);
                 });
                 return this.collectionReady()
-                    .then(collection => collection.removeAsync({ _id: { $in: ids }}))
+                    .then(collection => collection.removeAsync({ _id: { $in: ids } }))
                     .then(function () {
-                        var self = this;
+                        let self = this;
                         sid.forEach(function (s) {
-                            self.emit('destroy', s)
+                            self.emit('destroy', s);
                         });
                     })
                     .asCallback(callback);
