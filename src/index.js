@@ -302,10 +302,10 @@ module.exports = function connectMongo(connect) {
                 let ids = sid.map(function (s) {
                     return this.computeStorageId(s);
                 });
+                let self = this;
                 return this.collectionReady()
                     .then(collection => collection.removeAsync({ _id: { $in: ids } }))
                     .then(function () {
-                        let self = this;
                         sid.forEach(function (s) {
                             self.emit('destroy', s);
                         });
