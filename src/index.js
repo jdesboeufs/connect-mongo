@@ -260,13 +260,24 @@ module.exports = function connectMongo(connect) {
 
         all(callback) {
             return this.collectionReady()
-                    .then(collection => collection.findAsync({
-                        $or: [
-                            { expires: { $exists: false } },
-                            { expires: { $gt: new Date() } },
-                        ]
-                    }))
-                    .asCallback(callback);
+                .then(collection => collection.findAsync({
+                    $or: [
+                        { expires: { $exists: false } },
+                        { expires: { $gt: new Date() } },
+                    ]
+                }))
+                .then(sessionArray => {
+                    return new Promise((resolve, reject) => {
+                        sessionArray.toArray(function(err, sessions) {
+                            if (err) {
+                                reject(err);
+                            }
+
+                            resolve(sessions);
+                        });
+                    });
+                })
+                .asCallback(callback);
         }
 
         touch(sid, session, callback) {
