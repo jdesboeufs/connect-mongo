@@ -235,6 +235,23 @@ exports.test_get = function(done) {
   });
 };
 
+exports.test_all = function(done) {
+  getNativeDbConnection(function(store, db, collection) {
+    var sid = 'test_all-sid';
+    collection.insert({ _id: sid, session: JSON.stringify({ key1: 1, key2: 'two' }) }, function() {
+      store.all(function(err, sessions) {
+        assert.equal(err, null);
+        sessions.forEach(function(session) {
+          assert.strictEqual(session._id, sid);
+          cleanup(store, db, collection, function() {
+            done();
+          });
+        });
+      });
+    });
+  });
+};
+
 exports.test_length = function(done) {
   getNativeDbConnection(function(store, db, collection) {
     var sid = 'test_length-sid';
@@ -338,6 +355,29 @@ exports.test_set_with_mongoose_db = function(done) {
         cleanup(store, db, collection, function() {
           done();
         });
+      });
+    });
+  });
+};
+
+exports.test_all_with_mongoose_db = function(done) {
+  open_db({ mongooseConnection: getMongooseConnection() }, function(store, db, collection) {
+    var sid = 'test_all-sid';
+    collection.insert({ _id: sid, session: JSON.stringify({ key1: 1, key2: 'two' }) }, function() {
+      store.all(function(err, sessions) {
+        assert.equal(err, null);
+        sessions.stream()
+            .on('data', function(session) {
+              assert.strictEqual(session._id, sid);
+            })
+            .on('error', function(err) {
+              assert.equal(err, null);
+            })
+            .on('end', function() {
+              cleanup(store, db, collection, function() {
+                done();
+              });
+            });
       });
     });
   });

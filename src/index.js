@@ -257,16 +257,16 @@ module.exports = function connectMongo(connect) {
                 })
                 .asCallback(callback);
         }
-        
+
         all(callback) {
             return this.collectionReady()
-                .then(collection => collection.findAsync({
-                    $or: [
-                        { expires: { $exists: false } },
-                        { expires: { $gt: new Date() } },
-                    ]
-                }))
-        		.asCallback(callback);
+                    .then(collection => collection.findAsync({
+                        $or: [
+                            { expires: { $exists: false } },
+                            { expires: { $gt: new Date() } },
+                        ]
+                    }))
+                    .asCallback(callback);
         }
 
         touch(sid, session, callback) {
