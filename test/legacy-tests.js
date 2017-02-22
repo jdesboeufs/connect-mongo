@@ -237,12 +237,17 @@ exports.test_get = function(done) {
 
 exports.test_all = function(done) {
   getNativeDbConnection(function(store, db, collection) {
-    var sid = 'test_all-sid';
-    collection.insert({ _id: sid, session: JSON.stringify({ key1: 1, key2: 'two' }) }, function() {
+    var sid1 = 'test_all-sid1';
+    var sid2 = 'test_all-sid2';
+    collection.insert([
+      { _id: sid1, session: JSON.stringify({ key1: 1, key2: 'two' }) },
+      { _id: sid2, session: JSON.stringify({ key3: 3, key4: 'Four' }) }
+    ], function() {
       store.all(function(err, sessions) {
         assert.equal(err, null);
-        assert.strictEqual(sessions.length, 1);
-        assert.strictEqual(sessions[0]._id, sid);
+        assert.strictEqual(sessions.length, 2);
+        assert.deepEqual(sessions[0], { key1: 1, key2: 'two' });
+        assert.deepEqual(sessions[1], { key3: 3, key4: 'Four' });
 
         cleanup(store, db, collection, function() {
           done();
@@ -351,23 +356,6 @@ exports.test_set_with_mongoose_db = function(done) {
       // Verify it was saved
       collection.findOne({ _id: sid }, function (err, session) {
         assert_session_equals(sid, data, session);
-
-        cleanup(store, db, collection, function() {
-          done();
-        });
-      });
-    });
-  });
-};
-
-exports.test_all_with_mongoose_db = function(done) {
-  open_db({ mongooseConnection: getMongooseConnection() }, function(store, db, collection) {
-    var sid = 'test_all-sid';
-    collection.insert({ _id: sid, session: JSON.stringify({ key1: 1, key2: 'two' }) }, function() {
-      store.all(function(err, sessions) {
-        assert.equal(err, null);
-        assert.strictEqual(sessions.length, 1);
-        assert.strictEqual(sessions[0]._id, sid);
 
         cleanup(store, db, collection, function() {
           done();

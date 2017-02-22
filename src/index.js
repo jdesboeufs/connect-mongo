@@ -266,14 +266,19 @@ module.exports = function connectMongo(connect) {
                         { expires: { $gt: new Date() } },
                     ]
                 }))
-                .then(sessionArray => {
+                .then(sessions => {
+                    let transformFunctions = this.transformFunctions;
                     return new Promise((resolve, reject) => {
-                        sessionArray.toArray(function(err, sessions) {
-                            if (err) {
-                                reject(err);
+                        sessions.toArray(function(err, sArray) {
+                            if (err) { reject(err); }
+                            let sess = [];
+                            for (let i = 0; i < sArray.length; i++) {
+                                let session = sArray[i].session;
+                                if (session) {
+                                    sess.push(transformFunctions.unserialize(session));
+                                }
                             }
-
-                            resolve(sessions);
+                            resolve(sess);
                         });
                     });
                 })
