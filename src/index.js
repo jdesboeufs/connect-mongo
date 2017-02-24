@@ -298,10 +298,25 @@ module.exports = function connectMongo(connect) {
         }
 
         destroy(sid, callback) {
-            return this.collectionReady()
-                .then(collection => collection.removeAsync({ _id: this.computeStorageId(sid) }))
-                .then(() => this.emit('destroy', sid))
-                .asCallback(callback);
+            if (Array.isArray(sid)) {
+                let ids = sid.map(function (s) {
+                    return this.computeStorageId(s);
+                });
+                let self = this;
+                return this.collectionReady()
+                    .then(collection => collection.removeAsync({ _id: { $in: ids } }))
+                    .then(function () {
+                        sid.forEach(function (s) {
+                            self.emit('destroy', s);
+                        });
+                    })
+                    .asCallback(callback);
+            } else {
+                return this.collectionReady()
+                    .then(collection => collection.removeAsync({ _id: this.computeStorageId(sid) }))
+                    .then(() => this.emit('destroy', sid))
+                    .asCallback(callback);
+            }
         }
 
         length(callback) {
