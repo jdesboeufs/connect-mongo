@@ -28,16 +28,15 @@
   "devDependencies": {
     "expect.js": "^0.3.1",
     "express-session": ">= 1.0.0",
-    "istanbul": "^0.4.1",
-    "mocha": "^2.3.4",
+    "mocha": "^4.0.1",
     "mongoose": ">= 2.6.0 < 5.0",
+    "nyc": "^11.2.1",
     "xo": "^0.18.2"
   },
   "scripts": {
-    "test-unit": "mocha",
-    "cover": "istanbul cover -x 'src-es5/**' _mocha",
     "lint": "xo src",
-    "test": "npm run lint && npm run transpile && npm run cover"
+    "cover": "nyc mocha",
+    "test": "mocha"
   },
   "xo": {
     "space": 2,

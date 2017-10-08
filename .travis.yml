@@ -18,10 +18,10 @@ before_script:
 script:
   - npm run lint
   - MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm run cover
-  - MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm run test-unit
+  - MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm run test
   - npm install mongodb@1.x
-  - MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm run test-unit
-  - MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm run test-unit
+  - MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm run test
+  - MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm run test
 
 after_script:
   - npm install coveralls && cat ./coverage/lcov.info | coveralls
