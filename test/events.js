@@ -23,6 +23,9 @@ describe('Events', () => {
       collection.remove({}, done)
     })
   })
+  afterEach(() => {
+    store.close()
+  })
 
   describe('set() with an unknown session id', () => {
     it('should emit a `create` event', done => {
