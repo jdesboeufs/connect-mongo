@@ -22,7 +22,6 @@
     "url": "https://github.com/jdesboeufs/connect-mongo/issues"
   },
   "dependencies": {
-    "bluebird": "^3.0",
     "mongodb": ">= 1.2.0 <3.0.0"
   },
   "devDependencies": {

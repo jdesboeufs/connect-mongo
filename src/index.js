@@ -1,6 +1,5 @@
 'use strict'
 
-const bluebird = require('bluebird')
 const MongoClient = require('mongodb')
 
 function defaultSerializeFunction(session) {
@@ -124,13 +123,13 @@ module.exports = function (connect) {
       const removeQuery = {expires: {$lt: new Date()}}
       switch (this.autoRemove) {
         case 'native':
-          return this.collection.createIndexAsync({expires: 1}, {expireAfterSeconds: 0})
+          return this.collection.createIndex({expires: 1}, {expireAfterSeconds: 0})
         case 'interval':
           this.timer = setInterval(() => this.collection.remove(removeQuery, {w: 0}), this.autoRemoveInterval * 1000 * 60)
           this.timer.unref()
-          return bluebird.resolve()
+          return Promise.resolve()
         default:
-          return bluebird.resolve()
+          return Promise.resolve()
       }
     }
 
@@ -146,13 +145,7 @@ module.exports = function (connect) {
         clearInterval(this.timer)
       }
       this.collectionReadyPromise = undefined
-      this.collection = collection;
-
-            // Promisify used collection methods
-      ['count', 'findOne', 'remove', 'drop', 'createIndex'].forEach(method => {
-        collection[method + 'Async'] = bluebird.promisify(collection[method], {context: collection})
-      })
-      collection.updateAsync = bluebird.promisify(collection.update, {context: collection, multiArgs: true})
+      this.collection = collection
 
       return this
     }
@@ -185,7 +178,7 @@ module.exports = function (connect) {
 
     get(sid, callback) {
       return this.collectionReady()
-                .then(collection => collection.findOneAsync({
+                .then(collection => collection.findOne({
                   _id: this.computeStorageId(sid),
                   $or: [
                         {expires: {$exists: false}},
@@ -237,9 +230,8 @@ module.exports = function (connect) {
       }
 
       return this.collectionReady()
-                .then(collection => collection.updateAsync({_id: this.computeStorageId(sid)}, s, {upsert: true}))
-                .then(responseArray => {
-                  const rawResponse = responseArray.length === 2 ? responseArray[1] : responseArray[0].result
+                .then(collection => collection.update({_id: this.computeStorageId(sid)}, s, {upsert: true}))
+                .then(rawResponse => {
                   if (rawResponse && rawResponse.upserted) {
                     this.emit('create', sid)
                   } else {
@@ -275,7 +267,7 @@ module.exports = function (connect) {
       }
 
       return this.collectionReady()
-                .then(collection => collection.updateAsync({_id: this.computeStorageId(sid)}, {$set: updateFields}))
+                .then(collection => collection.update({_id: this.computeStorageId(sid)}, {$set: updateFields}))
                 .then(result => {
                   if (result.nModified === 0) {
                     throw new Error('Unable to find the session to touch')
@@ -288,20 +280,20 @@ module.exports = function (connect) {
 
     destroy(sid, callback) {
       return this.collectionReady()
-                .then(collection => collection.removeAsync({_id: this.computeStorageId(sid)}))
+                .then(collection => collection.remove({_id: this.computeStorageId(sid)}))
                 .then(() => this.emit('destroy', sid))
                 .asCallback(callback)
     }
 
     length(callback) {
       return this.collectionReady()
-                .then(collection => collection.countAsync({}))
+                .then(collection => collection.count({}))
                 .asCallback(callback)
     }
 
     clear(callback) {
       return this.collectionReady()
-                .then(collection => collection.dropAsync())
+                .then(collection => collection.drop())
                 .asCallback(callback)
     }
 

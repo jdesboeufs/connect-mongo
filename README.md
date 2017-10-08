@@ -13,10 +13,10 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 
 * Support Express up to `5.0`
 * Support all Connect versions
-* Support [Mongoose](http://mongoosejs.com/index.html) `>= 2.6`, `3.x` and `4.x`
-* Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 1.2`, `2.x`
+* Support [Mongoose](http://mongoosejs.com/index.html) `>= 4.1.2+`
+* Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 2.0.36`
 * Support Node.js 4, 6 and 8
-* Support [MongoDB](https://www.mongodb.com/) `3.0+`
+* Support [MongoDB](https://www.mongodb.com/) `>= 3.0`
 
 For extended compatibility, see previous versions.
 
