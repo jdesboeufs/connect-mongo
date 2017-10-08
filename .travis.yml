@@ -11,17 +11,14 @@ services:
   - docker
 
 before_script:
-  - docker run -d -p 27002:27017 mongo:2
-  - docker run -d -p 27003:27017 mongo:3
+  - docker run -d -p 27017:27017 mongo:3
   - docker ps -a
 
 script:
   - npm run lint
-  - MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm run cover
-  - MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm run test
+  - MONGODB_URL=mongodb://localhost/connect-mongo-test npm run cover
   - npm install mongodb@1.x
-  - MONGODB_URL=mongodb://localhost:27002/connect-mongo-test npm run test
-  - MONGODB_URL=mongodb://localhost:27003/connect-mongo-test npm run test
+  - MONGODB_URL=mongodb://localhost/connect-mongo-test npm run test
 
 after_script:
   - npm install coveralls && cat ./coverage/lcov.info | coveralls

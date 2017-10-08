@@ -16,7 +16,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 * Support [Mongoose](http://mongoosejs.com/index.html) `>= 2.6`, `3.x` and `4.x`
 * Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 1.2`, `2.x`
 * Support Node.js 4, 6 and 8
-* Support [MongoDB](https://www.mongodb.com/) up to `3.2`
+* Support [MongoDB](https://www.mongodb.com/) `3.0+`
 
 For extended compatibility, see previous versions.
 
