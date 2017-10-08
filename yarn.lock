@@ -1709,7 +1709,7 @@ mongodb-core@2.1.15:
     bson "~1.0.4"
     require_optional "~1.0.0"
 
-mongodb@2.2.31, "mongodb@>= 1.2.0 <3.0.0":
+mongodb@2.2.31, mongodb@^2.0.36:
   version "2.2.31"
   resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-2.2.31.tgz#1940445c661e19217bb3bf8245d9854aaef548db"
   dependencies:
@@ -1717,7 +1717,7 @@ mongodb@2.2.31, "mongodb@>= 1.2.0 <3.0.0":
     mongodb-core "2.1.15"
     readable-stream "2.2.7"
 
-"mongoose@>= 2.6.0 < 5.0":
+mongoose@^4.1.2:
   version "4.12.1"
   resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-4.12.1.tgz#fb27c108f940252e448bb1b80b5f8a404108ee28"
   dependencies:
