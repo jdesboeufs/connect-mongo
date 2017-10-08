@@ -26,17 +26,21 @@
     "mongodb": ">= 1.2.0 <3.0.0"
   },
   "devDependencies": {
-    "eslint": "^3.1.1",
     "expect.js": "^0.3.1",
     "express-session": ">= 1.0.0",
     "istanbul": "^0.4.1",
     "mocha": "^2.3.4",
-    "mongoose": ">= 2.6.0 < 5.0"
+    "mongoose": ">= 2.6.0 < 5.0",
+    "xo": "^0.18.2"
   },
   "scripts": {
     "test-unit": "mocha",
     "cover": "istanbul cover -x 'src-es5/**' _mocha",
-    "lint": "eslint src test",
+    "lint": "xo src",
     "test": "npm run lint && npm run transpile && npm run cover"
+  },
+  "xo": {
+    "space": 2,
+    "semicolon": false
   }
 }
