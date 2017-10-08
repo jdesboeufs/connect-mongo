@@ -14,10 +14,8 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 * Support all Connect versions
 * Support [Mongoose](http://mongoosejs.com/index.html) `>= 2.6`, `3.x` and `4.x`
 * Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 1.2`, `2.x`
-* Support Node.js `0.10`, `0.12`, `4.x`, `5.x`, `6.x` and all [io.js](https://iojs.org) versions
+* Support Node.js `4.x`, `5.x`, `6.x` and all [io.js](https://iojs.org) versions
 * Support [MongoDB](https://www.mongodb.com/) up to `3.2`
-
-For older Node.js versions `0.10`, `0.12` and io.js, please read the [Node.js compatibility section](#old-nodejs-versions-compatibility)
 
 ## Usage
 
@@ -128,13 +126,6 @@ A `MongoStore` instance will emit the following events:
 | `update` | A session has been updated | `sessionId` |
 | `set` | A session has been created OR updated _(for compatibility purpose)_ | `sessionId` |
 | `destroy` | A session has been destroyed | `sessionId` |
-
-## Old Node.js versions compatibility
-
-For versions `0.10`, `0.12` and io.js, you must use the ES5 fallback:
-```js
-var MongoStore = require('connect-mongo/es5')(session);
-```
 
 ## Session expiration
 

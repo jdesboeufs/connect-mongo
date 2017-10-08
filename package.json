@@ -16,23 +16,16 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kcbanner/connect-mongo.git"
+    "url": "https://github.com/jdesboeufs/connect-mongo.git"
   },
   "bugs": {
-    "url": "https://github.com/kcbanner/connect-mongo/issues"
+    "url": "https://github.com/jdesboeufs/connect-mongo/issues"
   },
   "dependencies": {
     "bluebird": "^3.0",
     "mongodb": ">= 1.2.0 <3.0.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.3.17",
-    "babel-plugin-transform-es2015-arrow-functions": "^6.3.13",
-    "babel-plugin-transform-es2015-block-scoping": "^6.3.13",
-    "babel-plugin-transform-es2015-classes": "^6.3.15",
-    "babel-plugin-transform-es2015-object-super": "^6.3.13",
-    "babel-plugin-transform-object-assign": "^6.8.0",
-    "babel-register": "^6.3.13",
     "eslint": "^3.1.1",
     "expect.js": "^0.3.1",
     "express-session": ">= 1.0.0",
@@ -41,13 +34,9 @@
     "mongoose": ">= 2.6.0 < 5.0"
   },
   "scripts": {
-    "test-unit-es5": "mocha --compilers js:babel-register",
     "test-unit": "mocha",
     "cover": "istanbul cover -x 'src-es5/**' _mocha",
     "lint": "eslint src test",
-    "test": "npm run lint && npm run transpile && npm run cover",
-    "test-es5": "npm run transpile && npm run test-unit-es5",
-    "transpile": "babel src --out-dir src-es5",
-    "prepublish": "npm run transpile"
+    "test": "npm run lint && npm run transpile && npm run cover"
   }
 }
