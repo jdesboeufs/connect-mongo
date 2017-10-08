@@ -124,7 +124,7 @@ module.exports = function (connect) {
       const removeQuery = {expires: {$lt: new Date()}}
       switch (this.autoRemove) {
         case 'native':
-          return this.collection.ensureIndexAsync({expires: 1}, {expireAfterSeconds: 0})
+          return this.collection.createIndexAsync({expires: 1}, {expireAfterSeconds: 0})
         case 'interval':
           this.timer = setInterval(() => this.collection.remove(removeQuery, {w: 0}), this.autoRemoveInterval * 1000 * 60)
           this.timer.unref()
@@ -149,7 +149,7 @@ module.exports = function (connect) {
       this.collection = collection;
 
             // Promisify used collection methods
-      ['count', 'findOne', 'remove', 'drop', 'ensureIndex'].forEach(method => {
+      ['count', 'findOne', 'remove', 'drop', 'createIndex'].forEach(method => {
         collection[method + 'Async'] = bluebird.promisify(collection[method], {context: collection})
       })
       collection.updateAsync = bluebird.promisify(collection.update, {context: collection, multiArgs: true})
