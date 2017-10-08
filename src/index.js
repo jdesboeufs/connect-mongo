@@ -2,6 +2,13 @@
 
 const MongoClient = require('mongodb')
 
+function withCallback(promise, cb) {
+  promise
+    .then(res => cb(null, res))
+    .catch(cb)
+  return promise
+}
+
 function defaultSerializeFunction(session) {
     // Copy each property of the session to a new object
   const obj = {}
@@ -177,14 +184,14 @@ module.exports = function (connect) {
         /* Public API */
 
     get(sid, callback) {
-      return this.collectionReady()
-                .then(collection => collection.findOne({
-                  _id: this.computeStorageId(sid),
-                  $or: [
+      return withCallback(this.collectionReady()
+              .then(collection => collection.findOne({
+                _id: this.computeStorageId(sid),
+                $or: [
                         {expires: {$exists: false}},
                         {expires: {$gt: new Date()}}
-                  ]
-                }))
+                ]
+              }))
                 .then(session => {
                   if (session) {
                     const s = this.transformFunctions.unserialize(session.session)
@@ -195,7 +202,7 @@ module.exports = function (connect) {
                     return s
                   }
                 })
-                .asCallback(callback)
+              , callback)
     }
 
     set(sid, session, callback) {
@@ -229,9 +236,12 @@ module.exports = function (connect) {
         s.lastModified = new Date()
       }
 
-      return this.collectionReady()
+      return withCallback(this.collectionReady()
                 .then(collection => collection.update({_id: this.computeStorageId(sid)}, s, {upsert: true}))
                 .then(rawResponse => {
+                  if (rawResponse.result) {
+                    rawResponse = rawResponse.result
+                  }
                   if (rawResponse && rawResponse.upserted) {
                     this.emit('create', sid)
                   } else {
@@ -239,7 +249,7 @@ module.exports = function (connect) {
                   }
                   this.emit('set', sid)
                 })
-                .asCallback(callback)
+              , callback)
     }
 
     touch(sid, session, callback) {
@@ -266,7 +276,7 @@ module.exports = function (connect) {
         updateFields.expires = new Date(Date.now() + (this.ttl * 1000))
       }
 
-      return this.collectionReady()
+      return withCallback(this.collectionReady()
                 .then(collection => collection.update({_id: this.computeStorageId(sid)}, {$set: updateFields}))
                 .then(result => {
                   if (result.nModified === 0) {
@@ -275,26 +285,26 @@ module.exports = function (connect) {
                     this.emit('touch', sid, session)
                   }
                 })
-                .asCallback(callback)
+              , callback)
     }
 
     destroy(sid, callback) {
-      return this.collectionReady()
+      return withCallback(this.collectionReady()
                 .then(collection => collection.remove({_id: this.computeStorageId(sid)}))
                 .then(() => this.emit('destroy', sid))
-                .asCallback(callback)
+              , callback)
     }
 
     length(callback) {
-      return this.collectionReady()
+      return withCallback(this.collectionReady()
                 .then(collection => collection.count({}))
-                .asCallback(callback)
+              , callback)
     }
 
     clear(callback) {
-      return this.collectionReady()
+      return withCallback(this.collectionReady()
                 .then(collection => collection.drop())
-                .asCallback(callback)
+              , callback)
     }
 
     close() {
