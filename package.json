@@ -34,8 +34,8 @@
   },
   "scripts": {
     "lint": "xo src",
-    "cover": "nyc mocha",
-    "test": "mocha"
+    "cover": "nyc report --reporter=text-lcov",
+    "test": "nyc mocha"
   },
   "xo": {
     "space": 2,
