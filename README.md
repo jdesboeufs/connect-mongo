@@ -7,6 +7,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 [![Build Status](https://travis-ci.org/jdesboeufs/connect-mongo.svg?branch=master)](https://travis-ci.org/jdesboeufs/connect-mongo)
 [![Coverage Status](https://coveralls.io/repos/jdesboeufs/connect-mongo/badge.svg?branch=master&service=github)](https://coveralls.io/github/jdesboeufs/connect-mongo?branch=master)
 [![Dependency Status](https://david-dm.org/jdesboeufs/connect-mongo.svg?style=flat)](https://david-dm.org/jdesboeufs/connect-mongo)
+[![Greenkeeper badge](https://badges.greenkeeper.io/jdesboeufs/connect-mongo.svg)](https://greenkeeper.io/)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
 
 ## Compatibility
