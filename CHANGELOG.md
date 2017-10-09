@@ -1,3 +1,15 @@
+2.0.0 / In development
+=================
+
+* __Drop__ support for Node.js 0.12 and io.js
+* __Drop__ support for MongoDB 2.x
+* __Drop__ support for mongodb driver < 2.0.36
+* __Drop__ support for mongoose < 4.1.2
+* __Fix__ `ensureIndex` deprecation warning (#268, #269, #270)
+* Improve `get()` (#246)
+* Pass session in `touch` event
+* Remove `bluebird` from dependencies
+
 1.3.2 / 2016-07-27
 =================
 
