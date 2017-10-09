@@ -1,12 +1,12 @@
-2.0.0 / In development
+2.0.0 / 2017-10-09
 =================
 
-* __Drop__ support for Node.js 0.12 and io.js
-* __Drop__ support for MongoDB 2.x
-* __Drop__ support for mongodb driver < 2.0.36
-* __Drop__ support for mongoose < 4.1.2
-* __Fix__ `ensureIndex` deprecation warning (#268, #269, #270)
-* Improve `get()` (#246)
+* __Drop__ Node.js 0.12 and io.js support
+* __Drop__ MongoDB 2.x support
+* __Drop__ mongodb driver < 2.0.36 support
+* __Drop__ mongoose < 4.1.2 support
+* __Fix__ `ensureIndex` deprecation warning ([#268](https://github.com/jdesboeufs/connect-mongo/issues/268), [#269](https://github.com/jdesboeufs/connect-mongo/pulls/269), [#270](https://github.com/jdesboeufs/connect-mongo/pulls/270))
+* Improve `get()` ([#246](https://github.com/jdesboeufs/connect-mongo/pulls/246))
 * Pass session in `touch` event
 * Remove `bluebird` from dependencies
 
