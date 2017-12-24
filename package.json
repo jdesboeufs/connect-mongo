@@ -22,7 +22,7 @@
     "url": "https://github.com/jdesboeufs/connect-mongo/issues"
   },
   "dependencies": {
-    "mongodb": "^2.0.36"
+    "mongodb": "^3.0.0"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
