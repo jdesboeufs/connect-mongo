@@ -3,9 +3,13 @@
 const MongoClient = require('mongodb')
 
 function withCallback(promise, cb) {
-  promise
-    .then(res => cb(null, res))
-    .catch(cb)
+  // assume that cb is a function - type checks and handling type errors
+  // can be done by caller
+  if (cb) {
+    promise
+      .then(res => cb(null, res))
+      .catch(cb)
+  }
   return promise
 }
 
