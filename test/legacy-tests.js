@@ -133,6 +133,26 @@ exports.test_set = function (done) {
   })
 }
 
+exports.test_set_promise = function (done) {
+  getNativeDbConnection((store, db, collection) => {
+    const sid = 'test_set_promise-sid'
+    const data = make_data()
+
+    store.set(sid, data)
+      .then(() => {
+        // Verify it was saved
+        collection.findOne({_id: sid}, (err, session) => {
+          assert_session_equals(sid, data, session)
+
+          cleanup(store, db, collection, () => {
+            done()
+          })
+        })
+      })
+      .catch(done)
+  })
+}
+
 exports.test_set_no_stringify = function (done) {
   getNativeDbConnection({stringify: false}, (store, db, collection) => {
     const sid = 'test_set-sid'
@@ -232,6 +252,22 @@ exports.test_get = function (done) {
   })
 }
 
+exports.test_get_promise = function (done) {
+  getNativeDbConnection((store, db, collection) => {
+    const sid = 'test_get_promise-sid'
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
+      store.get(sid)
+        .then((session) => {
+          assert.deepEqual(session, {key1: 1, key2: 'two'})
+          cleanup(store, db, collection, () => {
+            done()
+          })
+        })
+      .catch(done)
+    })
+  })
+}
+
 exports.test_length = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_length-sid'
@@ -243,6 +279,22 @@ exports.test_length = function (done) {
           done()
         })
       })
+    })
+  })
+}
+
+exports.test_length_promise = function (done) {
+  getNativeDbConnection((store, db, collection) => {
+    const sid = 'test_length_promise-sid'
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
+      store.length()
+        .then((length) => {
+          assert.strictEqual(length, 1)
+          cleanup(store, db, collection, () => {
+            done()
+          })
+        })
+      .catch(done)
     })
   })
 }
@@ -261,6 +313,21 @@ exports.test_destroy_ok = function (done) {
   })
 }
 
+exports.test_destroy_ok_promise = function (done) {
+  getNativeDbConnection((store, db, collection) => {
+    const sid = 'test_destroy_ok_promise-sid'
+    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
+      store.destroy(sid)
+        .then(() => {
+          cleanup(store, db, collection, () => {
+            done()
+          })
+        })
+      .catch(done)
+    })
+  })
+}
+
 exports.test_clear = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_length-sid'
@@ -274,6 +341,25 @@ exports.test_clear = function (done) {
           })
         })
       })
+    })
+  })
+}
+
+exports.test_clear_promise = function (done) {
+  getNativeDbConnection((store, db, collection) => {
+    const sid = 'test_length-sid'
+    collection.insert({_id: sid, key1: 1, key2: 'two'}, () => {
+      store.clear()
+        .then(() => {
+          collection.count((err, count) => {
+            assert.strictEqual(count, 0)
+
+            cleanup(store, db, collection, () => {
+              done()
+            })
+          })
+        })
+      .catch(done)
     })
   })
 }
@@ -522,6 +608,40 @@ exports.test_session_touch = function (done) {
         })
       })
     })
+  })
+}
+
+exports.test_session_touch_promise = function (done) {
+  getNativeDbConnection((store, db, collection) => {
+    let sid = 'test_touch_promise-sid',
+      data = make_data()
+
+    store.set(sid, data)
+      .then(() => {
+        // Verify it was saved
+        collection.findOne({_id: sid}, (err, session) => {
+          assert.equal(err, null)
+          assert_session_equals(sid, data, session)
+
+          // Touch the session
+          store.touch(sid, session.session)
+            .then(() => {
+              // Find the touched session
+              collection.findOne({_id: sid}, (err, session2) => {
+                assert.equal(err, null)
+
+                // Check if both expiry date are different
+                assert.ok(session2.expires.getTime() > session.expires.getTime())
+
+                cleanup(store, db, collection, () => {
+                  done()
+                })
+              })
+            })
+            .catch(done)
+        })
+      })
+      .catch(done)
   })
 }
 
