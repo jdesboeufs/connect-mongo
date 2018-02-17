@@ -294,7 +294,7 @@ module.exports = function (connect) {
 
     destroy(sid, callback) {
       return withCallback(this.collectionReady()
-                .then(collection => collection.remove({_id: this.computeStorageId(sid)}))
+                .then(collection => collection.remove({_id: this.computeStorageId(sid)}, {skipSessions: true}))
                 .then(() => this.emit('destroy', sid))
               , callback)
     }
