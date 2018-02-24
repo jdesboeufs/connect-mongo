@@ -237,6 +237,12 @@ by doing this, setting `touchAfter: 24 * 3600` you are saying to the session be 
 
 The tests use a database called `connect-mongo-test`.
 
+## Showcase
+
+Open source projects and production apps using `connect-mongo`. Feel free to add yours in a pull request.
+
+* [Builder Book](https://github.com/builderbook/builderbook): Open source web app to write and host documentation or sell books. Built with React, Material-UI, Next, Express, Mongoose, MongoDB.
+
 ## License
 
 The MIT License
