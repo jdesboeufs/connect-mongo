@@ -3,7 +3,7 @@
 const MongoClient = require('mongodb')
 
 function withCallback(promise, cb) {
-  // assume that cb is a function - type checks and handling type errors
+  // Assume that cb is a function - type checks and handling type errors
   // can be done by caller
   if (cb) {
     promise
@@ -14,14 +14,14 @@ function withCallback(promise, cb) {
 }
 
 function defaultSerializeFunction(session) {
-    // Copy each property of the session to a new object
+  // Copy each property of the session to a new object
   const obj = {}
   let prop
 
   for (prop in session) {
     if (prop === 'cookie') {
-            // Convert the cookie instance to an object, if possible
-            // This gets rid of the duplicate object under session.cookie.data property
+      // Convert the cookie instance to an object, if possible
+      // This gets rid of the duplicate object under session.cookie.data property
       obj.cookie = session.cookie.toJSON ? session.cookie.toJSON() : session.cookie
     } else {
       obj[prop] = session[prop]
@@ -59,18 +59,17 @@ module.exports = function (connect) {
   const MemoryStore = connect.MemoryStore || connect.session.MemoryStore
 
   class MongoStore extends Store {
-
     constructor(options) {
       options = options || {}
 
-            /* Fallback */
+      /* Fallback */
       if (options.fallbackMemory && MemoryStore) {
         return new MemoryStore()
       }
 
       super(options)
 
-            /* Options */
+      /* Options */
       this.ttl = options.ttl || 1209600 // 14 days
       this.collectionName = options.collection || 'sessions'
       this.autoRemove = options.autoRemove || 'native'
@@ -90,17 +89,17 @@ module.exports = function (connect) {
       }
 
       if (options.url) {
-                // New native connection using url + mongoOptions
+        // New native connection using url + mongoOptions
         MongoClient.connect(options.url, options.mongoOptions || {}, newConnectionCallback)
       } else if (options.mongooseConnection) {
-                // Re-use existing or upcoming mongoose connection
+        // Re-use existing or upcoming mongoose connection
         if (options.mongooseConnection.readyState === 1) {
           this.handleNewConnectionAsync(options.mongooseConnection.db)
         } else {
           options.mongooseConnection.once('open', () => this.handleNewConnectionAsync(options.mongooseConnection.db))
         }
       } else if (options.db && options.db.listCollections) {
-                // Re-use existing or upcoming native connection
+        // Re-use existing or upcoming native connection
         if (options.db.openCalled || options.db.openCalled === undefined) { // OpenCalled is undefined in mongodb@2.x
           this.handleNewConnectionAsync(options.db)
         } else {
@@ -108,8 +107,8 @@ module.exports = function (connect) {
         }
       } else if (options.dbPromise) {
         options.dbPromise
-                    .then(db => this.handleNewConnectionAsync(db))
-                    .catch(err => this.connectionFailed(err))
+          .then(db => this.handleNewConnectionAsync(db))
+          .catch(err => this.connectionFailed(err))
       } else {
         throw new Error('Connection strategy not found')
       }
@@ -125,9 +124,9 @@ module.exports = function (connect) {
     handleNewConnectionAsync(db) {
       this.db = db
       return this
-                .setCollection(db.collection(this.collectionName))
-                .setAutoRemoveAsync()
-                    .then(() => this.changeState('connected'))
+        .setCollection(db.collection(this.collectionName))
+        .setAutoRemoveAsync()
+        .then(() => this.changeState('connected'))
     }
 
     setAutoRemoveAsync() {
@@ -185,32 +184,32 @@ module.exports = function (connect) {
       return sessionId
     }
 
-        /* Public API */
+    /* Public API */
 
     get(sid, callback) {
       return withCallback(this.collectionReady()
-              .then(collection => collection.findOne({
-                _id: this.computeStorageId(sid),
-                $or: [
-                        {expires: {$exists: false}},
-                        {expires: {$gt: new Date()}}
-                ]
-              }))
-                .then(session => {
-                  if (session) {
-                    const s = this.transformFunctions.unserialize(session.session)
-                    if (this.options.touchAfter > 0 && session.lastModified) {
-                      s.lastModified = session.lastModified
-                    }
-                    this.emit('get', sid)
-                    return s
-                  }
-                })
-              , callback)
+        .then(collection => collection.findOne({
+          _id: this.computeStorageId(sid),
+          $or: [
+            {expires: {$exists: false}},
+            {expires: {$gt: new Date()}}
+          ]
+        }))
+        .then(session => {
+          if (session) {
+            const s = this.transformFunctions.unserialize(session.session)
+            if (this.options.touchAfter > 0 && session.lastModified) {
+              s.lastModified = session.lastModified
+            }
+            this.emit('get', sid)
+            return s
+          }
+        })
+        , callback)
     }
 
     set(sid, session, callback) {
-            // Removing the lastModified prop from the session object before update
+      // Removing the lastModified prop from the session object before update
       if (this.options.touchAfter > 0 && session && session.lastModified) {
         delete session.lastModified
       }
@@ -226,13 +225,13 @@ module.exports = function (connect) {
       if (session && session.cookie && session.cookie.expires) {
         s.expires = new Date(session.cookie.expires)
       } else {
-                // If there's no expiration date specified, it is
-                // browser-session cookie or there is no cookie at all,
-                // as per the connect docs.
-                //
-                // So we set the expiration to two-weeks from now
-                // - as is common practice in the industry (e.g Django) -
-                // or the default specified in the options.
+        // If there's no expiration date specified, it is
+        // browser-session cookie or there is no cookie at all,
+        // as per the connect docs.
+        //
+        // So we set the expiration to two-weeks from now
+        // - as is common practice in the industry (e.g Django) -
+        // or the default specified in the options.
         s.expires = new Date(Date.now() + (this.ttl * 1000))
       }
 
@@ -241,19 +240,19 @@ module.exports = function (connect) {
       }
 
       return withCallback(this.collectionReady()
-                .then(collection => collection.update({_id: this.computeStorageId(sid)}, s, {upsert: true}))
-                .then(rawResponse => {
-                  if (rawResponse.result) {
-                    rawResponse = rawResponse.result
-                  }
-                  if (rawResponse && rawResponse.upserted) {
-                    this.emit('create', sid)
-                  } else {
-                    this.emit('update', sid)
-                  }
-                  this.emit('set', sid)
-                })
-              , callback)
+        .then(collection => collection.update({_id: this.computeStorageId(sid)}, s, {upsert: true}))
+        .then(rawResponse => {
+          if (rawResponse.result) {
+            rawResponse = rawResponse.result
+          }
+          if (rawResponse && rawResponse.upserted) {
+            this.emit('create', sid)
+          } else {
+            this.emit('update', sid)
+          }
+          this.emit('set', sid)
+        })
+        , callback)
     }
 
     touch(sid, session, callback) {
@@ -262,9 +261,9 @@ module.exports = function (connect) {
       const lastModified = session.lastModified ? session.lastModified.getTime() : 0
       const currentDate = new Date()
 
-            // If the given options has a touchAfter property, check if the
-            // current timestamp - lastModified timestamp is bigger than
-            // the specified, if it's not, don't touch the session
+      // If the given options has a touchAfter property, check if the
+      // current timestamp - lastModified timestamp is bigger than
+      // the specified, if it's not, don't touch the session
       if (touchAfter > 0 && lastModified > 0) {
         const timeElapsed = currentDate.getTime() - session.lastModified
 
@@ -281,34 +280,34 @@ module.exports = function (connect) {
       }
 
       return withCallback(this.collectionReady()
-                .then(collection => collection.update({_id: this.computeStorageId(sid)}, {$set: updateFields}))
-                .then(result => {
-                  if (result.nModified === 0) {
-                    throw new Error('Unable to find the session to touch')
-                  } else {
-                    this.emit('touch', sid, session)
-                  }
-                })
-              , callback)
+        .then(collection => collection.update({_id: this.computeStorageId(sid)}, {$set: updateFields}))
+        .then(result => {
+          if (result.nModified === 0) {
+            throw new Error('Unable to find the session to touch')
+          } else {
+            this.emit('touch', sid, session)
+          }
+        })
+        , callback)
     }
 
     destroy(sid, callback) {
       return withCallback(this.collectionReady()
-                .then(collection => collection.remove({_id: this.computeStorageId(sid)}))
-                .then(() => this.emit('destroy', sid))
-              , callback)
+        .then(collection => collection.remove({_id: this.computeStorageId(sid)}))
+        .then(() => this.emit('destroy', sid))
+        , callback)
     }
 
     length(callback) {
       return withCallback(this.collectionReady()
-                .then(collection => collection.count({}))
-              , callback)
+        .then(collection => collection.count({}))
+        , callback)
     }
 
     clear(callback) {
       return withCallback(this.collectionReady()
-                .then(collection => collection.drop())
-              , callback)
+        .then(collection => collection.drop())
+        , callback)
     }
 
     close() {
@@ -316,7 +315,7 @@ module.exports = function (connect) {
         this.db.close()
       }
     }
-    }
+  }
 
   return MongoStore
 }

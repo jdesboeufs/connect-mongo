@@ -8,7 +8,7 @@ process.on('unhandledRejection', (reason, err) => {
   console.error(`Reason: ${reason}`)
   console.error(err)
   process.exit(1)
-});
+})
 
 describe('Legacy tests', function () {
   this.timeout(6000)

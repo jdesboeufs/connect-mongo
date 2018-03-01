@@ -1,7 +1,7 @@
 'use strict'
 
 const expressSession = require('express-session')
-const MongoStore = require('../')(expressSession)
+const MongoStore = require('..')(expressSession)
 const assert = require('assert')
 
 const connectionString = process.env.MONGODB_URL || 'mongodb://localhost/connect-mongo-test'
@@ -257,13 +257,13 @@ exports.test_get_promise = function (done) {
     const sid = 'test_get_promise-sid'
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
       store.get(sid)
-        .then((session) => {
+        .then(session => {
           assert.deepEqual(session, {key1: 1, key2: 'two'})
           cleanup(store, db, collection, () => {
             done()
           })
         })
-      .catch(done)
+        .catch(done)
     })
   })
 }
@@ -288,13 +288,13 @@ exports.test_length_promise = function (done) {
     const sid = 'test_length_promise-sid'
     collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
       store.length()
-        .then((length) => {
+        .then(length => {
           assert.strictEqual(length, 1)
           cleanup(store, db, collection, () => {
             done()
           })
         })
-      .catch(done)
+        .catch(done)
     })
   })
 }
@@ -323,7 +323,7 @@ exports.test_destroy_ok_promise = function (done) {
             done()
           })
         })
-      .catch(done)
+        .catch(done)
     })
   })
 }
@@ -359,7 +359,7 @@ exports.test_clear_promise = function (done) {
             })
           })
         })
-      .catch(done)
+        .catch(done)
     })
   })
 }

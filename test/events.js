@@ -3,7 +3,7 @@
 const expect = require('expect.js')
 
 const expressSession = require('express-session')
-const MongoStore = require('../')(expressSession)
+const MongoStore = require('..')(expressSession)
 
 const futureDate = new Date(2030, 1)
 
