@@ -27,10 +27,10 @@
   "devDependencies": {
     "expect.js": "^0.3.1",
     "express-session": "^1.0.0",
-    "mocha": "^4.0.1",
+    "mocha": "^5.0.1",
     "mongoose": "^4.1.2",
     "nyc": "^11.2.1",
-    "xo": "^0.18.2"
+    "xo": "^0.20.3"
   },
   "scripts": {
     "lint": "xo src",
