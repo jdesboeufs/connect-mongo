@@ -117,7 +117,7 @@ module.exports = function (connect) {
     }
 
     connectionFailed(err) {
-      this.changeState('disconnected')
+      this.changeState('disconnected', err)
       throw err
     }
 
@@ -143,10 +143,10 @@ module.exports = function (connect) {
       }
     }
 
-    changeState(newState) {
+    changeState(newState, msg) {
       if (newState !== this.state) {
         this.state = newState
-        this.emit(newState)
+        this.emit(newState, msg)
       }
     }
 
