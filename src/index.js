@@ -290,7 +290,7 @@ module.exports = function (connect) {
         })
         , callback)
     }
-    
+ 
     all(callback) {
       return withCallback(this.collectionReady()
         .then(collection => collection.find({
@@ -305,7 +305,7 @@ module.exports = function (connect) {
             sessions.forEach(session => results.push(this.transformFunctions.unserialize(session.session)),
               err => {
                 if (err) {
-                  reject(err) 
+                  reject(err)
                 }
                 this.emit('all', results)
                 resolve(results)
