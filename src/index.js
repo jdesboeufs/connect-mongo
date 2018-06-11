@@ -295,19 +295,21 @@ module.exports = function (connect) {
       return withCallback(this.collectionReady()
         .then(collection => collection.find({
           $or: [
-            { expires: { $exists: false } },
-            { expires: { $gt: new Date() } },
+            {expires: {$exists: false}},
+            {expires: {$gt: new Date()}}
           ]
         }))
         .then(sessions => {
           return new Promise((resolve, reject) => {
-            let results = []
+            const results = []
             sessions.forEach(session => results.push(this.transformFunctions.unserialize(session.session)),
-              (err) => {
-                if (err) { reject(err) }
+              err => {
+                if (err) {
+                  reject(err) 
+                }
                 this.emit('all', results)
-                resolve(results);
-              });
+                resolve(results)
+              })
           })
         })
         , callback)
