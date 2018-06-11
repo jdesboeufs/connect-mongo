@@ -290,7 +290,7 @@ module.exports = function (connect) {
         })
         , callback)
     }
- 
+
     all(callback) {
       return withCallback(this.collectionReady()
         .then(collection => collection.find({
