@@ -227,6 +227,10 @@ by doing this, setting `touchAfter: 24 * 3600` you are saying to the session be 
                 scenarios where you need to support different types of serializations
                 (e.g., objects and JSON strings) or need to modify the session before using
                 it in your app.
+  - `writeOperationOptions` Options object to pass to every MongoDB write operation call that
+                supports it (e.g. `update`, `remove`). Useful for adjusting the write concern.
+                Only exception: If `autoRemove` is set to `'interval'`, the write concern
+                from the `writeOperationOptions` object will get overwritten.
   - `transformId` (optional) Transform original sessionId in whatever you want to use as storage key.
 
 ## Tests
