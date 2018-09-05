@@ -331,7 +331,7 @@ module.exports = function (connect) {
 
     clear(callback) {
       return withCallback(this.collectionReady()
-        .then(collection => collection.drop())
+        .then(collection => collection.drop(this.writeOperationOptions))
         , callback)
     }
 
