@@ -240,7 +240,7 @@ module.exports = function (connect) {
       }
 
       return withCallback(this.collectionReady()
-        .then(collection => collection.update({_id: this.computeStorageId(sid)}, s, {upsert: true}))
+        .then(collection => collection.updateOne({_id: this.computeStorageId(sid)}, s, {upsert: true}))
         .then(rawResponse => {
           if (rawResponse.result) {
             rawResponse = rawResponse.result
@@ -280,7 +280,7 @@ module.exports = function (connect) {
       }
 
       return withCallback(this.collectionReady()
-        .then(collection => collection.update({_id: this.computeStorageId(sid)}, {$set: updateFields}))
+        .then(collection => collection.updateOne({_id: this.computeStorageId(sid)}, {$set: updateFields}))
         .then(result => {
           if (result.nModified === 0) {
             throw new Error('Unable to find the session to touch')

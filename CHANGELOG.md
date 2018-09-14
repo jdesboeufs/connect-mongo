@@ -1,3 +1,8 @@
+2.0.2 / 2018-09-13
+================
+
+* __Fix__ #297 DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead (guyellis)
+
 2.0.1 / 2018-01-04
 ================
 
