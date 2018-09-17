@@ -34,7 +34,7 @@ describe('Events', () => {
         done()
       })
       store.set('foo1', {foo: 'bar'}, noop)
-    })
+    }).timeout(10000);
     it('should emit a `set` event', done => {
       store.once('set', sid => {
         expect(sid).to.be('foo2')

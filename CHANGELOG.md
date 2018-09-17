@@ -2,7 +2,6 @@
 ================
 
 * __Fix__ #297 DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead (guyellis)
-* __Fix_Travis__ Updating this file so Travis will build again. This line can be removed.
 
 2.0.1 / 2018-01-04
 ================
