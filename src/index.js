@@ -217,7 +217,7 @@ module.exports = function (connect) {
       let s
 
       try {
-        s = {_id: this.computeStorageId(sid), session: this.transformFunctions.serialize(session)}
+        s = {$set: {_id: this.computeStorageId(sid), session: this.transformFunctions.serialize(session)}}
       } catch (err) {
         return callback(err)
       }
