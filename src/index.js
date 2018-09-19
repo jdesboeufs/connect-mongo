@@ -217,7 +217,7 @@ module.exports = function (connect) {
       let s
 
       try {
-        s = {$set: {_id: this.computeStorageId(sid), session: this.transformFunctions.serialize(session)}}
+        s = {_id: this.computeStorageId(sid), session: this.transformFunctions.serialize(session)}
       } catch (err) {
         return callback(err)
       }
@@ -240,7 +240,7 @@ module.exports = function (connect) {
       }
 
       return withCallback(this.collectionReady()
-        .then(collection => collection.updateOne({_id: this.computeStorageId(sid)}, s, {upsert: true}))
+        .then(collection => collection.updateOne({_id: this.computeStorageId(sid)}, {$set: s}, {upsert: true}))
         .then(rawResponse => {
           if (rawResponse.result) {
             rawResponse = rawResponse.result
