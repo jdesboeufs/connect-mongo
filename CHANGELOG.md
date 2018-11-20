@@ -1,8 +1,9 @@
-2.0.2 / 2018-09-18
+2.0.2 / 2018-11-20
 ================
 
 * __Fix__ #300 DeprecationWarning: collection.remove is deprecated. Use deleteOne, deleteMany, or bulkWrite instead
 * __Fix__ #297 DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead
+
 2.0.1 / 2018-01-04
 ================
 
