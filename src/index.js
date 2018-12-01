@@ -130,12 +130,14 @@ module.exports = function (connect) {
     }
 
     setAutoRemoveAsync() {
-      const removeQuery = {expires: {$lt: new Date()}}
+      const removeQuery = () => {
+        return {expires: {$lt: new Date()}}
+      }
       switch (this.autoRemove) {
         case 'native':
           return this.collection.createIndex({expires: 1}, {expireAfterSeconds: 0})
         case 'interval':
-          this.timer = setInterval(() => this.collection.remove(removeQuery, {w: 0}), this.autoRemoveInterval * 1000 * 60)
+          this.timer = setInterval(() => this.collection.remove(removeQuery(), {w: 0}), this.autoRemoveInterval * 1000 * 60)
           this.timer.unref()
           return Promise.resolve()
         default:
