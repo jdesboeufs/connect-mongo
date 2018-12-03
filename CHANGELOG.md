@@ -1,3 +1,8 @@
+2.0.3 / 2018-12-03
+================
+
+*  __Fix__ interval autoremove mode to use current date with every interval (#304, #305) (jlampise)
+
 2.0.2 / 2018-11-20
 ================
 
