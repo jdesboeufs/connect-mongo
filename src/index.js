@@ -133,7 +133,9 @@ module.exports = function (connect) {
       }
 
     setAutoRemoveAsync() {
-      const removeQuery = {expires: {$lt: new Date()}}
+      const removeQuery = () => {
+        return {expires: {$lt: new Date()}}
+      }
       switch (this.autoRemove) {
         case 'native':
           return this.collection.createIndex({expires: 1}, {expireAfterSeconds: 0})

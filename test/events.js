@@ -13,7 +13,8 @@ function noop() {}
 
 describe('Events', () => {
   let store, collection
-  beforeEach(done => {
+  beforeEach(function (done) {
+    this.timeout(10000)
     store = new MongoStore({
       url: connectionString,
       mongoOptions: { useNewUrlParser: true },
