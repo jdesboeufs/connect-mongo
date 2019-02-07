@@ -23,13 +23,14 @@ function getMongooseConnection() {
   return mongoose.createConnection(connectionString)
 }
 
-function getDbPromise() {
+function getClientPromise() {
   return new Promise((resolve, reject) => {
-    mongo.MongoClient.connect(connectionString, (err, db) => {
+    mongo.MongoClient.connect(connectionString, (err, client) => {
       if (err) {
-        return reject(err)
+        reject(err)
+      } else {
+        resolve(client)
       }
-      resolve(db)
     })
   })
 }
@@ -89,12 +90,11 @@ const open_db = function (options, callback) {
 }
 
 const cleanup_store = function (store) {
-  store.db.close()
+  store.close()
 }
 
 const cleanup = function (store, db, collection, callback) {
   collection.drop(() => {
-    db.close()
     cleanup_store(store)
     callback()
   })
@@ -105,12 +105,9 @@ function getNativeDbConnection(options, done) {
     done = options
     options = {}
   }
-  mongo.MongoClient.connect(connectionString, (err, db) => {
-    if (err) {
-      return done(err)
-    }
-    open_db(Object.assign(options, {db}), done)
-  })
+  open_db(Object.assign(options, {
+    url: connectionString
+  }), done)
 }
 
 exports.test_set = function (done) {
@@ -241,7 +238,7 @@ exports.test_set_expires_no_stringify = function (done) {
 exports.test_get = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_get-sid'
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
+    collection.insertOne({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
       store.get(sid, (err, session) => {
         assert.deepEqual(session, {key1: 1, key2: 'two'})
         cleanup(store, db, collection, () => {
@@ -255,7 +252,7 @@ exports.test_get = function (done) {
 exports.test_get_promise = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_get_promise-sid'
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
+    collection.insertOne({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
       store.get(sid)
         .then(session => {
           assert.deepEqual(session, {key1: 1, key2: 'two'})
@@ -271,7 +268,7 @@ exports.test_get_promise = function (done) {
 exports.test_length = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_length-sid'
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
+    collection.insertOne({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
       store.length((err, length) => {
         assert.equal(err, null)
         assert.strictEqual(length, 1)
@@ -286,7 +283,7 @@ exports.test_length = function (done) {
 exports.test_length_promise = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_length_promise-sid'
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
+    collection.insertOne({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
       store.length()
         .then(length => {
           assert.strictEqual(length, 1)
@@ -302,7 +299,7 @@ exports.test_length_promise = function (done) {
 exports.test_destroy_ok = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_destroy_ok-sid'
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
+    collection.insertOne({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
       store.destroy(sid, err => {
         assert.equal(err, null)
         cleanup(store, db, collection, () => {
@@ -316,7 +313,7 @@ exports.test_destroy_ok = function (done) {
 exports.test_destroy_ok_promise = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_destroy_ok_promise-sid'
-    collection.insert({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
+    collection.insertOne({_id: sid, session: JSON.stringify({key1: 1, key2: 'two'})}, () => {
       store.destroy(sid)
         .then(() => {
           cleanup(store, db, collection, () => {
@@ -331,9 +328,9 @@ exports.test_destroy_ok_promise = function (done) {
 exports.test_clear = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_length-sid'
-    collection.insert({_id: sid, key1: 1, key2: 'two'}, () => {
+    collection.insertOne({_id: sid, key1: 1, key2: 'two'}, () => {
       store.clear(() => {
-        collection.count((err, count) => {
+        collection.countDocuments((err, count) => {
           assert.strictEqual(count, 0)
 
           cleanup(store, db, collection, () => {
@@ -348,10 +345,10 @@ exports.test_clear = function (done) {
 exports.test_clear_promise = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_length-sid'
-    collection.insert({_id: sid, key1: 1, key2: 'two'}, () => {
+    collection.insertOne({_id: sid, key1: 1, key2: 'two'}, () => {
       store.clear()
         .then(() => {
-          collection.count((err, count) => {
+          collection.countDocuments((err, count) => {
             assert.strictEqual(count, 0)
 
             cleanup(store, db, collection, () => {
@@ -363,21 +360,6 @@ exports.test_clear_promise = function (done) {
     })
   })
 }
-
-// Exports.test_options_url = function(done) {
-//   var store = new MongoStore({
-//     url: connectionString,
-//     collection: 'sessions-test',
-//   });
-//   store.once('connected', function() {
-//     assert.strictEqual(store.db.databaseName, 'connect-mongo-test');
-//     assert.strictEqual(store.db.serverConfig.host, 'localhost');
-//     assert.equal(store.db.serverConfig.port, 27017);
-//     assert.equal(store.collection.collectionName, 'sessions-test');
-//     cleanup_store(store);
-//     done();
-//   });
-// };
 
 exports.new_connection_failure = function (done) {
   const originalException = process.listeners('uncaughtException').pop()
@@ -426,10 +408,10 @@ exports.test_set_with_mongoose_db = function (done) {
   })
 }
 
-/* Options.dbPromise tests */
+/* Options.clientPromise tests */
 
 exports.test_set_with_promise_db = function (done) {
-  open_db({dbPromise: getDbPromise()}, (store, db, collection) => {
+  open_db({clientPromise: getClientPromise()}, (store, db, collection) => {
     const sid = 'test_set-sid'
     const data = make_data()
 
