@@ -31,7 +31,7 @@ function defaultSerializeFunction(session) {
   return obj
 }
 
-function computeTransformFunctions(options, defaultStringify) {
+function computeTransformFunctions(options,) {
   if (options.serialize || options.unserialize) {
     return {
       serialize: options.serialize || defaultSerializeFunction,
@@ -39,14 +39,14 @@ function computeTransformFunctions(options, defaultStringify) {
     }
   }
 
-  if (options.stringify === false || defaultStringify === false) {
+  if (options.stringify === false) {
     return {
       serialize: defaultSerializeFunction,
       unserialize: x => x
     }
   }
 
-  if (options.stringify === true || defaultStringify === true) {
+  if (options.stringify === true) {
     return {
       serialize: JSON.stringify,
       unserialize: JSON.parse
@@ -74,7 +74,7 @@ module.exports = function (connect) {
       this.collectionName = options.collection || 'sessions'
       this.autoRemove = options.autoRemove || 'native'
       this.autoRemoveInterval = options.autoRemoveInterval || 10
-      this.transformFunctions = computeTransformFunctions(options, true)
+      this.transformFunctions = computeTransformFunctions(options)
 
       this.options = options
 
