@@ -4,7 +4,7 @@ const expressSession = require('express-session')
 const MongoStore = require('..')(expressSession)
 const assert = require('assert')
 
-const connectionString = process.env.MONGODB_URL || 'mongodb://localhost/connect-mongo-test'
+const connectionString = process.env.MONGODB_URL || 'mongodb://localhost:27017/connect-mongo-test'
 
 const mongo = require('mongodb')
 const mongoose = require('mongoose')
@@ -20,12 +20,12 @@ const make_cookie = function () {
 }
 
 function getMongooseConnection() {
-  return mongoose.createConnection(connectionString)
+  return mongoose.createConnection(connectionString, {useNewUrlParser: true})
 }
 
 function getClientPromise() {
   return new Promise((resolve, reject) => {
-    mongo.MongoClient.connect(connectionString, (err, client) => {
+    mongo.MongoClient.connect(connectionString, {useNewUrlParser: true}, (err, client) => {
       if (err) {
         reject(err)
       } else {
@@ -105,9 +105,12 @@ function getNativeDbConnection(options, done) {
     done = options
     options = {}
   }
-  open_db(Object.assign(options, {
-    url: connectionString
-  }), done)
+  mongo.MongoClient.connect(connectionString, {useNewUrlParser: true}, (err, client) => {
+    if (err) {
+      return done(err)
+    }
+    open_db(Object.assign(options, {client}), done)
+  })
 }
 
 exports.test_set = function (done) {
@@ -358,6 +361,21 @@ exports.test_clear_promise = function (done) {
         })
         .catch(done)
     })
+  })
+}
+
+exports.test_options_url = function(done) {
+  const store = new MongoStore({
+    url: connectionString,
+    collection: 'sessions-test',
+  })
+  store.once('connected', function() {
+    assert.strictEqual(store.db.databaseName, 'connect-mongo-test')
+    assert.strictEqual(store.db.serverConfig.host, 'localhost')
+    assert.equal(store.db.serverConfig.port, 27017)
+    assert.equal(store.collection.collectionName, 'sessions-test')
+    cleanup_store(store)
+    done()
   })
 }
 

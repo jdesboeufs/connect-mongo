@@ -73,7 +73,6 @@ module.exports = function (connect) {
       this.autoRemove = options.autoRemove || 'native'
       this.autoRemoveInterval = options.autoRemoveInterval || 10 // minutes
       this.transformFunctions = computeTransformFunctions(options)
-      console.log(this.transformFunctions)
 
       this.options = options
 
@@ -89,7 +88,11 @@ module.exports = function (connect) {
 
       if (options.url) {
         // New native connection using url + mongoOptions
-        MongoClient.connect(options.url, options.mongoOptions || {}, newConnectionCallback)
+        const _options = options.mongoOptions || {}
+        if (typeof _options.useNewUrlParser !== "boolean" ) {
+          _options.useNewUrlParser = true
+        }
+        MongoClient.connect(options.url, _options, newConnectionCallback)
       } else if (options.mongooseConnection) {
         // Re-use existing or upcoming mongoose connection
         if (options.mongooseConnection.readyState === 1) {
@@ -97,6 +100,8 @@ module.exports = function (connect) {
         } else {
           options.mongooseConnection.once('open', () => this.handleNewConnectionAsync(options.mongooseConnection))
         }
+      } else if (options.client) {
+        this.handleNewConnectionAsync(options.client)
       } else if (options.clientPromise) {
         options.clientPromise
           .then(client => this.handleNewConnectionAsync(client))

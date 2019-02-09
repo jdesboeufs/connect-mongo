@@ -76,15 +76,23 @@ app.use(session({
 }));
 ```
 
-#### Re-use a native MongoDB driver client
+#### Re-use a native MongoDB driver client (or a promise)
 
-In this case, you just have to give your `MongoClient` promise instance to `connect-mongo`.
+In this case, you just have to give your `MongoClient` instance to `connect-mongo`.
 
 ```js
 /*
 ** There are many ways to create MongoClient.
 ** You should refer to the driver documentation.
 */
+app.use(session({
+    store: new MongoStore({ client: clientInstance })
+}));
+```
+
+Or just give a promise...
+
+```js
 app.use(session({
     store: new MongoStore({ clientPromise: clientInstancePromise })
 }));
