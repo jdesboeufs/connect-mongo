@@ -14,10 +14,10 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 
 * Support Express up to `5.0`
 * Support all Connect versions
-* Support [Mongoose](http://mongoosejs.com/index.html) `>= 4.1.2+`
-* Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 2.0.36`
-* Support Node.js 4, 6, 8 and 10
-* Support [MongoDB](https://www.mongodb.com/) `>= 3.0`
+* Support [Mongoose](http://mongoosejs.com/index.html) `>= 5.0`
+* Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 3.0`
+* Support Node.js 6, 8 and 10
+* Support [MongoDB](https://www.mongodb.com/) `>= 3.2`
 
 For extended compatibility, see previous versions.
 
@@ -76,19 +76,17 @@ app.use(session({
 }));
 ```
 
-#### Re-use a native MongoDB driver connection (or a promise)
+#### Re-use a native MongoDB driver client (or a promise)
 
-In this case, you just have to give your `Db` instance to `connect-mongo`.
-If the connection is not opened, `connect-mongo` will do it for you.
+In this case, you just have to give your `MongoClient` instance to `connect-mongo`.
 
 ```js
 /*
-** There are many ways to create dbInstance.
+** There are many ways to create MongoClient.
 ** You should refer to the driver documentation.
 */
-
 app.use(session({
-    store: new MongoStore({ db: dbInstance })
+    store: new MongoStore({ client: clientInstance })
 }));
 ```
 
@@ -96,7 +94,7 @@ Or just give a promise...
 
 ```js
 app.use(session({
-    store: new MongoStore({ dbPromise: dbInstancePromise })
+    store: new MongoStore({ clientPromise: clientInstancePromise })
 }));
 ```
 

@@ -22,13 +22,13 @@
     "url": "https://github.com/jdesboeufs/connect-mongo/issues"
   },
   "dependencies": {
-    "mongodb": "^2.0.36"
+    "mongodb": "^3.1.0"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
     "express-session": "^1.0.0",
     "mocha": "^5.0.1",
-    "mongoose": "^4.1.2",
+    "mongoose": "^5.2.0",
     "nyc": "^11.2.1",
     "xo": "^0.20.3"
   },
