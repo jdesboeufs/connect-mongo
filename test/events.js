@@ -69,3 +69,63 @@ describe('Events', () => {
     })
   })
 })
+
+describe('Events w/ Crypto', () => {
+  let store, collection
+  beforeEach(function (done) {
+    this.timeout(10000)
+    store = new MongoStore({
+      url: connectionString,
+      mongoOptions: { useNewUrlParser: true },
+      collection: 'sessions-test',
+      secret: 'squirrel'
+    })
+    store.once('connected', () => {
+      collection = store.collection
+      collection.deleteMany({}, done)
+    })
+  })
+  afterEach(() => {
+    store.close()
+  })
+
+  describe('set() with an unknown session id', () => {
+    it('should emit a `create` event', done => {
+      store.once('create', sid => {
+        expect(sid).to.be('foo1')
+        done()
+      })
+      store.set('foo1', {foo: 'bar'}, noop)
+    })
+    it('should emit a `set` event', done => {
+      store.once('set', sid => {
+        expect(sid).to.be('foo2')
+        done()
+      })
+      store.set('foo2', {foo: 'bar'}, noop)
+    })
+  })
+
+  describe('set() with a session id associated to an existing session', () => {
+    it('should emit an `update` event', done => {
+      store.once('update', sid => {
+        expect(sid).to.be('foo3')
+        done()
+      })
+      collection.insertOne({_id: 'foo3', session: {foo: 'bar1'}, expires: futureDate}, err => {
+        expect(err).not.to.be.ok()
+        store.set('foo3', {foo: 'bar2'}, noop)
+      })
+    })
+    it('should emit an `set` event', done => {
+      store.once('update', sid => {
+        expect(sid).to.be('foo4')
+        done()
+      })
+      collection.insertOne({_id: 'foo4', session: {foo: 'bar1'}, expires: futureDate}, err => {
+        expect(err).not.to.be.ok()
+        store.set('foo4', {foo: 'bar2'}, noop)
+      })
+    })
+  })
+})
