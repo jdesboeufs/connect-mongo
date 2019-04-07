@@ -100,6 +100,13 @@ module.exports = function (connect) {
         } else {
           options.mongooseConnection.once('open', () => this.handleNewConnectionAsync(options.mongooseConnection))
         }
+      } else if (options.monkConnection) {
+        // Re-use existing or upcoming monk connection
+        if (options.monkConnection._state === 'open') {
+          this.handleNewConnectionAsync(options.monkConnection)
+        } else {
+          options.monkConnection.once('open', () => this.handleNewConnectionAsync(options.monkConnection))
+        }
       } else if (options.client) {
         this.handleNewConnectionAsync(options.client)
       } else if (options.clientPromise) {
@@ -120,7 +127,11 @@ module.exports = function (connect) {
 
     handleNewConnectionAsync(client) {
       this.client = client
-      this.db = typeof client.db !== 'function' ? client.db : client.db()
+      if (client.db) {
+        this.db = typeof client.db === 'function' ? client.db() : client.db
+      } else {
+        this.db = client._db // Monk
+      }
       return this
         .setCollection(this.db.collection(this.collectionName))
         .setAutoRemoveAsync()
