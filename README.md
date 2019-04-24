@@ -20,6 +20,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 * Support [MongoDB](https://www.mongodb.com/) `>= 3.2`
 
 For extended compatibility, see previous versions.
+This branch is under development. Documentation for latest release please refer to [v2.0.3](https://github.com/jdesboeufs/connect-mongo/tree/v2.0.3)
 
 ## Usage
 
