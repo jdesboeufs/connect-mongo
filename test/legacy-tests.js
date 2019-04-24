@@ -268,6 +268,39 @@ exports.test_get_promise = function (done) {
   })
 }
 
+exports.test_all = function (done) {
+  getNativeDbConnection((store, db, collection) => {
+    const sid = 'test_all-sid'
+    collection.insert({ _id: sid, session: JSON.stringify({key1: 1, key2: 'two'}) }, () => {
+      store.all((err, sessions) => {
+        assert.equal(err, null)
+        assert.strictEqual(sessions.length, 1)
+        assert.deepEqual(sessions[0], { key1: 1, key2: 'two' })
+        cleanup(store, db, collection, () => {
+          done()
+        })
+      })
+    })
+  })
+}
+
+exports.test_all_promise = function (done) {
+  getNativeDbConnection((store, db, collection) => {
+    const sid = 'test_all_promise-sid'
+    collection.insert({ _id: sid, session: JSON.stringify({key1: 1, key2: 'two'}) }, () => {
+      store.all()
+        .then((sessions) => {
+          assert.strictEqual(sessions.length, 1)
+          assert.deepEqual(sessions[0], {key1: 1, key2: 'two'})
+          cleanup(store, db, collection, () => {
+            done()
+          })
+        })
+        .catch(done)
+    })
+  })
+}
+
 exports.test_length = function (done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_length-sid'

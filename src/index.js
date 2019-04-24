@@ -291,6 +291,30 @@ module.exports = function (connect) {
         , callback)
     }
 
+    all(callback) {
+      return withCallback(this.collectionReady()
+        .then(collection => collection.find({
+          $or: [
+            {expires: {$exists: false}},
+            {expires: {$gt: new Date()}}
+          ]
+        }))
+        .then(sessions => {
+          return new Promise((resolve, reject) => {
+            const results = []
+            sessions.forEach(session => results.push(this.transformFunctions.unserialize(session.session)),
+              err => {
+                if (err) {
+                  reject(err)
+                }
+                this.emit('all', results)
+                resolve(results)
+              })
+          })
+        })
+        , callback)
+    }
+
     destroy(sid, callback) {
       return withCallback(this.collectionReady()
         .then(collection => collection.deleteOne({_id: this.computeStorageId(sid)}))
