@@ -67,6 +67,17 @@ module.exports = function (connect) {
 
       super(options)
 
+      /* Use crypto? */
+      if (options.secret) {
+        try {
+          this.Crypto = require('./crypto.js')
+          this.Crypto.init(options)
+          delete options.secret
+        } catch(error) {
+          throw error
+        }
+      }
+
       /* Options */
       this.ttl = options.ttl || 1209600 // 14 days
       this.collectionName = options.collection || 'sessions'
@@ -74,7 +85,6 @@ module.exports = function (connect) {
       this.autoRemoveInterval = options.autoRemoveInterval || 10 // minutes
       this.writeOperationOptions = options.writeOperationOptions || {}
       this.transformFunctions = computeTransformFunctions(options)
-
       this.options = options
 
       this.changeState('init')
@@ -198,6 +208,16 @@ module.exports = function (connect) {
         }))
         .then(session => {
           if (session) {
+
+            if (this.Crypto) {
+              try {
+                let tmp_session = this.transformFunctions.unserialize(session.session)
+                session.session = this.Crypto.get(tmp_session)
+              } catch(error) {
+                return callback(error)
+              }
+            }
+
             const s = this.transformFunctions.unserialize(session.session)
             if (this.options.touchAfter > 0 && session.lastModified) {
               s.lastModified = session.lastModified
@@ -216,6 +236,14 @@ module.exports = function (connect) {
       }
 
       let s
+
+      if (this.Crypto) {
+        try {
+          session = this.Crypto.set(session)
+        } catch(error) {
+          return callback(error)
+        }
+      }
 
       try {
         s = {_id: this.computeStorageId(sid), session: this.transformFunctions.serialize(session)}
@@ -344,3 +372,4 @@ module.exports = function (connect) {
 
   return MongoStore
 }
+

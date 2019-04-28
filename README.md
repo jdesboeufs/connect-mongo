@@ -214,6 +214,18 @@ app.use(express.session({
 
 by doing this, setting `touchAfter: 24 * 3600` you are saying to the session be updated only one time in a period of 24 hours, does not matter how many request's are made (with the exception of those that change something on the session data)
 
+
+## Transparent encryption/decryption of session data
+
+When working with sensitive session data it is [recommended](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Session_Management_Cheat_Sheet.md) to use encryption
+
+```js
+const store = new MongoStore({
+  url: 'mongodb://localhost/test-app',
+  secret: 'squirrel'
+})
+```
+
 ## More options
 
   - `collection` Collection (default: `sessions`)
@@ -233,6 +245,15 @@ by doing this, setting `touchAfter: 24 * 3600` you are saying to the session be 
                 Only exception: If `autoRemove` is set to `'interval'`, the write concern
                 from the `writeOperationOptions` object will get overwritten.
   - `transformId` (optional) Transform original sessionId in whatever you want to use as storage key.
+
+## Crypto options
+  - `secret` (optional) Enables transparent crypto in accordance with [OWASP session management recommendations](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Session_Management_Cheat_Sheet.md).
+  - `algorithm` (optional) Allows for changes to the default symmetric encryption cipher; default is `GCM`. See `crypto.getCiphers()` for supported algorithms.
+  - `hashing` (optional) May be used to change the default hashing algorithm; default is `sha512`. See `crypto.getHashes()` for supported hashing algorithms.
+  - `encodeas` (optional) Specify to change the session data cipher text encoding. Default is `hex`.
+  - `key_size` (optional) When using varying algorithms the key size may be used. Default is `32` based on the `AES` blocksize.
+  - `iv_size` (optional) This can be used to adjust the default [IV](https://csrc.nist.gov/glossary/term/IV) size if a different algorithm requires a different size. Default is `16`.
+  - `at_size` (optional) When using newer `AES` modes such as the default `GCM` or `CCM` an authentication tag size can be defined; default is `16`.
 
 ## Tests
 
