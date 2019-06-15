@@ -17,6 +17,7 @@ const makeCookie = function() {
   cookie.maxAge = 10000 // This sets cookie.expire through a setter
   cookie.secure = true
   cookie.domain = 'cow.com'
+  cookie.sameSite = false
 
   return cookie
 }
@@ -756,7 +757,7 @@ exports.test_session_lazy_touch_sync = function(done) {
 
         // Touch the session
         store.touch(sid, session, err => {
-          assert.strictEqual(err, null)
+          assert.strictEqual(err, undefined)
 
           collection.findOne({ _id: sid }, (err, session2) => {
             assert.strictEqual(err, null)

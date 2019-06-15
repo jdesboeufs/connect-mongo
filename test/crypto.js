@@ -36,7 +36,7 @@ describe('Crypto', () => {
     try {
       pt = Crypto.get(ct)
     } catch (err) {
-      expect(err).to.equal('Encrypted session was tampered with!')
+      expect(err).to.match(/Encrypted session was tampered with/)
     }
     done()
   })
