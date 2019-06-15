@@ -39,6 +39,7 @@
   },
   "xo": {
     "space": 2,
-    "semicolon": false
+    "semicolon": false,
+    "prettier": true
   }
 }

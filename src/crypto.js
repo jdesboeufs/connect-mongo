@@ -14,49 +14,69 @@ class Crypto {
 
   set(plaintext) {
     let iv = this.crypto.randomBytes(this.iv_size).toString(this.encodeas),
-        aad = this._digest(iv+this.secret, JSON.stringify(plaintext),
-                          this.hashing, this.encodeas),
-        ct = this._encrypt(this.secret, JSON.stringify(plaintext),
-                          this.algorithm, this.encodeas, iv, aad),
-        hmac = this._digest(this.secret, ct.ct, this.hashing, this.encodeas)
+      aad = this._digest(
+        iv + this.secret,
+        JSON.stringify(plaintext),
+        this.hashing,
+        this.encodeas
+      ),
+      ct = this._encrypt(
+        this.secret,
+        JSON.stringify(plaintext),
+        this.algorithm,
+        this.encodeas,
+        iv,
+        aad
+      ),
+      hmac = this._digest(this.secret, ct.ct, this.hashing, this.encodeas)
 
-    let obj = JSON.stringify({
-      hmac: hmac,
+    const obj = JSON.stringify({
+      hmac,
       ct: ct.ct,
       at: ct.at,
-      aad: aad,
-      iv: iv
+      aad,
+      iv,
     })
 
     return obj
   }
-    
+
   get(ciphertext) {
     let ct, hmac, pt, sid, session
 
-    if (ciphertext)
+    if (ciphertext) {
       try {
         ct = JSON.parse(ciphertext)
-      } catch(err) {
+      } catch (err) {
         ct = ciphertext
       }
+    }
 
     hmac = this._digest(this.secret, ct.ct, this.hashing, this.encodeas)
 
-    if (hmac != ct.hmac)
+    if (hmac != ct.hmac) {
       throw 'Encrypted session was tampered with!'
+    }
 
-    if (ct.at)
+    if (ct.at) {
       ct.at = Buffer.from(ct.at)
+    }
 
-    pt = this._decrypt(this.secret, ct.ct, this.algorithm, this.encodeas,
-                      ct.iv, ct.at, ct.aad)
+    pt = this._decrypt(
+      this.secret,
+      ct.ct,
+      this.algorithm,
+      this.encodeas,
+      ct.iv,
+      ct.at,
+      ct.aad
+    )
 
     return pt
   }
 
   _digest(key, obj, hashing, encodeas) {
-    let hmac = this.crypto.createHmac(this.hashing, key)
+    const hmac = this.crypto.createHmac(this.hashing, key)
     hmac.setEncoding(encodeas)
     hmac.write(obj)
     hmac.end()
@@ -65,15 +85,17 @@ class Crypto {
 
   _encrypt(key, pt, algo, encodeas, iv, aad) {
     let cipher = this.crypto.createCipheriv(algo, key, iv, {
-      authTagLength: this.at_size
-    }), ct, at
+        authTagLength: this.at_size,
+      }),
+      ct,
+      at
 
     if (aad) {
       try {
         cipher.setAAD(Buffer.from(aad), {
-          plaintextLength: Buffer.byteLength(pt)
+          plaintextLength: Buffer.byteLength(pt),
         })
-      } catch(err) {
+      } catch (err) {
         throw err
       }
     }
@@ -83,20 +105,21 @@ class Crypto {
 
     try {
       at = cipher.getAuthTag()
-    } catch(err) {
+    } catch (err) {
       throw err
     }
 
-    return (at) ? {'ct': ct, 'at': at} : {'ct': ct}
+    return at ? {ct, at} : {ct}
   }
 
   _decrypt(key, ct, algo, encodeas, iv, at, aad) {
-    let cipher = this.crypto.createDecipheriv(algo, key, iv), pt
+    let cipher = this.crypto.createDecipheriv(algo, key, iv),
+      pt
 
     if (at) {
       try {
         cipher.setAuthTag(Buffer.from(at))
-      } catch(err) {
+      } catch (err) {
         throw err
       }
     }
@@ -104,9 +127,9 @@ class Crypto {
     if (aad) {
       try {
         cipher.setAAD(Buffer.from(aad), {
-          plaintextLength: Buffer.byteLength(ct)
+          plaintextLength: Buffer.byteLength(ct),
         })
-      } catch(err) {
+      } catch (err) {
         throw err
       }
     }
@@ -130,4 +153,4 @@ class Crypto {
   }
 }
 
-module.exports = new Crypto
+module.exports = new Crypto()
