@@ -10,7 +10,7 @@ process.on('unhandledRejection', (reason, err) => {
   process.exit(1)
 })
 
-describe('Legacy tests', function () {
+describe('Legacy tests', function() {
   this.timeout(6000)
   Object.keys(legacyTests).forEach(testName => {
     it(testName, legacyTests[testName])

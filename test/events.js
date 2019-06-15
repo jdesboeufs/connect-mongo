@@ -7,18 +7,19 @@ const MongoStore = require('..')(expressSession)
 
 const futureDate = new Date(2030, 1)
 
-const connectionString = process.env.MONGODB_URL || 'mongodb://localhost:27017/connect-mongo-test'
+const connectionString =
+  process.env.MONGODB_URL || 'mongodb://localhost:27017/connect-mongo-test'
 
 function noop() {}
 
 describe('Events', () => {
   let store, collection
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     this.timeout(10000)
     store = new MongoStore({
       url: connectionString,
       mongoOptions: { useNewUrlParser: true },
-      collection: 'sessions-test'
+      collection: 'sessions-test',
     })
     store.once('connected', () => {
       collection = store.collection
@@ -35,14 +36,14 @@ describe('Events', () => {
         expect(sid).to.be('foo1')
         done()
       })
-      store.set('foo1', {foo: 'bar'}, noop)
+      store.set('foo1', { foo: 'bar' }, noop)
     })
     it('should emit a `set` event', done => {
       store.once('set', sid => {
         expect(sid).to.be('foo2')
         done()
       })
-      store.set('foo2', {foo: 'bar'}, noop)
+      store.set('foo2', { foo: 'bar' }, noop)
     })
   })
 
@@ -52,33 +53,39 @@ describe('Events', () => {
         expect(sid).to.be('foo3')
         done()
       })
-      collection.insertOne({_id: 'foo3', session: {foo: 'bar1'}, expires: futureDate}, err => {
-        expect(err).not.to.be.ok()
-        store.set('foo3', {foo: 'bar2'}, noop)
-      })
+      collection.insertOne(
+        { _id: 'foo3', session: { foo: 'bar1' }, expires: futureDate },
+        err => {
+          expect(err).not.to.be.ok()
+          store.set('foo3', { foo: 'bar2' }, noop)
+        }
+      )
     })
     it('should emit an `set` event', done => {
       store.once('update', sid => {
         expect(sid).to.be('foo4')
         done()
       })
-      collection.insertOne({_id: 'foo4', session: {foo: 'bar1'}, expires: futureDate}, err => {
-        expect(err).not.to.be.ok()
-        store.set('foo4', {foo: 'bar2'}, noop)
-      })
+      collection.insertOne(
+        { _id: 'foo4', session: { foo: 'bar1' }, expires: futureDate },
+        err => {
+          expect(err).not.to.be.ok()
+          store.set('foo4', { foo: 'bar2' }, noop)
+        }
+      )
     })
   })
 })
 
 describe('Events w/ Crypto', () => {
   let store, collection
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     this.timeout(10000)
     store = new MongoStore({
       url: connectionString,
       mongoOptions: { useNewUrlParser: true },
       collection: 'sessions-test',
-      secret: 'squirrel'
+      secret: 'squirrel',
     })
     store.once('connected', () => {
       collection = store.collection
@@ -95,14 +102,14 @@ describe('Events w/ Crypto', () => {
         expect(sid).to.be('foo1')
         done()
       })
-      store.set('foo1', {foo: 'bar'}, noop)
+      store.set('foo1', { foo: 'bar' }, noop)
     })
     it('should emit a `set` event', done => {
       store.once('set', sid => {
         expect(sid).to.be('foo2')
         done()
       })
-      store.set('foo2', {foo: 'bar'}, noop)
+      store.set('foo2', { foo: 'bar' }, noop)
     })
   })
 
@@ -112,20 +119,26 @@ describe('Events w/ Crypto', () => {
         expect(sid).to.be('foo3')
         done()
       })
-      collection.insertOne({_id: 'foo3', session: {foo: 'bar1'}, expires: futureDate}, err => {
-        expect(err).not.to.be.ok()
-        store.set('foo3', {foo: 'bar2'}, noop)
-      })
+      collection.insertOne(
+        { _id: 'foo3', session: { foo: 'bar1' }, expires: futureDate },
+        err => {
+          expect(err).not.to.be.ok()
+          store.set('foo3', { foo: 'bar2' }, noop)
+        }
+      )
     })
     it('should emit an `set` event', done => {
       store.once('update', sid => {
         expect(sid).to.be('foo4')
         done()
       })
-      collection.insertOne({_id: 'foo4', session: {foo: 'bar1'}, expires: futureDate}, err => {
-        expect(err).not.to.be.ok()
-        store.set('foo4', {foo: 'bar2'}, noop)
-      })
+      collection.insertOne(
+        { _id: 'foo4', session: { foo: 'bar1' }, expires: futureDate },
+        err => {
+          expect(err).not.to.be.ok()
+          store.set('foo4', { foo: 'bar2' }, noop)
+        }
+      )
     })
   })
 })

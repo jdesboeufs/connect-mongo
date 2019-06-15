@@ -4,7 +4,7 @@ const expect = require('expect.js')
 const Crypto = require('../src/crypto.js')
 
 const options = {
-  secret: 'squirrel'
+  secret: 'squirrel',
 }
 
 Crypto.init(options)
@@ -35,7 +35,7 @@ describe('Crypto', () => {
 
     try {
       pt = Crypto.get(ct)
-    } catch(err) {
+    } catch (err) {
       expect(err).to.equal('Encrypted session was tampered with!')
     }
     done()
@@ -44,16 +44,15 @@ describe('Crypto', () => {
   it('Authentication tag validation', done => {
     ct = JSON.parse(ct)
     ct.hmac = hmac
-  
-    if (!ct.at)
-      done()
-    
+
+    if (!ct.at) done()
+
     ct.at = 'funky chicken'
     ct = JSON.stringify(ct)
 
     try {
       pt = Crypto.get(ct)
-    } catch(err) {
+    } catch (err) {
       expect(err).to.match(/Unsupported state or unable to authenticate data/)
     }
     done()
@@ -63,13 +62,13 @@ describe('Crypto', () => {
     ct = JSON.parse(ct)
 
     if (!ct.aad) done()
-    
+
     ct.aad = 'funky chicken'
     ct = JSON.stringify(ct)
 
     try {
       pt = Crypto.get(ct)
-    } catch(err) {
+    } catch (err) {
       expect(err).to.match(/Unsupported state or unable to authenticate data/)
     }
     done()

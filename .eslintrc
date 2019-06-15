@@ -1,0 +1,38 @@
+{
+  "extends": [
+    "standard",
+    "prettier",
+    "prettier/standard"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 9
+  },
+  "plugins": [
+    "prettier",
+    "mocha"
+  ],
+  "rules": {
+    "mocha/no-exclusive-tests": "error",
+    "prettier/prettier": "error",
+    "standard/no-callback-literal": "off",
+    "no-unused-vars": [
+      "error",
+      {
+        "args": "none",
+        "varsIgnorePattern": "^_",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "prefer-const": [
+      "error", {
+        "destructuring": "any",
+        "ignoreReadBeforeAssign": false
+      }
+    ]
+  },
+  "env": {
+    "node": true,
+    "es6": true,
+    "mocha": true
+  }
+}

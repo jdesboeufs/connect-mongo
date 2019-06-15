@@ -13,22 +13,22 @@ class Crypto {
   }
 
   set(plaintext) {
-    let iv = this.crypto.randomBytes(this.iv_size).toString(this.encodeas),
-      aad = this._digest(
-        iv + this.secret,
-        JSON.stringify(plaintext),
-        this.hashing,
-        this.encodeas
-      ),
-      ct = this._encrypt(
-        this.secret,
-        JSON.stringify(plaintext),
-        this.algorithm,
-        this.encodeas,
-        iv,
-        aad
-      ),
-      hmac = this._digest(this.secret, ct.ct, this.hashing, this.encodeas)
+    const iv = this.crypto.randomBytes(this.iv_size).toString(this.encodeas)
+    const aad = this._digest(
+      iv + this.secret,
+      JSON.stringify(plaintext),
+      this.hashing,
+      this.encodeas
+    )
+    const ct = this._encrypt(
+      this.secret,
+      JSON.stringify(plaintext),
+      this.algorithm,
+      this.encodeas,
+      iv,
+      aad
+    )
+    const hmac = this._digest(this.secret, ct.ct, this.hashing, this.encodeas)
 
     const obj = JSON.stringify({
       hmac,
@@ -84,11 +84,11 @@ class Crypto {
   }
 
   _encrypt(key, pt, algo, encodeas, iv, aad) {
-    let cipher = this.crypto.createCipheriv(algo, key, iv, {
-        authTagLength: this.at_size,
-      }),
-      ct,
-      at
+    const cipher = this.crypto.createCipheriv(algo, key, iv, {
+      authTagLength: this.at_size,
+    })
+    let ct
+    let at
 
     if (aad) {
       try {
@@ -109,12 +109,12 @@ class Crypto {
       throw err
     }
 
-    return at ? {ct, at} : {ct}
+    return at ? { ct, at } : { ct }
   }
 
   _decrypt(key, ct, algo, encodeas, iv, at, aad) {
-    let cipher = this.crypto.createDecipheriv(algo, key, iv),
-      pt
+    const cipher = this.crypto.createDecipheriv(algo, key, iv)
+    let pt
 
     if (at) {
       try {

@@ -8,3 +8,4 @@ examples/
 support/
 test/
 coverage/
+.vscode/

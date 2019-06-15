@@ -25,21 +25,31 @@
     "mongodb": "^3.1.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.0.0",
+    "@commitlint/config-conventional": "^8.0.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-config-prettier-standard": "^2.0.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-mocha": "^5.3.0",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
     "expect.js": "^0.3.1",
     "express-session": "^1.0.0",
+    "husky": "^2.4.1",
+    "lint-staged": "^8.2.1",
     "mocha": "^5.0.1",
     "mongoose": "^5.2.0",
     "nyc": "^11.2.1",
-    "xo": "^0.20.3"
+    "prettier": "^1.18.2"
   },
   "scripts": {
-    "lint": "xo src",
+    "lint": "eslint src test",
+    "lint:fix": "eslint src test --fix",
     "cover": "nyc report --reporter=text-lcov",
     "test": "nyc mocha"
-  },
-  "xo": {
-    "space": 2,
-    "semicolon": false,
-    "prettier": true
   }
 }

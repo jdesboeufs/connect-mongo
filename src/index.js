@@ -147,20 +147,23 @@ module.exports = function(connect) {
 
     setAutoRemoveAsync() {
       const removeQuery = () => {
-        return {expires: {$lt: new Date()}}
+        return { expires: { $lt: new Date() } }
       }
       switch (this.autoRemove) {
         case 'native':
           return this.collection.createIndex(
-            {expires: 1},
-            Object.assign({expireAfterSeconds: 0}, this.writeOperationOptions)
+            { expires: 1 },
+            Object.assign({ expireAfterSeconds: 0 }, this.writeOperationOptions)
           )
         case 'interval':
           this.timer = setInterval(
             () =>
               this.collection.deleteMany(
                 removeQuery(),
-                Object.assign({}, this.writeOperationOptions, {w: 0, j: false})
+                Object.assign({}, this.writeOperationOptions, {
+                  w: 0,
+                  j: false,
+                })
               ),
             this.autoRemoveInterval * 1000 * 60
           )
@@ -223,7 +226,10 @@ module.exports = function(connect) {
           .then(collection =>
             collection.findOne({
               _id: this.computeStorageId(sid),
-              $or: [{expires: {$exists: false}}, {expires: {$gt: new Date()}}],
+              $or: [
+                { expires: { $exists: false } },
+                { expires: { $gt: new Date() } },
+              ],
             })
           )
           .then(session => {
@@ -297,9 +303,9 @@ module.exports = function(connect) {
         this.collectionReady()
           .then(collection =>
             collection.updateOne(
-              {_id: this.computeStorageId(sid)},
-              {$set: s},
-              Object.assign({upsert: true}, this.writeOperationOptions)
+              { _id: this.computeStorageId(sid) },
+              { $set: s },
+              Object.assign({ upsert: true }, this.writeOperationOptions)
             )
           )
           .then(rawResponse => {
@@ -347,8 +353,8 @@ module.exports = function(connect) {
         this.collectionReady()
           .then(collection =>
             collection.updateOne(
-              {_id: this.computeStorageId(sid)},
-              {$set: updateFields},
+              { _id: this.computeStorageId(sid) },
+              { $set: updateFields },
               this.writeOperationOptions
             )
           )
@@ -368,7 +374,10 @@ module.exports = function(connect) {
         this.collectionReady()
           .then(collection =>
             collection.find({
-              $or: [{expires: {$exists: false}}, {expires: {$gt: new Date()}}],
+              $or: [
+                { expires: { $exists: false } },
+                { expires: { $gt: new Date() } },
+              ],
             })
           )
           .then(sessions => {
@@ -398,7 +407,7 @@ module.exports = function(connect) {
         this.collectionReady()
           .then(collection =>
             collection.deleteOne(
-              {_id: this.computeStorageId(sid)},
+              { _id: this.computeStorageId(sid) },
               this.writeOperationOptions
             )
           )
