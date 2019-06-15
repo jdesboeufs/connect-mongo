@@ -293,7 +293,7 @@ exports.test_get_promise = function(done) {
 exports.test_all = function(done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_all-sid'
-    collection.insert(
+    collection.insertOne(
       { _id: sid, session: JSON.stringify({ key1: 1, key2: 'two' }) },
       () => {
         store.all((err, sessions) => {
@@ -312,7 +312,7 @@ exports.test_all = function(done) {
 exports.test_all_promise = function(done) {
   getNativeDbConnection((store, db, collection) => {
     const sid = 'test_all_promise-sid'
-    collection.insert(
+    collection.insertOne(
       { _id: sid, session: JSON.stringify({ key1: 1, key2: 'two' }) },
       () => {
         store
