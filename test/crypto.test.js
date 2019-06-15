@@ -1,6 +1,5 @@
 'use strict'
 
-const expect = require('expect.js')
 const Crypto = require('../src/crypto.js')
 
 const options = {
@@ -16,15 +15,15 @@ describe('Crypto', () => {
 
   it('Encrypt data', done => {
     ct = JSON.parse(Crypto.set('123, easy as ABC. ABC, easy as 123'))
-    expect(ct).to.have.property('ct')
-    expect(ct).to.have.property('iv')
-    expect(ct).to.have.property('hmac')
+    expect(ct).toHaveProperty('ct')
+    expect(ct).toHaveProperty('iv')
+    expect(ct).toHaveProperty('hmac')
     done()
   })
 
   it('Decrypt data', done => {
     pt = Crypto.get(JSON.stringify(ct))
-    expect(pt).to.match(/123, easy as ABC. ABC, easy as 123/)
+    expect(pt).toMatch(/123, easy as ABC. ABC, easy as 123/)
     done()
   })
 
@@ -32,12 +31,9 @@ describe('Crypto', () => {
     hmac = ct.hmac
     ct.hmac = 'funky chicken'
     ct = JSON.stringify(ct)
-
-    try {
+    expect(() => {
       pt = Crypto.get(ct)
-    } catch (err) {
-      expect(err).to.match(/Encrypted session was tampered with/)
-    }
+    }).toThrow(/Encrypted session was tampered with/)
     done()
   })
 
@@ -49,12 +45,9 @@ describe('Crypto', () => {
 
     ct.at = 'funky chicken'
     ct = JSON.stringify(ct)
-
-    try {
+    expect(() => {
       pt = Crypto.get(ct)
-    } catch (err) {
-      expect(err).to.match(/Unsupported state or unable to authenticate data/)
-    }
+    }).toThrow(/Unsupported state or unable to authenticate data/)
     done()
   })
 
@@ -65,12 +58,9 @@ describe('Crypto', () => {
 
     ct.aad = 'funky chicken'
     ct = JSON.stringify(ct)
-
-    try {
+    expect(() => {
       pt = Crypto.get(ct)
-    } catch (err) {
-      expect(err).to.match(/Unsupported state or unable to authenticate data/)
-    }
+    }).toThrow(/Unsupported state or unable to authenticate data/)
     done()
   })
 })

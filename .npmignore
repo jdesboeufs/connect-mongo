@@ -3,6 +3,7 @@
 History.md
 Makefile
 Readme.md
+.DS_Store
 
 examples/
 support/
@@ -15,3 +16,4 @@ coverage/
 .travis.yml
 commitlint.config.js
 .nyc_output/
+jest.config.js

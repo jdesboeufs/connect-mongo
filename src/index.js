@@ -235,16 +235,11 @@ module.exports = function(connect) {
           .then(session => {
             if (session) {
               if (this.Crypto) {
-                try {
-                  const tmpSession = this.transformFunctions.unserialize(
-                    session.session
-                  )
-                  session.session = this.Crypto.get(tmpSession)
-                } catch (error) {
-                  return callback(error)
-                }
+                const tmpSession = this.transformFunctions.unserialize(
+                  session.session
+                )
+                session.session = this.Crypto.get(tmpSession)
               }
-
               const s = this.transformFunctions.unserialize(session.session)
               if (this.options.touchAfter > 0 && session.lastModified) {
                 s.lastModified = session.lastModified
@@ -269,7 +264,7 @@ module.exports = function(connect) {
         try {
           session = this.Crypto.set(session)
         } catch (error) {
-          return callback(error)
+          return withCallback(Promise.reject(error), callback)
         }
       }
 
@@ -279,7 +274,7 @@ module.exports = function(connect) {
           session: this.transformFunctions.serialize(session),
         }
       } catch (err) {
-        return callback(err)
+        return withCallback(Promise.reject(err), callback)
       }
 
       if (session && session.cookie && session.cookie.expires) {
@@ -338,7 +333,7 @@ module.exports = function(connect) {
         const timeElapsed = currentDate.getTime() - session.lastModified
 
         if (timeElapsed < touchAfter) {
-          return callback()
+          return withCallback(Promise.resolve(), callback)
         }
         updateFields.lastModified = currentDate
       }
@@ -436,7 +431,7 @@ module.exports = function(connect) {
 
     close() {
       if (this.client) {
-        this.client.close()
+        return this.client.close()
       }
     }
   }

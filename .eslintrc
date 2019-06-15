@@ -2,17 +2,18 @@
   "extends": [
     "standard",
     "prettier",
-    "prettier/standard"
+    "prettier/standard",
+    "plugin:jest/recommended"
   ],
   "parserOptions": {
     "ecmaVersion": 9
   },
   "plugins": [
     "prettier",
-    "mocha"
+    "jest"
   ],
   "rules": {
-    "mocha/no-exclusive-tests": "error",
+    "jest/no-disabled-tests": "error",
     "prettier/prettier": "error",
     "standard/no-callback-literal": "off",
     "no-unused-vars": [
@@ -33,6 +34,6 @@
   "env": {
     "node": true,
     "es6": true,
-    "mocha": true
+    "jest/globals": true
   }
 }
