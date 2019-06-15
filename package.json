@@ -41,7 +41,7 @@
     "express-session": "^1.0.0",
     "husky": "^2.4.1",
     "lint-staged": "^8.2.1",
-    "mocha": "^5.0.1",
+    "mocha": "^6.1.4",
     "mongoose": "^5.2.0",
     "nyc": "^14.1.1",
     "prettier": "^1.18.2"
