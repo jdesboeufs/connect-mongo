@@ -147,6 +147,20 @@ describe('legacy tests', () => {
     })
   })
 
+  test('test_set_event', done => {
+    getNativeDbConnection(async (store, db, collection) => {
+      const sid = 'test_set_promise-sid'
+      const data = makeData()
+      store.on('set', async sessionId => {
+        // Verify it was saved
+        const session = await collection.findOne({ _id: sid })
+        assertSessionEquals(sid, data, session)
+        cleanup(store, collection, done)
+      })
+      store.set(sid, data)
+    })
+  })
+
   test('test_set_no_stringify', done => {
     getNativeDbConnection(
       { stringify: false },
@@ -303,6 +317,22 @@ describe('legacy tests', () => {
       })
       await store.destroy(sid)
       cleanup(store, collection, done)
+    })
+  })
+
+  test('test_destroy_ok_event', done => {
+    getNativeDbConnection(async (store, db, collection) => {
+      const sid = 'test_destroy_ok_event-sid'
+      const testData = { key1: 1, key2: 'two' }
+      await collection.insertOne({
+        _id: sid,
+        session: JSON.stringify(testData),
+      })
+      store.on('destroy', sessionId => {
+        expect(sessionId).toBe(sid)
+        cleanup(store, collection, done)
+      })
+      store.destroy(sid)
     })
   })
 
