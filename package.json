@@ -37,20 +37,17 @@
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-promise": "^4.1.1",
     "eslint-plugin-standard": "^4.0.0",
-    "expect.js": "^0.3.1",
     "express-session": "^1.0.0",
     "husky": "^2.4.1",
+    "jest": "^24.8.0",
     "lint-staged": "^8.2.1",
-    "mocha": "^6.1.4",
     "mongoose": "^5.2.0",
-    "nyc": "^14.1.1",
     "prettier": "^1.18.2"
   },
   "scripts": {
     "lint": "eslint src test",
     "lint:fix": "eslint src test --fix",
-    "cover": "nyc report --reporter=text-lcov",
-    "test": "nyc mocha"
+    "test": "jest --coverage"
   },
   "husky": {
     "hooks": {

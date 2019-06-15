@@ -15,3 +15,4 @@ coverage/
 .travis.yml
 commitlint.config.js
 .nyc_output/
+jest.config.js
