@@ -51,5 +51,17 @@
     "lint:fix": "eslint src test --fix",
     "cover": "nyc report --reporter=text-lcov",
     "test": "nyc mocha"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
   }
 }
