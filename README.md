@@ -255,7 +255,11 @@ const store = new MongoStore({
 
 ## Tests
 
-    npm test
+```
+docker run --rm -p 27017:27017 mongo:3.6
+yarn install
+yarn test
+```
 
 The tests use a database called `connect-mongo-test`.
 
