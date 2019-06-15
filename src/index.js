@@ -112,7 +112,11 @@ module.exports = function (connect) {
           options.mongooseConnection.once('open', () => this.handleNewConnectionAsync(options.mongooseConnection))
         }
       } else if (options.client) {
-        this.handleNewConnectionAsync(options.client)
+        if (options.client.isConnected()) {
+          this.handleNewConnectionAsync(options.client)
+        } else {
+          options.client.once('open', () => this.handleNewConnectionAsync(options.client))
+        }
       } else if (options.clientPromise) {
         options.clientPromise
           .then(client => this.handleNewConnectionAsync(client))
