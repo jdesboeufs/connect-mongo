@@ -383,6 +383,26 @@ describe('legacy tests', () => {
     )
   })
 
+  // Memory store ONLY support callback but not promise!
+  test('test_set_with_memory_db', done => {
+    const store = new MongoStore({ fallbackMemory: true })
+    const sid = 'test_set_memory-sid'
+    const data = makeData()
+    store.set(sid, data, async err => {
+      store.get(sid, (err, session) => {
+        for (const prop in session.session) {
+          if (prop === 'cookie') {
+            // Make sure the cookie is intact
+            assert.deepStrictEqual(session.session.cookie, data.cookie.toJSON())
+          } else {
+            assert.deepStrictEqual(session.session[prop], data[prop])
+          }
+        }
+        done()
+      })
+    })
+  })
+
   test('test_set_default_expiration', done => {
     const defaultTTL = 10
     getNativeDbConnection(
