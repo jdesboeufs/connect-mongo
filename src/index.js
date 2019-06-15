@@ -436,7 +436,7 @@ module.exports = function(connect) {
 
     close() {
       if (this.client) {
-        this.client.close()
+        return this.client.close()
       }
     }
   }

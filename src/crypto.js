@@ -55,7 +55,7 @@ class Crypto {
     const hmac = this._digest(this.secret, ct.ct, this.hashing, this.encodeas)
 
     if (hmac !== ct.hmac) {
-      throw Error('Encrypted session was tampered with!')
+      throw new Error('Encrypted session was tampered with!')
     }
 
     if (ct.at) {
