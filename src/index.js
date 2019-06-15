@@ -236,10 +236,10 @@ module.exports = function(connect) {
             if (session) {
               if (this.Crypto) {
                 try {
-                  const tmp_session = this.transformFunctions.unserialize(
+                  const tmpSession = this.transformFunctions.unserialize(
                     session.session
                   )
-                  session.session = this.Crypto.get(tmp_session)
+                  session.session = this.Crypto.get(tmpSession)
                 } catch (error) {
                   return callback(error)
                 }

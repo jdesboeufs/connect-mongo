@@ -9,7 +9,7 @@ class Crypto {
     this.iv_size = options.iv_size || 16
     this.at_size = options.at_size || 16
     this.key_size = options.key_size || 32
-    this.secret = this._derive_key(options.secret) || false
+    this.secret = this._deriveKey(options.secret) || false
   }
 
   set(plaintext) {
@@ -42,7 +42,7 @@ class Crypto {
   }
 
   get(ciphertext) {
-    let ct, hmac, pt, sid, session
+    let ct
 
     if (ciphertext) {
       try {
@@ -52,17 +52,17 @@ class Crypto {
       }
     }
 
-    hmac = this._digest(this.secret, ct.ct, this.hashing, this.encodeas)
+    const hmac = this._digest(this.secret, ct.ct, this.hashing, this.encodeas)
 
-    if (hmac != ct.hmac) {
-      throw 'Encrypted session was tampered with!'
+    if (hmac !== ct.hmac) {
+      throw Error('Encrypted session was tampered with!')
     }
 
     if (ct.at) {
       ct.at = Buffer.from(ct.at)
     }
 
-    pt = this._decrypt(
+    const pt = this._decrypt(
       this.secret,
       ct.ct,
       this.algorithm,
@@ -140,14 +140,12 @@ class Crypto {
     return pt
   }
 
-  _derive_key(secret) {
-    let key, hash, salt
-
-    hash = this.crypto.createHash(this.hashing)
+  _deriveKey(secret) {
+    const hash = this.crypto.createHash(this.hashing)
     hash.update(secret)
-    salt = hash.digest(this.encodeas).substr(0, 16)
+    const salt = hash.digest(this.encodeas).substr(0, 16)
 
-    key = this.crypto.pbkdf2Sync(secret, salt, 10000, 64, this.hashing)
+    const key = this.crypto.pbkdf2Sync(secret, salt, 10000, 64, this.hashing)
 
     return key.toString(this.encodeas).substr(0, this.key_size)
   }
