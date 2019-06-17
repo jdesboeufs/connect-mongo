@@ -1,6 +1,6 @@
 {
   "name": "connect-mongo",
-  "version": "3.0.0-rc.2",
+  "version": "3.0.0",
   "description": "MongoDB session store for Express and Connect",
   "keywords": [
     "connect",
@@ -11,7 +11,8 @@
   ],
   "contributors": [
     "Casey Banner <kcbanner@gmail.com>",
-    "Jerome Desboeufs <jerome.desboeufs@gmail.com>"
+    "Jerome Desboeufs <jerome.desboeufs@gmail.com>",
+    "MC Or <mingchuno@gmail.com>"
   ],
   "license": "MIT",
   "repository": {

@@ -17,8 +17,8 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 * Support Node.js 8, 10 and 12
 * Support [MongoDB](https://www.mongodb.com/) `3.2 - 4.0`
 
-For extended compatibility, see previous versions.
-This branch is under development. Documentation for latest release please refer to [v2.0.3](https://github.com/jdesboeufs/connect-mongo/tree/v2.0.3)
+For extended compatibility, see previous versions [v2.0.3](https://github.com/jdesboeufs/connect-mongo/tree/v2.0.3).
+But please note that we are not maintaining v2.x.x anymore.
 
 ## Usage
 
@@ -35,19 +35,6 @@ app.use(session({
     store: new MongoStore(options)
 }));
 ```
-
-Express `2.x`, `3.x` and Connect `1.x`, `2.x`:
-
-```js
-const MongoStore = require('connect-mongo')(express);
-
-app.use(express.session({
-    secret: 'foo',
-    store: new MongoStore(options)
-}));
-```
-
-For Connect `1.x` and `2.x`, just replace `express` by `connect`.
 
 ### Connection to MongoDB
 
@@ -126,7 +113,7 @@ A `MongoStore` instance will emit the following events:
 | `touch` | A session has been touched (but not modified) | `sessionId` |
 | `update` | A session has been updated | `sessionId` |
 | `set` | A session has been created OR updated _(for compatibility purpose)_ | `sessionId` |
-| `destroy` | A session has been destroyed | `sessionId` |
+| `destroy` | A session has been destroyed manually | `sessionId` |
 
 ## Session expiration
 
@@ -137,8 +124,8 @@ Otherwise, it will create a new one, using `ttl` option.
 ```js
 app.use(session({
     store: new MongoStore({
-      url: 'mongodb://localhost/test-app',
-      ttl: 14 * 24 * 60 * 60 // = 14 days. Default
+        url: 'mongodb://localhost/test-app',
+        ttl: 14 * 24 * 60 * 60 // = 14 days. Default
     })
 }));
 ```

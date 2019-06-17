@@ -1,3 +1,20 @@
+3.0.0 / 2019-06-17
+================
+
+__Breaking changes:__
+* __Drop__ Node.js 4 & 6 support
+* __Add__ Node.js 10 & 12 support
+* Upgrade `mongoose` to v5 and `mongodb` to v3 and drop old version support
+* Replace deprecated mongo operation
+* MongoStore need to supply client/clientPromise instead of db/dbPromise due to depns upgrade
+
+__Others changes:__
+* __Add__ Implement store.all function (#291)
+* __Add__ Add option writeOperationOptions (#295)
+* __Add__ Transparent crypto support (#314)
+* Change test framework from Mocha to Jest
+* Change linter from xo to eslint
+
 2.0.3 / 2018-12-03
 ================
 
