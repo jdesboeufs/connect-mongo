@@ -143,8 +143,8 @@ By default, `connect-mongo` uses MongoDB's TTL collection feature (2.2+) to have
 ```js
 app.use(session({
     store: new MongoStore({
-      url: 'mongodb://localhost/test-app',
-      autoRemove: 'native' // Default
+        url: 'mongodb://localhost/test-app',
+        autoRemove: 'native' // Default
     })
 }));
 ```
@@ -174,8 +174,8 @@ You are in production environnement and/or you manage the TTL index elsewhere.
 ```js
 app.use(session({
     store: new MongoStore({
-      url: 'mongodb://localhost/test-app',
-      autoRemove: 'disabled'
+        url: 'mongodb://localhost/test-app',
+        autoRemove: 'disabled'
     })
 }));
 ```
@@ -206,8 +206,8 @@ When working with sensitive session data it is [recommended](https://github.com/
 
 ```js
 const store = new MongoStore({
-  url: 'mongodb://localhost/test-app',
-  secret: 'squirrel'
+    url: 'mongodb://localhost/test-app',
+    secret: 'squirrel'
 })
 ```
 
