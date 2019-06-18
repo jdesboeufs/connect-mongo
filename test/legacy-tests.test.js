@@ -1,4 +1,3 @@
-/* eslint-disable handle-callback-err */
 'use strict'
 
 const expressSession = require('express-session')
@@ -128,6 +127,7 @@ describe('legacy tests', () => {
       store.set(sid, data, err => {
         assert.strictEqual(err, null)
         collection.findOne({ _id: sid }, (err, session) => {
+          assert.strictEqual(err, null)
           assertSessionEquals(sid, data, session)
           cleanup(store, collection, done)
         })
@@ -210,6 +210,7 @@ describe('legacy tests', () => {
         session: JSON.stringify(testData),
       })
       store.get(sid, (err, session) => {
+        assert.strictEqual(err, null)
         assert.deepStrictEqual(session, testData)
         cleanup(store, collection, done)
       })
@@ -419,7 +420,9 @@ describe('legacy tests', () => {
     const sid = 'test_set_memory-sid'
     const data = makeData()
     store.set(sid, data, async err => {
+      expect(err).toBeFalsy()
       store.get(sid, (err, session) => {
+        assert.strictEqual(err, null)
         for (const prop in session.session) {
           if (prop === 'cookie') {
             // Make sure the cookie is intact
