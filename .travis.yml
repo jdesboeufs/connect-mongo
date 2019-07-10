@@ -23,7 +23,6 @@ before_script:
 
 script:
   - yarn lint
-  # turn off lint for the moment
   - MONGODB_URL=mongodb://localhost/connect-mongo-test travis_retry yarn test
 
 after_success:

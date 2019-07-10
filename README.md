@@ -6,7 +6,6 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 [![downloads](https://img.shields.io/npm/dm/connect-mongo.svg)](https://www.npmjs.com/package/connect-mongo)
 [![Build Status](https://travis-ci.org/jdesboeufs/connect-mongo.svg?branch=master)](https://travis-ci.org/jdesboeufs/connect-mongo)
 [![Coverage Status](https://coveralls.io/repos/jdesboeufs/connect-mongo/badge.svg?branch=master&service=github)](https://coveralls.io/github/jdesboeufs/connect-mongo?branch=master)
-[![Dependency Status](https://david-dm.org/jdesboeufs/connect-mongo.svg?style=flat)](https://david-dm.org/jdesboeufs/connect-mongo)
 
 ## Compatibility
 
