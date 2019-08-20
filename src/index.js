@@ -1,6 +1,7 @@
 'use strict'
 
 const MongoClient = require('mongodb')
+const { mergeMongoOptions } = require('./helper')
 
 function withCallback(promise, cb) {
   // Assume that cb is a function - type checks and handling type errors
@@ -99,11 +100,8 @@ module.exports = function(connect) {
 
       if (options.url) {
         // New native connection using url + mongoOptions
-        const _options = options.mongoOptions || {}
-        if (typeof _options.useNewUrlParser !== 'boolean') {
-          _options.useNewUrlParser = true
-        }
-        MongoClient.connect(options.url, _options, newConnectionCallback)
+        const _mongoOptions = mergeMongoOptions(options.mongoOptions)
+        MongoClient.connect(options.url, _mongoOptions, newConnectionCallback)
       } else if (options.mongooseConnection) {
         // Re-use existing or upcoming mongoose connection
         if (options.mongooseConnection.readyState === 1) {
