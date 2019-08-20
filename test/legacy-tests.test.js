@@ -371,8 +371,6 @@ describe('legacy tests', () => {
     })
     store.once('connected', function() {
       assert.strictEqual(store.db.databaseName, 'connect-mongo-test')
-      assert.strictEqual(store.db.serverConfig.host, 'localhost')
-      assert.strictEqual(store.db.serverConfig.port, 27017)
       assert.strictEqual(store.collection.collectionName, 'sessions-test')
       store.close().then(done)
     })
