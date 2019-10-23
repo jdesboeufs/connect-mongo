@@ -1,3 +1,12 @@
+3.1.0 / 2019-10-23
+================
+
+* __Add__ useUnifiedTopology=true
+* Refactor merge config logic
+
+__Others changes:__
+* chore: update depns (#326)
+
 3.0.0 / 2019-06-17
 ================
 
