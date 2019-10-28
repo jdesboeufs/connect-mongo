@@ -61,5 +61,6 @@
       "eslint --fix",
       "git add"
     ]
-  }
+  },
+  "types": "src/types.d.ts"
 }
