@@ -81,6 +81,11 @@ declare namespace connectMongo {
          * don't save session if unmodified
          */
         touchAfter?: number;
+
+        /**
+         * Enables transparent crypto in accordance with OWASP session management recommendations.
+         */
+        secret?: string
     }
 
     export interface MongoUrlOptions extends DefaultOptions {
