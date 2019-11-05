@@ -94,7 +94,7 @@ module.exports = function(connect) {
         if (err) {
           this.connectionFailed(err)
         } else {
-          this.handleNewConnectionAsync(client)
+          this.handleNewConnectionAsync(client, options.dbName)
         }
       }
 
@@ -113,15 +113,15 @@ module.exports = function(connect) {
         }
       } else if (options.client) {
         if (options.client.isConnected()) {
-          this.handleNewConnectionAsync(options.client)
+          this.handleNewConnectionAsync(options.client, options.dbName)
         } else {
           options.client.once('open', () =>
-            this.handleNewConnectionAsync(options.client)
+            this.handleNewConnectionAsync(options.client, options.dbName)
           )
         }
       } else if (options.clientPromise) {
         options.clientPromise
-          .then(client => this.handleNewConnectionAsync(client))
+          .then(client => this.handleNewConnectionAsync(client, options.dbName))
           .catch(err => this.connectionFailed(err))
       } else {
         throw new Error('Connection strategy not found')
@@ -135,9 +135,11 @@ module.exports = function(connect) {
       throw err
     }
 
-    handleNewConnectionAsync(client) {
+    handleNewConnectionAsync(client, dbName) {
       this.client = client
-      this.db = typeof client.db !== 'function' ? client.db : client.db()
+      // If dbName === undefined, client.db(dbName) will return
+      // the same value that client.db() would return.
+      this.db = typeof client.db !== 'function' ? client.db : client.db(dbName)
       return this.setCollection(this.db.collection(this.collectionName))
         .setAutoRemoveAsync()
         .then(() => this.changeState('connected'))
