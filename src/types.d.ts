@@ -86,6 +86,15 @@ declare namespace connectMongo {
          * Enables transparent crypto in accordance with OWASP session management recommendations.
          */
         secret?: string
+
+        /**
+         * Explicitly specify database name otherwise the name present in the connection string will be used
+         */
+        dbName?: string;
+
+
+        serialize?<TOutput = string, TInput = Express.SessionData>(session: TInput): TOutput;
+        unserialize?<TOutput = Express.SessionData, TInput = string>(session: TInput): TOutput;
     }
 
     export interface MongoUrlOptions extends DefaultOptions {
