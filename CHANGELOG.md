@@ -1,3 +1,9 @@
+3.2.0 / 2019-11-29
+================
+
+* __Add__ add dbName option (#343)
+* __Fix__ add missing `secret` option to TS definition (#342)
+
 3.1.2 / 2019-11-01
 ================
 
