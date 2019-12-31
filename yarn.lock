@@ -3131,6 +3131,11 @@ kleur@^3.0.2:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
+kruptein@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/kruptein/-/kruptein-2.1.0.tgz#63643ac4f07a4e415ea22a16e75e398f1a34fa7b"
+  integrity sha512-E9p95WwDl5usm3mNelJ4zekLT1+IcxrzR5dquP/QXUppKeNgNRgtjUYMts8HKyqG2O6inaRCQBxmu4Adqd1jXw==
+
 lcid@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/lcid/-/lcid-2.0.0.tgz#6ef5d2df60e52f82eb228a4c373e8d1f397253cf"

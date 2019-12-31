@@ -69,15 +69,7 @@ module.exports = function(connect) {
       super(options)
 
       /* Use crypto? */
-      if (options.secret) {
-        try {
-          this.Crypto = require('./crypto.js')
-          this.Crypto.init(options)
-          delete options.secret
-        } catch (error) {
-          throw error
-        }
-      }
+      if (options.secret) this.Crypto = require('kruptein')(options)
 
       /* Options */
       this.ttl = options.ttl || 1209600 // 14 days
@@ -238,7 +230,15 @@ module.exports = function(connect) {
                 const tmpSession = this.transformFunctions.unserialize(
                   session.session
                 )
-                session.session = this.Crypto.get(tmpSession)
+                this.Crypto.get(
+                  this.options.secret,
+                  tmpSession,
+                  (err, plaintext) => {
+                    if (err) throw err
+
+                    session.session = plaintext
+                  }
+                )
               }
               const s = this.transformFunctions.unserialize(session.session)
               if (this.options.touchAfter > 0 && session.lastModified) {
@@ -261,11 +261,11 @@ module.exports = function(connect) {
       let s
 
       if (this.Crypto) {
-        try {
-          session = this.Crypto.set(session)
-        } catch (error) {
-          return withCallback(Promise.reject(error), callback)
-        }
+        this.Crypto.set(this.options.secret, session, (err, data) => {
+          if (err) return withCallback(Promise.reject(err), callback)
+
+          session = data
+        })
       }
 
       try {

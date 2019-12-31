@@ -137,4 +137,27 @@ describe('Events w/ Crypto', () => {
       )
     })
   })
+
+  describe('get() handle errors', () => {
+    it('should emit a `create` event', done => {
+      store.once('create', sid => {
+        expect(sid).toBe('foo1')
+        done()
+      })
+      store.set('foo1', { foo: 'bar' }, noop)
+    })
+    it('should emit a `set` event', done => {
+      store.once('set', sid => {
+        expect(sid).toBe('foo1')
+        done()
+      })
+      store.set('foo1', { foo: 'bar' }, noop)
+
+      store.options.secret = 'w00t w00t'
+      store.get('foo1', (err, res) => {
+        expect(err).toMatch('Encrypted session was tampered with!')
+        expect(res).toBeFalsy()
+      })
+    })
+  })
 })

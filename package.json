@@ -23,6 +23,7 @@
     "url": "https://github.com/jdesboeufs/connect-mongo/issues"
   },
   "dependencies": {
+    "kruptein": "^2.1.0",
     "mongodb": "^3.1.0"
   },
   "devDependencies": {
