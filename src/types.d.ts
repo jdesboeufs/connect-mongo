@@ -1,4 +1,4 @@
-// Type definitions for connect-mongo 3.1
+// Type definitions for connect-mongo 3.2.0
 // Project: https://github.com/kcbanner/connect-mongo
 // Definitions by: Mizuki Yamamoto <https://github.com/Syati>
 //                 Guy Ellis <https://github.com/guyellis>
@@ -86,6 +86,11 @@ declare namespace connectMongo {
          * Enables transparent crypto in accordance with OWASP session management recommendations.
          */
         secret?: string
+
+        /**
+         * A name of database used for storing sessions. Can be used with `url`, `client` or `clientPromise` options. Takes precedence over database name present in the connection string.
+         */
+        dbName?: string
     }
 
     export interface MongoUrlOptions extends DefaultOptions {
