@@ -99,6 +99,7 @@ declare namespace connectMongo {
 
     export interface NativeMongoOptions extends DefaultOptions {
         client: mongodb.MongoClient;
+        dbName: string;
     }
 
     export interface NativeMongoPromiseOptions extends DefaultOptions {
