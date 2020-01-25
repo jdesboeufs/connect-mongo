@@ -104,6 +104,7 @@ declare namespace connectMongo {
 
     export interface NativeMongoPromiseOptions extends DefaultOptions {
         clientPromise: Promise<mongodb.MongoClient>;
+        dbName: string;
     }
 
     export interface MongoStoreFactory {
