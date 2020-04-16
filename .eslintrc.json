@@ -8,10 +8,7 @@
   "parserOptions": {
     "ecmaVersion": 9
   },
-  "plugins": [
-    "prettier",
-    "jest"
-  ],
+  "plugins": ["prettier", "jest"],
   "rules": {
     "jest/no-disabled-tests": "error",
     "prettier/prettier": "error",
@@ -25,7 +22,8 @@
       }
     ],
     "prefer-const": [
-      "error", {
+      "error",
+      {
         "destructuring": "any",
         "ignoreReadBeforeAssign": false
       }
