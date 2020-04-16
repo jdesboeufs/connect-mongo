@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jdesboeufs/connect-mongo.git"
+    "url": "git+https://github.com/jdesboeufs/connect-mongo.git"
   },
   "bugs": {
     "url": "https://github.com/jdesboeufs/connect-mongo/issues"
@@ -65,5 +65,10 @@
       "git add"
     ]
   },
-  "types": "src/types.d.ts"
+  "types": "src/types.d.ts",
+  "homepage": "https://github.com/jdesboeufs/connect-mongo#readme",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  }
 }
