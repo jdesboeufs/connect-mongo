@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@types/express-session": "^1.17.0",
-    "mongodb": "^3.1.0"
+    "mongodb": "^3.5.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.0.0",
