@@ -7,7 +7,7 @@ function withCallback(promise, cb) {
   // Assume that cb is a function - type checks and handling type errors
   // can be done by caller
   if (cb) {
-    promise.then(res => cb(null, res)).catch(cb)
+    promise.then((res) => cb(null, res)).catch(cb)
   }
   return promise
 }
@@ -36,14 +36,14 @@ function computeTransformFunctions(options) {
   if (options.serialize || options.unserialize) {
     return {
       serialize: options.serialize || defaultSerializeFunction,
-      unserialize: options.unserialize || (x => x),
+      unserialize: options.unserialize || ((x) => x),
     }
   }
 
   if (options.stringify === false) {
     return {
       serialize: defaultSerializeFunction,
-      unserialize: x => x,
+      unserialize: (x) => x,
     }
   }
   // Default case
@@ -53,7 +53,7 @@ function computeTransformFunctions(options) {
   }
 }
 
-module.exports = function(connect) {
+module.exports = function (connect) {
   const Store = connect.Store || connect.session.Store
   const MemoryStore = connect.MemoryStore || connect.session.MemoryStore
 
@@ -70,13 +70,9 @@ module.exports = function(connect) {
 
       /* Use crypto? */
       if (options.secret) {
-        try {
-          this.Crypto = require('./crypto.js')
-          this.Crypto.init(options)
-          delete options.secret
-        } catch (error) {
-          throw error
-        }
+        this.Crypto = require('./crypto.js')
+        this.Crypto.init(options)
+        delete options.secret
       }
 
       /* Options */
@@ -121,8 +117,10 @@ module.exports = function(connect) {
         }
       } else if (options.clientPromise) {
         options.clientPromise
-          .then(client => this.handleNewConnectionAsync(client, options.dbName))
-          .catch(err => this.connectionFailed(err))
+          .then((client) =>
+            this.handleNewConnectionAsync(client, options.dbName)
+          )
+          .catch((err) => this.connectionFailed(err))
       } else {
         throw new Error('Connection strategy not found')
       }
@@ -223,7 +221,7 @@ module.exports = function(connect) {
     get(sid, callback) {
       return withCallback(
         this.collectionReady()
-          .then(collection =>
+          .then((collection) =>
             collection.findOne({
               _id: this.computeStorageId(sid),
               $or: [
@@ -232,7 +230,7 @@ module.exports = function(connect) {
               ],
             })
           )
-          .then(session => {
+          .then((session) => {
             if (session) {
               if (this.Crypto) {
                 const tmpSession = this.transformFunctions.unserialize(
@@ -296,14 +294,14 @@ module.exports = function(connect) {
 
       return withCallback(
         this.collectionReady()
-          .then(collection =>
+          .then((collection) =>
             collection.updateOne(
               { _id: this.computeStorageId(sid) },
               { $set: s },
               Object.assign({ upsert: true }, this.writeOperationOptions)
             )
           )
-          .then(rawResponse => {
+          .then((rawResponse) => {
             if (rawResponse.result) {
               rawResponse = rawResponse.result
             }
@@ -346,14 +344,14 @@ module.exports = function(connect) {
 
       return withCallback(
         this.collectionReady()
-          .then(collection =>
+          .then((collection) =>
             collection.updateOne(
               { _id: this.computeStorageId(sid) },
               { $set: updateFields },
               this.writeOperationOptions
             )
           )
-          .then(result => {
+          .then((result) => {
             if (result.nModified === 0) {
               throw new Error('Unable to find the session to touch')
             } else {
@@ -367,7 +365,7 @@ module.exports = function(connect) {
     all(callback) {
       return withCallback(
         this.collectionReady()
-          .then(collection =>
+          .then((collection) =>
             collection.find({
               $or: [
                 { expires: { $exists: false } },
@@ -375,15 +373,15 @@ module.exports = function(connect) {
               ],
             })
           )
-          .then(sessions => {
+          .then((sessions) => {
             return new Promise((resolve, reject) => {
               const results = []
               sessions.forEach(
-                session =>
+                (session) =>
                   results.push(
                     this.transformFunctions.unserialize(session.session)
                   ),
-                err => {
+                (err) => {
                   if (err) {
                     reject(err)
                   }
@@ -400,7 +398,7 @@ module.exports = function(connect) {
     destroy(sid, callback) {
       return withCallback(
         this.collectionReady()
-          .then(collection =>
+          .then((collection) =>
             collection.deleteOne(
               { _id: this.computeStorageId(sid) },
               this.writeOperationOptions
@@ -413,7 +411,7 @@ module.exports = function(connect) {
 
     length(callback) {
       return withCallback(
-        this.collectionReady().then(collection =>
+        this.collectionReady().then((collection) =>
           collection.countDocuments({})
         ),
         callback
@@ -422,7 +420,7 @@ module.exports = function(connect) {
 
     clear(callback) {
       return withCallback(
-        this.collectionReady().then(collection =>
+        this.collectionReady().then((collection) =>
           collection.drop(this.writeOperationOptions)
         ),
         callback
