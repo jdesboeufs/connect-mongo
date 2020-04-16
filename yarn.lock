@@ -548,7 +548,7 @@
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-2.0.1.tgz#dc488842312a7f075149312905b5e3c0b054c79d"
   integrity sha512-FwI9gX75FgVBJ7ywgnq/P7tw+/o1GUbtP0KzbtusLigAOgIgNISRK0ZPl4qertvXSIE8YbsVJueQ90cDt9YYyw==
 
-"@types/mongodb@*", "@types/mongodb@3.3.7":
+"@types/mongodb@*":
   version "3.3.7"
   resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-3.3.7.tgz#f11fbad6ea48135634bce7e70080031cb35c5c84"
   integrity sha512-X/yDgFAgn3ypXN/CcckHe3nzxaliGtvrJ52kW2k9MAHDfYpc83wvvqHECfmx88pfrrquxFgRWqCTXprqABPfbw==
