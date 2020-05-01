@@ -3,5 +3,5 @@
   "editor.formatOnPaste": false,
   "editor.tabSize": 2,
   "eslint.autoFixOnSave": true,
-  "javascript.updateImportsOnFileMove.enabled": "never",
+  "javascript.updateImportsOnFileMove.enabled": "never"
 }
