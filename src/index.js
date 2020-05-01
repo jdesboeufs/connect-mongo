@@ -15,9 +15,8 @@ function withCallback(promise, cb) {
 function defaultSerializeFunction(session) {
   // Copy each property of the session to a new object
   const obj = {}
-  let prop
 
-  for (prop in session) {
+  for (const prop in session) {
     if (prop === 'cookie') {
       // Convert the cookie instance to an object, if possible
       // This gets rid of the duplicate object under session.cookie.data property
@@ -58,9 +57,7 @@ module.exports = function (connect) {
   const MemoryStore = connect.MemoryStore || connect.session.MemoryStore
 
   class MongoStore extends Store {
-    constructor(options) {
-      options = options || {}
-
+    constructor(options = {}) {
       /* Fallback */
       if (options.fallbackMemory && MemoryStore) {
         return new MemoryStore()

@@ -30,13 +30,7 @@ class Crypto {
     )
     const hmac = this._digest(this.secret, ct.ct, this.hashing, this.encodeas)
 
-    const obj = JSON.stringify({
-      hmac,
-      ct: ct.ct,
-      at: ct.at,
-      aad,
-      iv,
-    })
+    const obj = JSON.stringify({ hmac, ct: ct.ct, at: ct.at, aad, iv })
 
     return obj
   }

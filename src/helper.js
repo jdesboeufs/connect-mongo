@@ -5,6 +5,4 @@ function mergeMongoOptions(mongoOptions) {
   return Object.assign(DEFAULT_OPTS, mongoOptions)
 }
 
-module.exports = {
-  mergeMongoOptions,
-}
+module.exports = { mergeMongoOptions }
