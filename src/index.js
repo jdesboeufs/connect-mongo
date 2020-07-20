@@ -80,6 +80,15 @@ module.exports = function(connect) {
       }
 
       /* Options */
+      if (
+        options.autoRemoveInterval &&
+        options.autoRemoveInterval >
+          71582 /* (Math.pow(2, 32) - 1) / (1000 * 60) */
+      ) {
+        throw new Error(
+          'autoRemoveInterval is too large. options.autoRemoveInterval is in minutes but not seconds nor mills'
+        )
+      }
       this.ttl = options.ttl || 1209600 // 14 days
       this.collectionName = options.collection || 'sessions'
       this.autoRemove = options.autoRemove || 'native'

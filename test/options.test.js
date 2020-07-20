@@ -54,4 +54,33 @@ describe('Validate options', () => {
       })
     })
   })
+
+  describe('autoRemoveInterval', () => {
+    test('not providoing autoRemoveInterval', done => {
+      const dbName = 'dbName-test'
+      const clientPromise = MongoClient.connect(connectionString, mongoOptions)
+      store = new MongoStore({
+        clientPromise,
+        dbName,
+        autoRemove: 'interval',
+      })
+      store.once('connected', () => {
+        expect(store.db.databaseName).toEqual(dbName)
+        done()
+      })
+    })
+
+    test('should throw error when autoRemoveInterval is too large', () => {
+      const dbName = 'dbName-test'
+      const clientPromise = MongoClient.connect(connectionString, mongoOptions)
+      expect(() => {
+        store = new MongoStore({
+          clientPromise,
+          dbName,
+          autoRemove: 'interval',
+          autoRemoveInterval: 71583,
+        })
+      }).toThrowErrorMatchingSnapshot()
+    })
+  })
 })
