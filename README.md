@@ -115,7 +115,7 @@ app.use(session({
 // Advanced usage
 app.use(session({
     store: new MongoStore({
-        url: 'mongodb://user12345:foobar@localhost/test-app?authSource=admins&w=1',
+        url: 'mongodb://user12345:foobar@localhost/test-app?authSource=admin&w=1',
         mongoOptions: advancedOptions // See below for details
     })
 }));
