@@ -70,13 +70,9 @@ module.exports = function(connect) {
 
       /* Use crypto? */
       if (options.secret) {
-        try {
-          this.Crypto = require('./crypto.js')
-          this.Crypto.init(options)
-          delete options.secret
-        } catch (error) {
-          throw error
-        }
+        this.Crypto = require('./crypto.js')
+        this.Crypto.init(options)
+        delete options.secret
       }
 
       /* Options */
