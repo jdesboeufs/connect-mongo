@@ -116,7 +116,7 @@ module.exports = function(connect) {
         if (options.mongooseConnection.readyState === 1) {
           this.handleNewConnectionAsync(options.mongooseConnection)
         } else {
-          options.mongooseConnection.once('open', () =>
+          options.mongooseConnection.once('all', () =>
             this.handleNewConnectionAsync(options.mongooseConnection)
           )
         }
