@@ -28,8 +28,8 @@
   "devDependencies": {
     "@commitlint/cli": "^8.0.0",
     "@commitlint/config-conventional": "^8.0.0",
-    "@types/express": "4.17.1",
-    "@types/express-session": "1.15.15",
+    "@types/express": "4.17.9",
+    "@types/express-session": "1.17.3",
     "@types/mongodb": "3.3.7",
     "@types/mongoose": "5.5.26",
     "eslint": "^5.16.0",

@@ -115,12 +115,12 @@ declare namespace connectMongo {
     }
 
     export class MongoStore extends session.Store {
-        get: (sid: string, callback: (err: any, session: Express.SessionData | null) => void) => void;
-        set: (sid: string, session: Express.SessionData, callback?: (err: any) => void) => void;
+        get: (sid: string, callback: (err: any, session: session.SessionData | null) => void) => void;
+        set: (sid: string, session: session.SessionData, callback?: (err: any) => void) => void;
         destroy: (sid: string, callback?: (err: any) => void) => void;
         length: (callback: (err: any, length: number) => void) => void;
         clear: (callback?: (err?: any) => void) => void;
-        touch: (sid: string, session: Express.SessionData, callback?: (err: any) => void) => void;
+        touch: (sid: string, session: session.SessionData, callback?: (err: any) => void) => void;
         close: () => void;
     }
 }
