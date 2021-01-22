@@ -525,14 +525,22 @@ describe('legacy tests', () => {
   test('test_session_touch', done => {
     getNativeDbConnection(async (store, db, collection) => {
       const sid = 'test_touch-sid'
+      // set original session
       const data = makeData()
       await store.set(sid, data)
-      const session = await collection.findOne({ _id: sid })
-      assertSessionEquals(sid, data, session)
-      await store.touch(sid, session.session)
-      const session2 = await collection.findOne({ _id: sid })
-      // Check if both expiry date are different
-      assert.ok(session2.expires.getTime() > session.expires.getTime())
+      const sessionDoc = await collection.findOne({ _id: sid })
+      const session = await store.get(sid)
+      assertSessionEquals(sid, data, sessionDoc)
+      // touch with new session
+      await store.touch(sid, makeData())
+      // check if expiry dates are different
+      const session2Doc = await collection.findOne({ _id: sid })
+      const session2 = await store.get(sid)
+      assert.ok(session2Doc.expires.getTime() > sessionDoc.expires.getTime())
+      assert.ok(
+        new Date(session2.cookie.expires).getTime() >
+          new Date(session.cookie.expires).getTime()
+      )
       cleanup(store, collection, done)
     })
   })

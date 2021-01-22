@@ -348,7 +348,9 @@ module.exports = function(connect) {
       }
 
       if (session && session.cookie && session.cookie.expires) {
+        // new session, perform update
         updateFields.expires = new Date(session.cookie.expires)
+        updateFields.session = this.transformFunctions.serialize(session)
       } else {
         updateFields.expires = new Date(Date.now() + this.ttl * 1000)
       }
