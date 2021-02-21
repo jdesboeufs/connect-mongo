@@ -1,3 +1,4 @@
+import { assert } from 'console'
 import * as session from 'express-session'
 import {
   Collection,
@@ -7,7 +8,8 @@ import {
 } from 'mongodb'
 
 export type ConnectMongoOptions = {
-  mongoUrl: string
+  mongoUrl?: string
+  clientPromise?: Promise<MongoClient>
   collectionName?: string
   mongoOptions?: MongoClientOptions
   dbName?: string
@@ -23,7 +25,8 @@ export type ConnectMongoOptions = {
 }
 
 type ConcretConnectMongoOptions = {
-  mongoUrl: string
+  mongoUrl?: string
+  clientPromise?: Promise<MongoClient>
   collectionName: string
   mongoOptions: MongoClientOptions
   dbName?: string
@@ -126,12 +129,23 @@ export default class MongoStoreV2 extends session.Store {
       stringify,
       ...required,
     }
+    assert(
+      options.mongoUrl || options.clientPromise,
+      'You must provide either mongoUr|clientPromise in options'
+    )
     // console.log('constructor', options)
     this.transformFunctions = computeTransformFunctions(options)
-    const _clientP = MongoClient.connect(options.mongoUrl, options.mongoOptions)
-    this.clientP = _clientP
+    let _clientP: Promise<MongoClient>
+    if (options.mongoUrl) {
+      _clientP = MongoClient.connect(options.mongoUrl, options.mongoOptions)
+    } else if (options.clientPromise) {
+      _clientP = options.clientPromise
+    } else {
+      throw new Error('Cannot init client')
+    }
+    this.clientP = _clientP!
     this.options = options
-    this.collectionP = _clientP
+    this.collectionP = _clientP!
       .then((con) => con.db(options.dbName))
       .then((db) => db.collection(options.collectionName))
       .then((collection) => {
