@@ -230,7 +230,6 @@ test.serial('touch ops with touchAfter', async (t) => {
 })
 
 test.serial('touch ops with touchAfter with touch', async (t) => {
-  console.log('hahahahaha')
   ;({ store, storePromise } = createStoreHelper({ touchAfter: 1 }))
   const orgSession = makeDataNoCookie()
   const sid = 'test-touch-with-touchAfter-should-touch'

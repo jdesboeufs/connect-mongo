@@ -270,7 +270,6 @@ export default class MongoStoreV2 extends session.Store {
         // the specified, if it's not, don't touch the session
         if (touchAfter > 0 && lastModified > 0) {
           const timeElapsed = currentDate.getTime() - lastModified
-          // console.log({ touchAfter, timeElapsed, lastModified })
           if (timeElapsed < touchAfter) {
             return callback(null)
           }
