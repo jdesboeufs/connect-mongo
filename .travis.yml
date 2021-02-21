@@ -1,0 +1,13 @@
+sudo: false
+language: node_js
+node_js:
+  - '10'
+  - '12'
+  - '14'
+# keep the npm cache to speed up installs
+cache:
+  directories:
+    - '$HOME/.npm'
+after_success:
+  - npm run cov:send
+  - npm run cov:check
