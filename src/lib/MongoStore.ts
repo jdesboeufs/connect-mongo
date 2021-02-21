@@ -100,7 +100,7 @@ function computeTransformFunctions(options: ConcretConnectMongoOptions) {
   }
 }
 
-export default class MongoStoreV2 extends session.Store {
+export default class MongoStore extends session.Store {
   private clientP: Promise<MongoClient>
   collectionP: Promise<Collection>
   private options: ConcretConnectMongoOptions
@@ -159,8 +159,8 @@ export default class MongoStoreV2 extends session.Store {
       })
   }
 
-  static create(options: ConnectMongoOptions): MongoStoreV2 {
-    return new MongoStoreV2(options)
+  static create(options: ConnectMongoOptions): MongoStore {
+    return new MongoStore(options)
   }
 
   private computeStorageId(sessionId: string) {

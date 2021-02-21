@@ -3,7 +3,7 @@
 import util from 'util'
 import ExpressSession from 'express-session'
 
-import MongoStoreV2, { ConnectMongoOptions } from '../lib/MongoStore'
+import MongoStore, { ConnectMongoOptions } from '../lib/MongoStore'
 
 // Create a connect cookie instance
 export const makeCookie = () => {
@@ -42,7 +42,7 @@ export const makeDataNoCookie = () => {
 }
 
 export const createStoreHelper = (opt: Partial<ConnectMongoOptions> = {}) => {
-  const store = MongoStoreV2.create({
+  const store = MongoStore.create({
     mongoUrl: 'mongodb://root:example@127.0.0.1:27017',
     mongoOptions: { useUnifiedTopology: true },
     dbName: 'testDb',
