@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Validate options autoRemoveInterval should throw error when autoRemoveInterval is too large 1`] = `"autoRemoveInterval is too large. options.autoRemoveInterval is in minutes but not seconds nor mills"`;
