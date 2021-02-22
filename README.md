@@ -32,7 +32,7 @@ Express `4.x`, `5.0` and Connect `3.x`:
 
 ```js
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
+const MongoStore = require('connect-mongo').default;
 
 app.use(session({
   secret: 'foo',
@@ -215,12 +215,20 @@ yarn watch:build
 yarn watch:test
 ```
 
+### Example application
+
+```
+yarn link
+cd example
+yarn link "connect-mongo"
+yarn install
+yarn start
+```
+
 ## License
 
 The MIT License
 
 ## TODOs
 
-- [ ] Crypto
-- [ ] Example code
 - [ ] Github Action release workflow

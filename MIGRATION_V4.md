@@ -22,7 +22,7 @@ Next step is to import the dependencies
 
 Javascript:
 ```js
-const MongoStore = require('connect-mongo');
+const MongoStore = require('connect-mongo').default;
 ```
 
 Typescript:
