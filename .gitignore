@@ -1,7 +1,9 @@
-node_modules/
-.DS_Store
+.idea/*
+.nyc_output
+build
+node_modules
+src/**.js
 coverage
-src-es5
 *.log
-.nyc_output/
 package-lock.json
+.eslintcache

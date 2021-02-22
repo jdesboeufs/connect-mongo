@@ -17,3 +17,4 @@ coverage/
 commitlint.config.js
 .nyc_output/
 jest.config.js
+src/test/
