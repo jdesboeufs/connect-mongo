@@ -5,3 +5,8 @@
 - **What is the new behavior (if this is a feature change)?**
 
 - **Other information**:
+
+- **Checklist:**
+
+- [ ] Added test cases
+- [ ] Updated changelog

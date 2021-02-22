@@ -7,6 +7,8 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 [![Sanity check](https://github.com/jdesboeufs/connect-mongo/actions/workflows/sanity.yml/badge.svg)](https://github.com/jdesboeufs/connect-mongo/actions/workflows/sanity.yml)
 [![Coverage Status](https://coveralls.io/repos/jdesboeufs/connect-mongo/badge.svg?branch=master&service=github)](https://coveralls.io/github/jdesboeufs/connect-mongo?branch=master)
 
+> Breaking change in V4 and rewritten the whole project using Typescript. Please checkout the migration guide and [changelog](CHANGELOG.md) for details.
+
 ## Compatibility
 
 * Support Express up to `5.0`
@@ -15,7 +17,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 * Support [MongoDB](https://www.mongodb.com/) `3.2+`
 
 For extended compatibility, see previous versions [v3.x](https://github.com/jdesboeufs/connect-mongo/tree/v3.x).
-But please note that we are not maintaining v2.x.x anymore.
+But please note that we are not maintaining v3.x anymore.
 
 ## Usage
 
@@ -28,8 +30,8 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
 app.use(session({
-    secret: 'foo',
-    store: MongoStore.create(options)
+  secret: 'foo',
+  store: MongoStore.create(options)
 }));
 ```
 
@@ -38,6 +40,25 @@ app.use(session({
 In many circumstances, `connect-mongo` will not be the only part of your application which need a connection to a MongoDB database. It could be interesting to re-use an existing connection.
 
 Alternatively, you can configure `connect-mongo` to establish a new connection.
+
+#### Create a new connection from a MongoDB connection string
+
+[MongoDB connection strings](http://docs.mongodb.org/manual/reference/connection-string/) are __the best way__ to configure a new connection. For advanced usage, [more options](http://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html#mongoclient-connect-options) can be configured with `mongoOptions` property.
+
+```js
+// Basic usage
+app.use(session({
+  store: MongoStore.create({ mongoUrl: 'mongodb://localhost/test-app' })
+}));
+
+// Advanced usage
+app.use(session({
+  store: MongoStore.create({
+    mongoUrl: 'mongodb://user12345:foobar@localhost/test-app?authSource=admin&w=1',
+    mongoOptions: advancedOptions // See below for details
+  })
+}));
+```
 
 #### Re-use an existing native MongoDB driver client promise
 
@@ -51,34 +72,15 @@ In this case, you just have to give your `MongoClient` instance to `connect-mong
 
 // Database name present in the connection string will be used
 app.use(session({
-    store: MongoStore.create({ clientPromise })
+  store: MongoStore.create({ clientPromise })
 }));
 
 // Explicitly specifying database name
 app.use(session({
-    store: MongoStore.create({
-        clientPromise,
-        dbName: 'test-app'
-    })
-}));
-```
-
-#### Create a new connection from a MongoDB connection string
-
-[MongoDB connection strings](http://docs.mongodb.org/manual/reference/connection-string/) are __the best way__ to configure a new connection. For advanced usage, [more options](http://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html#mongoclient-connect-options) can be configured with `mongoOptions` property.
-
-```js
-// Basic usage
-app.use(session({
-    store: MongoStore.create({ mongoUrl: 'mongodb://localhost/test-app' })
-}));
-
-// Advanced usage
-app.use(session({
-    store: MongoStore.create({
-        mongoUrl: 'mongodb://user12345:foobar@localhost/test-app?authSource=admin&w=1',
-        mongoOptions: advancedOptions // See below for details
-    })
+  store: MongoStore.create({
+    clientPromise,
+    dbName: 'test-app'
+  })
 }));
 ```
 
@@ -102,25 +104,25 @@ Otherwise, it will create a new one, using `ttl` option.
 
 ```js
 app.use(session({
-    store: MongoStore.create({
-        mongoUrl: 'mongodb://localhost/test-app',
-        ttl: 14 * 24 * 60 * 60 // = 14 days. Default
-    })
+  store: MongoStore.create({
+    mongoUrl: 'mongodb://localhost/test-app',
+    ttl: 14 * 24 * 60 * 60 // = 14 days. Default
+  })
 }));
 ```
 
 __Note:__ Each time an user interacts with the server, its session expiration date is refreshed.
 
 ## Remove expired sessions
-
-By default, `connect-mongo` uses MongoDB's TTL collection feature (2.2+) to have mongod automatically remove expired sessions. `connect-mongo` will create a TTL index for you at startup. But you can disable the creation of index with `createAutoRemoveIdx: false`
+`
+By default, `connect-mongo` uses MongoDB's TTL collection feature (2.2+) to have `mongod` automatically remove expired sessions. `connect-mongo` will create a TTL index for you at startup. But you can disable the creation of index with `createAutoRemoveIdx: false`
 
 ```js
 app.use(session({
-    store: MongoStore.create({
-        mongoUrl: 'mongodb://localhost/test-app',
-        createAutoRemoveIdx: false
-    })
+  store: MongoStore.create({
+    mongoUrl: 'mongodb://localhost/test-app',
+    createAutoRemoveIdx: false
+  })
 }));
 ```
 
@@ -132,13 +134,13 @@ If you are using [express-session](https://github.com/expressjs/session) >= [1.1
 
 ```js
 app.use(express.session({
-    secret: 'keyboard cat',
-    saveUninitialized: false, // don't create session until something stored
-    resave: false, //don't save session if unmodified
-    store: MongoStore.create({
-        mongoUrl: 'mongodb://localhost/test-app',
-        touchAfter: 24 * 3600 // time period in seconds
-    })
+  secret: 'keyboard cat',
+  saveUninitialized: false, // don't create session until something stored
+  resave: false, //don't save session if unmodified
+  store: MongoStore.create({
+    mongoUrl: 'mongodb://localhost/test-app',
+    touchAfter: 24 * 3600 // time period in seconds
+  })
 }));
 ```
 
@@ -213,6 +215,6 @@ The MIT License
 ## TODOs
 
 - [ ] Crypto
-- [ ] Mongoose support?
 - [ ] Doc and meta data in package json
 - [ ] Remove console.log and add DEBUG log
+- [ ] Example code

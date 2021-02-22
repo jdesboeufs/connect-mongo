@@ -1,72 +1,111 @@
-3.2.0 / 2019-11-29
-================
+# Changelog
+All notable changes to this project will be documented in this file.
 
-* __Add__ add dbName option (#343)
-* __Fix__ add missing `secret` option to TS definition (#342)
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-3.1.2 / 2019-11-01
-================
+## [Unreleased]
 
-* __Fix__ add @types/ dev dependencies for tsc. fixes #340 (#341)
+### **BREAKING CHANGES**
 
-3.1.1 / 2019-10-30
-================
+- Support Node.Js 10.x, 12.x and 14.x and drop older support.
+- Review method to connect to MongoDB and keep only `mongoUrl` and `clientPromise` options.
+- Remove the "Remove expired sessions compatibility mode". Now library user can choose to create auto remove index on startup or not.
+- Remove `fallbackMemory` options.
+- Rewrite the library and test case using typescript.
 
-* __Add__ add TS type defination
+> Checkout the complete [migration guide](MIGRATION_V4.md) for more details.
 
-3.1.0 / 2019-10-23
-================
+## [3.2.0] - 2019-11-29
 
-* __Add__ useUnifiedTopology=true
-* Refactor merge config logic
+### Added
 
-__Others changes:__
-* chore: update depns (#326)
+- Add dbName option (#343)
 
-3.0.0 / 2019-06-17
-================
+### Fixed
 
-__Breaking changes:__
-* __Drop__ Node.js 4 & 6 support
-* __Add__ Node.js 10 & 12 support
-* Upgrade `mongoose` to v5 and `mongodb` to v3 and drop old version support
-* Replace deprecated mongo operation
-* MongoStore need to supply client/clientPromise instead of db/dbPromise due to depns upgrade
+- Add missing `secret` option to TS definition (#342)
 
-__Others changes:__
-* __Add__ Implement store.all function (#291)
-* __Add__ Add option writeOperationOptions (#295)
-* __Add__ Transparent crypto support (#314)
+## [3.1.2] - 2019-11-01
+
+### Fixed
+
+- Add @types/ dev dependencies for tsc. fixes #340 (#341)
+
+## [3.1.1] - 2019-10-30
+
+### Added
+
+- Add TS type definition
+
+## [3.1.0] - 2019-10-23
+
+### Added
+
+- Added `useUnifiedTopology=true` to mongo options
+
+### Changed
+
+- Refactor merge config logic
+- chore: update depns (#326)
+
+## [3.0.0] - 2019-06-17
+
+### **BREAKING CHANGES**
+
+- Drop Node.js 4 & 6 support
+- Upgrade `mongoose` to v5 and `mongodb` to v3 and drop old version support
+- Replace deprecated mongo operation
+- MongoStore need to supply client/clientPromise instead of db/dbPromise due to depns upgrade
+
+## Added
+
+- Add Node.js 10 & 12 support
+- Implement store.all function (#291)
+- Add option `writeOperationOptions` (#295)
+- Add Transparent crypto support (#314)
+
+## Changed
+
 * Change test framework from Mocha to Jest
-* Change linter from xo to eslint
+* Change linter from `xo` to `eslint`
 
-2.0.3 / 2018-12-03
-================
+## [2.0.3] - 2018-12-03
 
-*  __Fix__ interval autoremove mode to use current date with every interval (#304, #305) (jlampise)
+## Fixed
 
-2.0.2 / 2018-11-20
-================
+- Fixed interval autoremove mode to use current date with every interval (#304, #305) (jlampise)
 
-* __Fix__ #300 DeprecationWarning: collection.remove is deprecated. Use deleteOne, deleteMany, or bulkWrite instead
-* __Fix__ #297 DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead
+## [2.0.2] - 2018-11-20
 
-2.0.1 / 2018-01-04
-================
+## Fixed
 
-* __Fix__ #271 TypeError: cb is not a function (brainthinks)
+- Fxi #300 DeprecationWarning: collection.remove is deprecated. Use deleteOne, deleteMany, or bulkWrite instead
+- Fxi #297 DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead
 
-2.0.0 / 2017-10-09
-=================
+## [2.0.1] - 2018-01-04
+
+## Fixed
+
+- Fixed #271 TypeError: cb is not a function (brainthinks)
+
+## [2.0.0] - 2017-10-09
+
+### **BREAKING CHANGES**
 
 * __Drop__ Node.js 0.12 and io.js support
 * __Drop__ MongoDB 2.x support
 * __Drop__ mongodb driver < 2.0.36 support
 * __Drop__ mongoose < 4.1.2 support
+
+## Changed
+
 * __Fix__ `ensureIndex` deprecation warning ([#268](https://github.com/jdesboeufs/connect-mongo/issues/268), [#269](https://github.com/jdesboeufs/connect-mongo/pulls/269), [#270](https://github.com/jdesboeufs/connect-mongo/pulls/270))
 * Improve `get()` ([#246](https://github.com/jdesboeufs/connect-mongo/pulls/246))
 * Pass session in `touch` event
 * Remove `bluebird` from dependencies
+
+<!-- Legacy changelog format -->
 
 1.3.2 / 2016-07-27
 =================
