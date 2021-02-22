@@ -1,0 +1,496 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>connect-mongo</title>
+	<meta name="description" content="Documentation for connect-mongo">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">connect-mongo</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>connect-mongo</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#connect-mongo" id="connect-mongo" style="color: inherit; text-decoration: none;">
+					<h1>connect-mongo</h1>
+				</a>
+				<p>MongoDB session store for <a href="https://github.com/senchalabs/connect">Connect</a> and <a href="http://expressjs.com/">Express</a> written in Typescript.</p>
+				<p><a href="https://www.npmjs.com/package/connect-mongo"><img src="https://img.shields.io/npm/v/connect-mongo.svg" alt="npm version"></a>
+					<a href="https://www.npmjs.com/package/connect-mongo"><img src="https://img.shields.io/npm/dm/connect-mongo.svg" alt="downloads"></a>
+					<a href="https://github.com/jdesboeufs/connect-mongo/actions/workflows/sanity.yml"><img src="https://github.com/jdesboeufs/connect-mongo/actions/workflows/sanity.yml/badge.svg" alt="Sanity check"></a>
+				<a href="https://coveralls.io/github/jdesboeufs/connect-mongo?branch=master"><img src="https://coveralls.io/repos/jdesboeufs/connect-mongo/badge.svg?branch=master&service=github" alt="Coverage Status"></a></p>
+				<blockquote>
+					<p>Breaking change in V4 and rewritten the whole project using Typescript. Please checkout the <a href="MIGRATION_V4.md">migration guide</a> and <a href="CHANGELOG.md">changelog</a> for details.</p>
+				</blockquote>
+				<pre><code>npm install <span class="hljs-keyword">connect</span><span class="hljs-operator">-</span>mongo<span class="hljs-variable">@next</span>
+yarn <span class="hljs-keyword">add</span> <span class="hljs-keyword">connect</span><span class="hljs-operator">-</span>mongo<span class="hljs-variable">@next</span></code></pre>
+				<a href="#compatibility" id="compatibility" style="color: inherit; text-decoration: none;">
+					<h2>Compatibility</h2>
+				</a>
+				<ul>
+					<li>Support Express up to <code>5.0</code></li>
+					<li>Support <a href="http://mongodb.github.io/node-mongodb-native/">native MongoDB driver</a> <code>&gt;= 3.0</code></li>
+					<li>Support Node.js 10, 12 and 14</li>
+					<li>Support <a href="https://www.mongodb.com/">MongoDB</a> <code>3.2+</code></li>
+				</ul>
+				<p>For extended compatibility, see previous versions <a href="https://github.com/jdesboeufs/connect-mongo/tree/v3.x">v3.x</a>.
+				But please note that we are not maintaining v3.x anymore.</p>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>Usage</h2>
+				</a>
+				<a href="#express-or-connect-integration" id="express-or-connect-integration" style="color: inherit; text-decoration: none;">
+					<h3>Express or Connect integration</h3>
+				</a>
+				<p>Express <code>4.x</code>, <code>5.0</code> and Connect <code>3.x</code>:</p>
+				<pre><code class="language-js"><span class="hljs-keyword">const</span> session = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express-session&#x27;</span>);
+<span class="hljs-keyword">const</span> MongoStore = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;connect-mongo&#x27;</span>).default;
+
+app.use(session({
+  <span class="hljs-attr">secret</span>: <span class="hljs-string">&#x27;foo&#x27;</span>,
+  <span class="hljs-attr">store</span>: MongoStore.create(options)
+}));</code></pre>
+				<a href="#connection-to-mongodb" id="connection-to-mongodb" style="color: inherit; text-decoration: none;">
+					<h3>Connection to MongoDB</h3>
+				</a>
+				<p>In many circumstances, <code>connect-mongo</code> will not be the only part of your application which need a connection to a MongoDB database. It could be interesting to re-use an existing connection.</p>
+				<p>Alternatively, you can configure <code>connect-mongo</code> to establish a new connection.</p>
+				<a href="#create-a-new-connection-from-a-mongodb-connection-string" id="create-a-new-connection-from-a-mongodb-connection-string" style="color: inherit; text-decoration: none;">
+					<h4>Create a new connection from a MongoDB connection string</h4>
+				</a>
+				<p><a href="http://docs.mongodb.org/manual/reference/connection-string/">MongoDB connection strings</a> are <strong>the best way</strong> to configure a new connection. For advanced usage, <a href="http://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html#mongoclient-connect-options">more options</a> can be configured with <code>mongoOptions</code> property.</p>
+				<pre><code class="language-js"><span class="hljs-comment">// Basic usage</span>
+app.use(session({
+  <span class="hljs-attr">store</span>: MongoStore.create({ <span class="hljs-attr">mongoUrl</span>: <span class="hljs-string">&#x27;mongodb://localhost/test-app&#x27;</span> })
+}));
+
+<span class="hljs-comment">// Advanced usage</span>
+app.use(session({
+  <span class="hljs-attr">store</span>: MongoStore.create({
+    <span class="hljs-attr">mongoUrl</span>: <span class="hljs-string">&#x27;mongodb://user12345:foobar@localhost/test-app?authSource=admin&amp;w=1&#x27;</span>,
+    <span class="hljs-attr">mongoOptions</span>: advancedOptions <span class="hljs-comment">// See below for details</span>
+  })
+}));</code></pre>
+				<a href="#re-use-an-existing-native-mongodb-driver-client-promise" id="re-use-an-existing-native-mongodb-driver-client-promise" style="color: inherit; text-decoration: none;">
+					<h4>Re-use an existing native MongoDB driver client promise</h4>
+				</a>
+				<p>In this case, you just have to give your <code>MongoClient</code> instance to <code>connect-mongo</code>.</p>
+				<pre><code class="language-js"><span class="hljs-comment">/*
+** There are many ways to create MongoClient.
+** You should refer to the driver documentation.
+*/</span>
+
+<span class="hljs-comment">// Database name present in the connection string will be used</span>
+app.use(session({
+  <span class="hljs-attr">store</span>: MongoStore.create({ clientPromise })
+}));
+
+<span class="hljs-comment">// Explicitly specifying database name</span>
+app.use(session({
+  <span class="hljs-attr">store</span>: MongoStore.create({
+    clientPromise,
+    <span class="hljs-attr">dbName</span>: <span class="hljs-string">&#x27;test-app&#x27;</span>
+  })
+}));</code></pre>
+				<a href="#events" id="events" style="color: inherit; text-decoration: none;">
+					<h2>Events</h2>
+				</a>
+				<p>A <code>MongoStore</code> instance will emit the following events:</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Event name</th>
+							<th>Description</th>
+							<th>Payload</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td><code>create</code></td>
+							<td>A session has been created</td>
+							<td><code>sessionId</code></td>
+						</tr>
+						<tr>
+							<td><code>touch</code></td>
+							<td>A session has been touched (but not modified)</td>
+							<td><code>sessionId</code></td>
+						</tr>
+						<tr>
+							<td><code>update</code></td>
+							<td>A session has been updated</td>
+							<td><code>sessionId</code></td>
+						</tr>
+						<tr>
+							<td><code>set</code></td>
+							<td>A session has been created OR updated <em>(for compatibility purpose)</em></td>
+							<td><code>sessionId</code></td>
+						</tr>
+						<tr>
+							<td><code>destroy</code></td>
+							<td>A session has been destroyed manually</td>
+							<td><code>sessionId</code></td>
+						</tr>
+				</tbody></table>
+				<a href="#session-expiration" id="session-expiration" style="color: inherit; text-decoration: none;">
+					<h2>Session expiration</h2>
+				</a>
+				<p>When the session cookie has an expiration date, <code>connect-mongo</code> will use it.</p>
+				<p>Otherwise, it will create a new one, using <code>ttl</code> option.</p>
+				<pre><code class="language-js">app.use(session({
+  <span class="hljs-attr">store</span>: MongoStore.create({
+    <span class="hljs-attr">mongoUrl</span>: <span class="hljs-string">&#x27;mongodb://localhost/test-app&#x27;</span>,
+    <span class="hljs-attr">ttl</span>: <span class="hljs-number">14</span> * <span class="hljs-number">24</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> <span class="hljs-comment">// = 14 days. Default</span>
+  })
+}));</code></pre>
+				<p><strong>Note:</strong> Each time an user interacts with the server, its session expiration date is refreshed.</p>
+				<a href="#remove-expired-sessions" id="remove-expired-sessions" style="color: inherit; text-decoration: none;">
+					<h2>Remove expired sessions</h2>
+				</a>
+				<p><code>By default,</code>connect-mongo<code>uses MongoDB&#39;s TTL collection feature (2.2+) to have</code>mongod<code>automatically remove expired sessions.</code>connect-mongo<code>will create a TTL index for you at startup. But you can disable the creation of index with</code>createAutoRemoveIdx: false`</p>
+				<pre><code class="language-js">app.use(session({
+  <span class="hljs-attr">store</span>: MongoStore.create({
+    <span class="hljs-attr">mongoUrl</span>: <span class="hljs-string">&#x27;mongodb://localhost/test-app&#x27;</span>,
+    <span class="hljs-attr">createAutoRemoveIdx</span>: <span class="hljs-literal">false</span>
+  })
+}));</code></pre>
+				<p><strong>Note:</strong> If you use <code>connect-mongo</code> in a very concurrent environment, you should avoid this mode and prefer setting the index yourself, once!</p>
+				<a href="#lazy-session-update" id="lazy-session-update" style="color: inherit; text-decoration: none;">
+					<h2>Lazy session update</h2>
+				</a>
+				<p>If you are using <a href="https://github.com/expressjs/session">express-session</a> &gt;= <a href="https://github.com/expressjs/session/releases/tag/v1.10.0">1.10.0</a> and don&#39;t want to resave all the session on database every single time that the user refresh the page, you can lazy update the session, by limiting a period of time.</p>
+				<pre><code class="language-js">app.use(express.session({
+  <span class="hljs-attr">secret</span>: <span class="hljs-string">&#x27;keyboard cat&#x27;</span>,
+  <span class="hljs-attr">saveUninitialized</span>: <span class="hljs-literal">false</span>, <span class="hljs-comment">// don&#x27;t create session until something stored</span>
+  <span class="hljs-attr">resave</span>: <span class="hljs-literal">false</span>, <span class="hljs-comment">//don&#x27;t save session if unmodified</span>
+  <span class="hljs-attr">store</span>: MongoStore.create({
+    <span class="hljs-attr">mongoUrl</span>: <span class="hljs-string">&#x27;mongodb://localhost/test-app&#x27;</span>,
+    <span class="hljs-attr">touchAfter</span>: <span class="hljs-number">24</span> * <span class="hljs-number">3600</span> <span class="hljs-comment">// time period in seconds</span>
+  })
+}));</code></pre>
+				<p>by doing this, setting <code>touchAfter: 24 * 3600</code> you are saying to the session be updated only one time in a period of 24 hours, does not matter how many request&#39;s are made (with the exception of those that change something on the session data)</p>
+				<a href="#transparent-encryptiondecryption-of-session-data" id="transparent-encryptiondecryption-of-session-data" style="color: inherit; text-decoration: none;">
+					<h2>Transparent encryption/decryption of session data</h2>
+				</a>
+				<p>When working with sensitive session data it is <a href="https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Session_Management_Cheat_Sheet.md">recommended</a> to use encryption</p>
+				<pre><code class="language-js"><span class="hljs-keyword">const</span> store = MongoStore.create({
+  <span class="hljs-attr">mongoUrl</span>: <span class="hljs-string">&#x27;mongodb://localhost/test-app&#x27;</span>,
+  <span class="hljs-attr">crypto</span>: {
+    <span class="hljs-attr">secret</span>: <span class="hljs-string">&#x27;squirrel&#x27;</span>
+  }
+})</code></pre>
+				<a href="#options" id="options" style="color: inherit; text-decoration: none;">
+					<h2>Options</h2>
+				</a>
+				<a href="#connection-related-options-required" id="connection-related-options-required" style="color: inherit; text-decoration: none;">
+					<h3>Connection-related options (required)</h3>
+				</a>
+				<p>One of the following options should be provided. If more than one option are provided, each option will take precedence over others according to priority.</p>
+				<table>
+					<thead>
+						<tr>
+							<th align="center">Priority</th>
+							<th>Option</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td align="center">1</td>
+							<td><code>mongoUrl</code></td>
+							<td>A <a href="https://docs.mongodb.com/manual/reference/connection-string/">connection string</a> for creating a new MongoClient connection. If database name is not present in the connection string, database name should be provided using <code>dbName</code> option.</td>
+						</tr>
+						<tr>
+							<td align="center">2</td>
+							<td><code>clientPromise</code></td>
+							<td>A Promise that is resolved with MongoClient connection. If the connection was established without database name being present in the connection string, database name should be provided using <code>dbName</code> option.</td>
+						</tr>
+				</tbody></table>
+				<a href="#more-options" id="more-options" style="color: inherit; text-decoration: none;">
+					<h3>More options</h3>
+				</a>
+				<table>
+					<thead>
+						<tr>
+							<th>Option</th>
+							<th align="center">Default</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td><code>mongoOptions</code></td>
+							<td align="center"><code>{ useUnifiedTopology: true }</code></td>
+							<td>Options object for <a href="https://mongodb.github.io/node-mongodb-native/3.3/api/MongoClient.html#.connect"><code>MongoClient.connect()</code></a> method. Can be used with <code>mongoUrl</code> option.</td>
+						</tr>
+						<tr>
+							<td><code>dbName</code></td>
+							<td align="center"></td>
+							<td>A name of database used for storing sessions. Can be used with <code>mongoUrl</code>, or <code>clientPromise</code> options. Takes precedence over database name present in the connection string.</td>
+						</tr>
+						<tr>
+							<td><code>collectionName</code></td>
+							<td align="center"><code>&#39;sessions&#39;</code></td>
+							<td>A name of collection used for storing sessions.</td>
+						</tr>
+						<tr>
+							<td><code>ttl</code></td>
+							<td align="center"><code>1209600</code></td>
+							<td>The maximum lifetime (in seconds) of the session which will be used to set <code>session.cookie.expires</code> if it is not yet set. Default is 14 days.</td>
+						</tr>
+						<tr>
+							<td><code>createAutoRemoveIdx</code></td>
+							<td align="center"><code>true</code></td>
+							<td>Create TTL index in MongoDB collection or not.</td>
+						</tr>
+						<tr>
+							<td><code>touchAfter</code></td>
+							<td align="center"><code>0</code></td>
+							<td>Interval (in seconds) between session updates.</td>
+						</tr>
+						<tr>
+							<td><code>stringify</code></td>
+							<td align="center"><code>true</code></td>
+							<td>If <code>true</code>, connect-mongo will serialize sessions using <code>JSON.stringify</code> before setting them, and deserialize them with <code>JSON.parse</code> when getting them. This is useful if you are using types that MongoDB doesn&#39;t support.</td>
+						</tr>
+						<tr>
+							<td><code>serialize</code></td>
+							<td align="center"></td>
+							<td>Custom hook for serializing sessions to MongoDB. This is helpful if you need to modify the session before writing it out.</td>
+						</tr>
+						<tr>
+							<td><code>unserialize</code></td>
+							<td align="center"></td>
+							<td>Custom hook for unserializing sessions from MongoDB. This can be used in scenarios where you need to support different types of serializations (e.g., objects and JSON strings) or need to modify the session before using it in your app.</td>
+						</tr>
+						<tr>
+							<td><code>writeOperationOptions</code></td>
+							<td align="center"></td>
+							<td>Options object to pass to every MongoDB write operation call that supports it (e.g. <code>update</code>, <code>remove</code>). Useful for adjusting the write concern. Only exception: If <code>autoRemove</code> is set to <code>&#39;interval&#39;</code>, the write concern from the <code>writeOperationOptions</code> object will get overwritten.</td>
+						</tr>
+						<tr>
+							<td><code>transformId</code></td>
+							<td align="center"></td>
+							<td>Transform original <code>sessionId</code> in whatever you want to use as storage key.</td>
+						</tr>
+						<tr>
+							<td><code>crypto</code></td>
+							<td align="center"></td>
+							<td>Crypto related options. See below.</td>
+						</tr>
+				</tbody></table>
+				<a href="#crypto-related-options" id="crypto-related-options" style="color: inherit; text-decoration: none;">
+					<h3>Crypto-related options</h3>
+				</a>
+				<table>
+					<thead>
+						<tr>
+							<th>Option</th>
+							<th align="center">Default</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td><code>secret</code></td>
+							<td align="center"><code>false</code></td>
+							<td>Enables transparent crypto in accordance with <a href="https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Session_Management_Cheat_Sheet.md">OWASP session management recommendations</a>.</td>
+						</tr>
+						<tr>
+							<td><code>algorithm</code></td>
+							<td align="center"><code>&#39;aes-256-gcm&#39;</code></td>
+							<td>Allows for changes to the default symmetric encryption cipher. See <a href="https://nodejs.org/api/crypto.html#crypto_crypto_getciphers"><code>crypto.getCiphers()</code></a> for supported algorithms.</td>
+						</tr>
+						<tr>
+							<td><code>hashing</code></td>
+							<td align="center"><code>&#39;sha512&#39;</code></td>
+							<td>May be used to change the default hashing algorithm. See <a href="https://nodejs.org/api/crypto.html#crypto_crypto_gethashes"><code>crypto.getHashes()</code></a> for supported hashing algorithms.</td>
+						</tr>
+						<tr>
+							<td><code>encodeas</code></td>
+							<td align="center"><code>&#39;hex&#39;</code></td>
+							<td>Specify to change the session data cipher text encoding.</td>
+						</tr>
+						<tr>
+							<td><code>key_size</code></td>
+							<td align="center"><code>32</code></td>
+							<td>When using varying algorithms the key size may be used. Default value <code>32</code> is based on the <code>AES</code> blocksize.</td>
+						</tr>
+						<tr>
+							<td><code>iv_size</code></td>
+							<td align="center"><code>16</code></td>
+							<td>This can be used to adjust the default <a href="https://csrc.nist.gov/glossary/term/IV">IV</a> size if a different algorithm requires a different size.</td>
+						</tr>
+						<tr>
+							<td><code>at_size</code></td>
+							<td align="center"><code>16</code></td>
+							<td>When using newer <code>AES</code> modes such as the default <code>GCM</code> or <code>CCM</code> an authentication tag size can be defined.</td>
+						</tr>
+				</tbody></table>
+				<a href="#development" id="development" style="color: inherit; text-decoration: none;">
+					<h2>Development</h2>
+				</a>
+				<pre><code>yarn <span class="hljs-keyword">install</span>
+docker-compose up -d
+<span class="hljs-comment"># Run these 2 lines in 2 shell</span>
+yarn watch:build
+yarn watch:<span class="hljs-keyword">test</span></code></pre>
+				<a href="#example-application" id="example-application" style="color: inherit; text-decoration: none;">
+					<h3>Example application</h3>
+				</a>
+				<pre><code>yarn <span class="hljs-keyword">link</span>
+cd example
+yarn <span class="hljs-keyword">link</span> <span class="hljs-string">&quot;connect-mongo&quot;</span>
+yarn install
+yarn start</code></pre>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p>The MIT License</p>
+				<a href="#todos" id="todos" style="color: inherit; text-decoration: none;">
+					<h2>TODOs</h2>
+				</a>
+				<ul>
+					<li><input disabled="" type="checkbox"> Github Action release workflow</li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class">
+						<a href="classes/mongostore.html" class="tsd-kind-icon">Mongo<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#concretconnectmongooptions" class="tsd-kind-icon">Concret<wbr>Connect<wbr>Mongo<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#concretcryptooptions" class="tsd-kind-icon">Concret<wbr>Crypto<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#connectmongooptions" class="tsd-kind-icon">Connect<wbr>Mongo<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#cryptooptions" class="tsd-kind-icon">Crypto<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#errorornull" class="tsd-kind-icon">Error<wbr>OrNull</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#internalsessiontype" class="tsd-kind-icon">Internal<wbr>Session<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#debug" class="tsd-kind-icon">debug</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#computetransformfunctions" class="tsd-kind-icon">compute<wbr>Transform<wbr>Functions</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createstorehelper" class="tsd-kind-icon">create<wbr>Store<wbr>Helper</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#defaultserializefunction" class="tsd-kind-icon">default<wbr>Serialize<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makecookie" class="tsd-kind-icon">make<wbr>Cookie</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makedata" class="tsd-kind-icon">make<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makedatanocookie" class="tsd-kind-icon">make<wbr>Data<wbr>NoCookie</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#noop" class="tsd-kind-icon">noop</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#unit" class="tsd-kind-icon">unit</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
