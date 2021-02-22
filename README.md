@@ -10,8 +10,8 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 > Breaking change in V4 and rewritten the whole project using Typescript. Please checkout the [migration guide](MIGRATION_V4.md) and [changelog](CHANGELOG.md) for details.
 
 ```
-npm install connect-mongo@next
-yarn add connect-mongo@next
+npm install connect-mongo
+yarn add connect-mongo
 ```
 
 ## Compatibility
@@ -229,8 +229,8 @@ yarn start
 
 Since I cannot access the setting page. I can only do it manually.
 
-1. Bump version and update `CHANGELOG.md`. Commit and push.
-2. Run `yarn build && yarn test && npm publish --tag next`
+1. Bump version, update `CHANGELOG.md` and README. Commit and push.
+2. Run `yarn build && yarn test && npm publish`
 3. `git tag vX.Y.Z && git push --tags`
 
 ## License

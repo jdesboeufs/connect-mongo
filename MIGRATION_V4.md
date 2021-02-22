@@ -7,7 +7,7 @@ If you are using `npm`
 ```
 npm uninstall connect-mongo
 npm uninstall @types/connect-mongo
-npm install connect-mongo@next
+npm install connect-mongo
 ```
 
 If you are using `yarn`
@@ -15,7 +15,7 @@ If you are using `yarn`
 ```
 yarn remove connect-mongo
 yarn remove @types/connect-mongo
-yarn add connect-mongo@next
+yarn add connect-mongo
 ```
 
 Next step is to import the dependencies
