@@ -151,17 +151,19 @@ app.use(express.session({
 
 by doing this, setting `touchAfter: 24 * 3600` you are saying to the session be updated only one time in a period of 24 hours, does not matter how many request's are made (with the exception of those that change something on the session data)
 
-<!--
+
 ## Transparent encryption/decryption of session data
 
 When working with sensitive session data it is [recommended](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Session_Management_Cheat_Sheet.md) to use encryption
 
 ```js
-const store = new MongoStore({
-    url: 'mongodb://localhost/test-app',
+const store = MongoStore.create({
+  mongoUrl: 'mongodb://localhost/test-app',
+  crypto: {
     secret: 'squirrel'
+  }
 })
-``` -->
+```
 
 ## Options
 
@@ -189,8 +191,8 @@ One of the following options should be provided. If more than one option are pro
 |`unserialize`||Custom hook for unserializing sessions from MongoDB. This can be used in scenarios where you need to support different types of serializations (e.g., objects and JSON strings) or need to modify the session before using it in your app.|
 |`writeOperationOptions`||Options object to pass to every MongoDB write operation call that supports it (e.g. `update`, `remove`). Useful for adjusting the write concern. Only exception: If `autoRemove` is set to `'interval'`, the write concern from the `writeOperationOptions` object will get overwritten.|
 |`transformId`||Transform original `sessionId` in whatever you want to use as storage key.|
+|`crypto`||Crypto related options. See below.|
 
-<!--
 ### Crypto-related options
 
 |Option|Default|Description|
@@ -201,7 +203,7 @@ One of the following options should be provided. If more than one option are pro
 |`encodeas`|`'hex'`|Specify to change the session data cipher text encoding.|
 |`key_size`|`32`|When using varying algorithms the key size may be used. Default value `32` is based on the `AES` blocksize.|
 |`iv_size`|`16`|This can be used to adjust the default [IV](https://csrc.nist.gov/glossary/term/IV) size if a different algorithm requires a different size.|
-|`at_size`|`16`|When using newer `AES` modes such as the default `GCM` or `CCM` an authentication tag size can be defined.| -->
+|`at_size`|`16`|When using newer `AES` modes such as the default `GCM` or `CCM` an authentication tag size can be defined.|
 
 ## Development
 
@@ -221,3 +223,4 @@ The MIT License
 
 - [ ] Crypto
 - [ ] Example code
+- [ ] Github Action release workflow

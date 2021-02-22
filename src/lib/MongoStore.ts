@@ -1,4 +1,5 @@
 import { assert } from 'console'
+import util from 'util'
 import * as session from 'express-session'
 import {
   Collection,
@@ -7,8 +8,19 @@ import {
   MongoClientOptions,
 } from 'mongodb'
 import Debug from 'debug'
+import Kruptein from 'kruptein'
 
 const debug = Debug('connect-mongo')
+
+export type CryptoOptions = {
+  secret: false | string
+  algorithm?: string
+  hashing?: string
+  encodeas?: string
+  key_size?: number
+  iv_size?: number
+  at_size?: number
+}
 
 export type ConnectMongoOptions = {
   mongoUrl?: string
@@ -25,7 +37,10 @@ export type ConnectMongoOptions = {
   unserialize?: (a: any) => any
   writeOperationOptions?: CommonOptions
   transformId?: (a: any) => any
+  crypto?: CryptoOptions
 }
+
+type ConcretCryptoOptions = Required<CryptoOptions>
 
 type ConcretConnectMongoOptions = {
   mongoUrl?: string
@@ -34,7 +49,7 @@ type ConcretConnectMongoOptions = {
   mongoOptions: MongoClientOptions
   dbName?: string
   ttl: number
-  createAutoRemoveIdx?: boolean
+  createAutoRemoveIdx: boolean
   touchAfter: number
   stringify: boolean
   // FIXME: remove those any
@@ -43,6 +58,7 @@ type ConcretConnectMongoOptions = {
   writeOperationOptions?: CommonOptions
   transformId?: (a: any) => any
   // FIXME: remove above any
+  crypto: ConcretCryptoOptions
 }
 
 type ErrorOrNull = Error | null
@@ -105,6 +121,7 @@ function computeTransformFunctions(options: ConcretConnectMongoOptions) {
 
 export default class MongoStore extends session.Store {
   private clientP: Promise<MongoClient>
+  private crypto: Kruptein | null = null
   collectionP: Promise<Collection>
   private options: ConcretConnectMongoOptions
   // FIXME: remvoe any
@@ -120,10 +137,11 @@ export default class MongoStore extends session.Store {
     createAutoRemoveIdx = true,
     touchAfter = 0,
     stringify = true,
+    crypto,
     ...required
   }: ConnectMongoOptions) {
-    debug('create MongoStore instance')
     super()
+    debug('create MongoStore instance')
     const options: ConcretConnectMongoOptions = {
       collectionName,
       ttl,
@@ -131,6 +149,18 @@ export default class MongoStore extends session.Store {
       createAutoRemoveIdx,
       touchAfter,
       stringify,
+      crypto: {
+        ...{
+          secret: false,
+          algorithm: 'aes-256-gcm',
+          hashing: 'sha512',
+          encodeas: 'hex',
+          key_size: 32,
+          iv_size: 16,
+          at_size: 16,
+        },
+        ...crypto,
+      },
       ...required,
     }
     assert(
@@ -161,6 +191,9 @@ export default class MongoStore extends session.Store {
         }
         return collection
       })
+    if (options.crypto.secret) {
+      this.crypto = require('kruptein')(options.crypto)
+    }
   }
 
   static create(options: ConnectMongoOptions): MongoStore {
@@ -196,6 +229,23 @@ export default class MongoStore extends session.Store {
             { expires: { $gt: new Date() } },
           ],
         })
+        if (this.crypto && session) {
+          const cryptoGet = util.promisify(this.crypto.get).bind(this.crypto)
+          try {
+            const plaintext = await cryptoGet(
+              this.options.crypto.secret as string,
+              JSON.stringify(
+                this.transformFunctions.unserialize(session.session)
+              )
+            ).catch((err) => {
+              throw new Error(err)
+            })
+            // @ts-ignore
+            session.session = plaintext
+          } catch (error) {
+            callback(error)
+          }
+        }
         const s =
           session && this.transformFunctions.unserialize(session.session)
         if (this.options.touchAfter > 0 && session.lastModified) {
@@ -249,6 +299,20 @@ export default class MongoStore extends session.Store {
         if (this.options.touchAfter > 0) {
           s.lastModified = new Date()
         }
+        if (this.crypto) {
+          const cryptoSet = util.promisify(this.crypto.set).bind(this.crypto)
+          try {
+            const data = await cryptoSet(
+              this.options.crypto.secret as string,
+              s.session
+            ).catch((err) => {
+              throw new Error(err)
+            })
+            s.session = (data as unknown) as session.SessionData
+          } catch (error) {
+            callback(error)
+          }
+        }
         const collection = await this.collectionP
         const rawResp = await collection.updateOne(
           { _id: s._id },
@@ -279,7 +343,11 @@ export default class MongoStore extends session.Store {
     ;(async () => {
       try {
         debug(`MongoStore#touch=${sid}`)
-        const updateFields: { lastModified?: Date; expires?: Date } = {}
+        const updateFields: {
+          lastModified?: Date
+          expires?: Date
+          session?: session.SessionData
+        } = {}
         const touchAfter = this.options.touchAfter * 1000
         const lastModified = session.lastModified
           ? session.lastModified.getTime()
@@ -300,6 +368,7 @@ export default class MongoStore extends session.Store {
 
         if (session?.cookie?.expires) {
           updateFields.expires = new Date(session.cookie.expires)
+          updateFields.session = this.transformFunctions.serialize(session)
         } else {
           updateFields.expires = new Date(Date.now() + this.options.ttl * 1000)
         }

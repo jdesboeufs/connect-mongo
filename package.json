@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "debug": "^4.3.1",
+    "kruptein": "^2.2.3",
     "mongodb": "^3.6.3"
   },
   "devDependencies": {

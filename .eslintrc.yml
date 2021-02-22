@@ -24,6 +24,7 @@ plugins:
 
 rules:
   prettier/prettier: error
+  camelcase: warn
   standard/no-callback-literal: off
   '@typescript-eslint/no-unused-vars':
     - warn

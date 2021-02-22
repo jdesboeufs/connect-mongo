@@ -48,6 +48,7 @@ test.serial('basic operation flow', async (t) => {
   const res = await storePromise.set(sid, orgSession)
   t.is(res, undefined)
   const session = await storePromise.get(sid)
+  t.is(typeof session, 'object')
   orgSession = JSON.parse(JSON.stringify(orgSession))
   t.deepEqual(session, orgSession)
   const allSessions = await storePromise.all()
@@ -68,6 +69,7 @@ test.serial.cb('set and listen to event', (t) => {
     t.is(sessionId, sid)
     store.get(sid, (err, session) => {
       t.is(err, null)
+      t.is(typeof session, 'object')
       t.deepEqual(session, orgSession)
       t.end()
     })
@@ -105,6 +107,7 @@ test.serial('set with no stringify', async (t) => {
   const res = await storePromise.set(sid, orgSession)
   t.is(res, undefined)
   const session = await storePromise.get(sid)
+  t.is(typeof session, 'object')
   t.deepEqual(orgSession.cookie, cookie)
   // @ts-ignore
   t.deepEqual(cookie.expires.toJSON(), session.cookie.expires.toJSON())
@@ -164,7 +167,7 @@ test.serial('test default TTL', async (t) => {
 test.serial('test custom serializer', async (t) => {
   ;({ store, storePromise } = createStoreHelper({
     serialize: (obj) => {
-      obj.ice = 'test-ice'
+      obj.ice = 'test-ice-serializer'
       return JSON.stringify(obj)
     },
   }))
@@ -172,9 +175,10 @@ test.serial('test custom serializer', async (t) => {
   const sid = 'test-custom-serializer'
   await storePromise.set(sid, orgSession)
   const session = await storePromise.get(sid)
+  t.is(typeof session, 'string')
   t.not(session, undefined)
   // @ts-ignore
-  orgSession.ice = 'test-ice'
+  orgSession.ice = 'test-ice-serializer'
   // @ts-ignore
   t.is(session, JSON.stringify(orgSession))
 })
@@ -182,7 +186,7 @@ test.serial('test custom serializer', async (t) => {
 test.serial('test custom deserializer', async (t) => {
   ;({ store, storePromise } = createStoreHelper({
     unserialize: (obj) => {
-      obj.ice = 'test-ice'
+      obj.ice = 'test-ice-deserializer'
       return obj
     },
   }))
@@ -190,10 +194,11 @@ test.serial('test custom deserializer', async (t) => {
   const sid = 'test-custom-deserializer'
   await storePromise.set(sid, orgSession)
   const session = await storePromise.get(sid)
+  t.is(typeof session, 'object')
   // @ts-ignore
   orgSession.cookie = orgSession.cookie.toJSON()
   // @ts-ignore
-  orgSession.ice = 'test-ice'
+  orgSession.ice = 'test-ice-deserializer'
   t.not(session, undefined)
   t.deepEqual(session, orgSession)
 })
@@ -244,4 +249,19 @@ test.serial('touch ops with touchAfter with touch', async (t) => {
   const lastModifiedAfterTouch = session2.lastModified.getTime()
   // Check if both expiry date are different
   t.truthy(lastModifiedAfterTouch > lastModifiedBeforeTouch)
+})
+
+// Impl still buggy!
+test.serial('basic operation flow with crypto', async (t) => {
+  ;({ store, storePromise } = createStoreHelper({
+    crypto: { secret: 'secret' },
+  }))
+  let orgSession = makeData()
+  const sid = 'test-basic-flow-with-crypto'
+  const res = await storePromise.set(sid, orgSession)
+  t.is(res, undefined)
+  const session = await storePromise.get(sid)
+  orgSession = JSON.parse(JSON.stringify(orgSession))
+  // @ts-ignore
+  t.deepEqual(JSON.parse(session), orgSession)
 })

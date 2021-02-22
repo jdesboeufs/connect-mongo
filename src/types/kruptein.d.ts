@@ -17,9 +17,16 @@
  * something();
  * ```
  */
-declare module 'module-name' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const whatever: any
-  export = whatever
+declare module 'kruptein' {
+  type Callback = (msg?: string, data?: string) => void
+  class Kruptein {
+    public set(
+      secret: string,
+      plaintext: string | any,
+      callback: Callback
+    ): void
+
+    public get(secret: string, ciphertext: string, callback: Callback): void
+  }
+  export = Kruptein
 }
-// FIXME: remove me if not needed
