@@ -2,9 +2,9 @@ name: Sanity check
 
 on:
   push:
-  #   branches: [$default-branch]
-  # pull_request:
-  #   branches: [$default-branch]
+    branches: [$default-branch]
+  pull_request:
+    branches: [$default-branch]
 
 jobs:
   build:

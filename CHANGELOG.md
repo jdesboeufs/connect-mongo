@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0] - 2021-02-22
+
 ### **BREAKING CHANGES**
 
 - Support Node.Js 10.x, 12.x and 14.x and drop older support.

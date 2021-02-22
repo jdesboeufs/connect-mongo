@@ -225,10 +225,14 @@ yarn install
 yarn start
 ```
 
+### Release
+
+Since I cannot access the setting page. I can only do it manually.
+
+1. Bump version and update `CHANGELOG.md`. Commit and push.
+2. Run `yarn build && yarn test && npm publish --tag next`
+3. `git tag vX.Y.Z && git push --tags`
+
 ## License
 
 The MIT License
-
-## TODOs
-
-- [ ] Github Action release workflow
