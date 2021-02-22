@@ -6,6 +6,9 @@ import {
   MongoClient,
   MongoClientOptions,
 } from 'mongodb'
+import Debug from 'debug'
+
+const debug = Debug('connect-mongo')
 
 export type ConnectMongoOptions = {
   mongoUrl?: string
@@ -119,6 +122,7 @@ export default class MongoStore extends session.Store {
     stringify = true,
     ...required
   }: ConnectMongoOptions) {
+    debug('create MongoStore instance')
     super()
     const options: ConcretConnectMongoOptions = {
       collectionName,
@@ -133,7 +137,6 @@ export default class MongoStore extends session.Store {
       options.mongoUrl || options.clientPromise,
       'You must provide either mongoUr|clientPromise in options'
     )
-    // console.log('constructor', options)
     this.transformFunctions = computeTransformFunctions(options)
     let _clientP: Promise<MongoClient>
     if (options.mongoUrl) {
@@ -150,6 +153,7 @@ export default class MongoStore extends session.Store {
       .then((db) => db.collection(options.collectionName))
       .then((collection) => {
         if (options.createAutoRemoveIdx) {
+          debug('Creating MongoDB TTL index')
           collection.createIndex(
             { expires: 1 },
             { expireAfterSeconds: 0, ...options.writeOperationOptions }
@@ -183,6 +187,7 @@ export default class MongoStore extends session.Store {
   ): void {
     ;(async () => {
       try {
+        debug(`MongoStore#get=${sid}`)
         const collection = await this.collectionP
         const session = await collection.findOne({
           _id: this.computeStorageId(sid),
@@ -216,6 +221,7 @@ export default class MongoStore extends session.Store {
   ): void {
     ;(async () => {
       try {
+        debug(`MongoStore#set=${sid}`)
         // Removing the lastModified prop from the session object before update
         // @ts-ignore
         if (this.options.touchAfter > 0 && session?.lastModified) {
@@ -272,6 +278,7 @@ export default class MongoStore extends session.Store {
   ): void {
     ;(async () => {
       try {
+        debug(`MongoStore#touch=${sid}`)
         const updateFields: { lastModified?: Date; expires?: Date } = {}
         const touchAfter = this.options.touchAfter * 1000
         const lastModified = session.lastModified
@@ -285,6 +292,7 @@ export default class MongoStore extends session.Store {
         if (touchAfter > 0 && lastModified > 0) {
           const timeElapsed = currentDate.getTime() - lastModified
           if (timeElapsed < touchAfter) {
+            debug(`Skip touching session=${sid}`)
             return callback(null)
           }
           updateFields.lastModified = currentDate
@@ -327,6 +335,7 @@ export default class MongoStore extends session.Store {
   ): void {
     ;(async () => {
       try {
+        debug('MongoStore#all()')
         const collection = await this.collectionP
         const sessions = collection.find({
           $or: [
@@ -359,6 +368,7 @@ export default class MongoStore extends session.Store {
    * @param sid session ID
    */
   destroy(sid: string, callback: (err: ErrorOrNull) => void = noop): void {
+    debug(`MongoStore#destroy=${sid}`)
     this.collectionP
       .then((colleciton) =>
         colleciton.deleteOne(
@@ -377,6 +387,7 @@ export default class MongoStore extends session.Store {
    * Get the count of all sessions in the store
    */
   length(callback: (err: ErrorOrNull, length: number) => void): void {
+    debug('MongoStore#length()')
     this.collectionP
       .then((collection) => collection.countDocuments())
       .then((c) => callback(null, c))
@@ -388,6 +399,7 @@ export default class MongoStore extends session.Store {
    * Delete all sessions from the store.
    */
   clear(callback: (err: ErrorOrNull) => void = noop): void {
+    debug('MongoStore#clear()')
     this.collectionP
       .then((collection) => collection.drop())
       .then(() => callback(null))
@@ -398,6 +410,7 @@ export default class MongoStore extends session.Store {
    * Close database connection
    */
   close(): Promise<void> {
+    debug('MongoStore#close()')
     return this.clientP.then((c) => c.close())
   }
 }

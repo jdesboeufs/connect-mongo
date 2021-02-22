@@ -220,5 +220,4 @@ The MIT License
 ## TODOs
 
 - [ ] Crypto
-- [ ] Remove console.log and add DEBUG log
 - [ ] Example code
