@@ -7,7 +7,12 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 [![Sanity check](https://github.com/jdesboeufs/connect-mongo/actions/workflows/sanity.yml/badge.svg)](https://github.com/jdesboeufs/connect-mongo/actions/workflows/sanity.yml)
 [![Coverage Status](https://coveralls.io/repos/jdesboeufs/connect-mongo/badge.svg?branch=master&service=github)](https://coveralls.io/github/jdesboeufs/connect-mongo?branch=master)
 
-> Breaking change in V4 and rewritten the whole project using Typescript. Please checkout the migration guide and [changelog](CHANGELOG.md) for details.
+> Breaking change in V4 and rewritten the whole project using Typescript. Please checkout the [migration guide](MIGRATION_V4.md) and [changelog](CHANGELOG.md) for details.
+
+```
+npm install connect-mongo@next
+yarn add connect-mongo@next
+```
 
 ## Compatibility
 
@@ -215,6 +220,5 @@ The MIT License
 ## TODOs
 
 - [ ] Crypto
-- [ ] Doc and meta data in package json
 - [ ] Remove console.log and add DEBUG log
 - [ ] Example code

@@ -7,7 +7,7 @@ If you are using `npm`
 ```
 npm uninstall connect-mongo
 npm uninstall @types/connect-mongo
-npm install -D connect-mongo@next
+npm install connect-mongo@next
 ```
 
 If you are using `yarn`
@@ -15,15 +15,17 @@ If you are using `yarn`
 ```
 yarn remove connect-mongo
 yarn remove @types/connect-mongo
-yarn add -D connect-mongo@next
+yarn add connect-mongo@next
 ```
 
 Next step is to import the dependencies
 
+Javascript:
 ```js
 const MongoStore = require('connect-mongo');
 ```
 
+Typescript:
 ```ts
 import MongoStore from 'connect-mongo';
 ```
@@ -49,6 +51,6 @@ For the options, you should make the following changes:
 const session = require('express-session');
 
 app.use(session({
-  store: new session.MemoryStore()
+  store: isDev ? new session.MemoryStore() : MongoStore.create(options)
 }));
 ```
