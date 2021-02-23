@@ -368,7 +368,6 @@ export default class MongoStore extends session.Store {
 
         if (session?.cookie?.expires) {
           updateFields.expires = new Date(session.cookie.expires)
-          updateFields.session = this.transformFunctions.serialize(session)
         } else {
           updateFields.expires = new Date(Date.now() + this.options.ttl * 1000)
         }
