@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Use `matchedCount` instead of `modifiedCount` to avoid throwing exceptions when nothing to modify (#390)
+
 ## [4.1.0] - 2021-02-22
 
 ### **BREAKING CHANGES**

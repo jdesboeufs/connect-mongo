@@ -378,7 +378,7 @@ export default class MongoStore extends session.Store {
           { $set: updateFields },
           this.options.writeOperationOptions
         )
-        if (rawResp.modifiedCount === 0) {
+        if (rawResp.matchedCount === 0) {
           return callback(new Error('Unable to find the session to touch'))
         } else {
           this.emit('touch', sid, session)
