@@ -248,7 +248,7 @@ export default class MongoStore extends session.Store {
         }
         const s =
           session && this.transformFunctions.unserialize(session.session)
-        if (this.options.touchAfter > 0 && session.lastModified) {
+        if (this.options.touchAfter > 0 && session?.lastModified) {
           s.lastModified = session.lastModified
         }
         this.emit('get', sid)

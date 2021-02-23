@@ -265,3 +265,12 @@ test.serial('basic operation flow with crypto', async (t) => {
   // @ts-ignore
   t.deepEqual(JSON.parse(session), orgSession)
 })
+
+test.serial('with touch after and get non-exist session', async (t) => {
+  ;({ store, storePromise } = createStoreHelper({
+    touchAfter: 10,
+  }))
+  const sid = 'fake-sid-for-test-touch-after'
+  const res = await storePromise.get(sid)
+  t.is(res, null)
+})
