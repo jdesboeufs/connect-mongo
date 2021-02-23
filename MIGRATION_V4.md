@@ -54,3 +54,5 @@ app.use(session({
   store: isDev ? new session.MemoryStore() : MongoStore.create(options)
 }));
 ```
+
+> You can also take a look at [example](example) directory for example usage.
