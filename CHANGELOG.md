@@ -6,9 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added mongoose example
+
 ### Fixed
 
 - Use `matchedCount` instead of `modifiedCount` to avoid throwing exceptions when nothing to modify (#390)
+- Fixed `Warning: Accessing non-existent property 'MongoError' of module exports inside circular dependency` by downgrade to `mongodb@3.6.3`
+- Revert update session when touch
 
 ## [4.1.0] - 2021-02-22
 
