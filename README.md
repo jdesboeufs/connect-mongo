@@ -9,6 +9,28 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 
 > Breaking change in V4 and rewritten the whole project using Typescript. Please checkout the [migration guide](MIGRATION_V4.md) and [changelog](CHANGELOG.md) for details.
 
+- [Install](#install)
+- [Compatibility](#compatibility)
+- [Usage](#usage)
+  - [Express or Connect integration](#express-or-connect-integration)
+  - [Connection to MongoDB](#connection-to-mongodb)
+- [Known issues](#known-issues)
+- [Events](#events)
+- [Session expiration](#session-expiration)
+- [Remove expired sessions](#remove-expired-sessions)
+- [Lazy session update](#lazy-session-update)
+- [Transparent encryption/decryption of session data](#transparent-encryptiondecryption-of-session-data)
+- [Options](#options)
+  - [Connection-related options (required)](#connection-related-options-required)
+  - [More options](#more-options)
+  - [Crypto-related options](#crypto-related-options)
+- [Development](#development)
+  - [Example application](#example-application)
+  - [Release](#release)
+- [License](#license)
+
+## Install
+
 ```
 npm install connect-mongo
 yarn add connect-mongo
