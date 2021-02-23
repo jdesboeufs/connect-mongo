@@ -89,6 +89,10 @@ app.use(session({
 }));
 ```
 
+## Known issues
+
+[Known issues](https://github.com/jdesboeufs/connect-mongo/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
+
 ## Events
 
 A `MongoStore` instance will emit the following events:
