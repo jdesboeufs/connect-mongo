@@ -5,6 +5,12 @@ import session, { SessionOptions } from 'express-session'
 import MongoStore from '../'
 import { ConnectMongoOptions } from '../lib/MongoStore'
 
+declare module 'express-session' {
+  interface SessionData {
+    views: number
+  }
+}
+
 function createSupertetAgent(
   sessionOpts: SessionOptions,
   mongoStoreOpts: ConnectMongoOptions
@@ -18,21 +24,16 @@ function createSupertetAgent(
     })
   )
   app.get('/', function (req, res) {
-    // @ts-ignore
     if (typeof req.session.views === 'number') {
-      // @ts-ignore
       req.session.views++
     } else {
-      // @ts-ignore
       req.session.views = 0
     }
     console.log(req.session)
-    // @ts-ignore
     res.status(200).send({ views: req.session.views })
   })
   app.get('/ping', function (req, res) {
     console.log(req.session)
-    // @ts-ignore
     res.status(200).send({ views: req.session.views })
   })
   const agent = request.agent(app)
