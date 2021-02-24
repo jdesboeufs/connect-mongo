@@ -17,6 +17,7 @@ app.use(session({
     clientPromise: clientP,
     dbName: "example-db-mongoose",
     stringify: false,
+    autoRemove: 'interval'
   })
 }));
 

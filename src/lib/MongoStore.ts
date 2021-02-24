@@ -29,9 +29,11 @@ export type ConnectMongoOptions = {
   mongoOptions?: MongoClientOptions
   dbName?: string
   ttl?: number
-  createAutoRemoveIdx?: boolean
   touchAfter?: number
   stringify?: boolean
+  createAutoRemoveIdx?: boolean
+  autoRemove?: 'native' | 'interval' | 'disabled'
+  autoRemoveInterval?: number
   // FIXME: remove those any
   serialize?: (a: any) => any
   unserialize?: (a: any) => any
@@ -49,7 +51,9 @@ type ConcretConnectMongoOptions = {
   mongoOptions: MongoClientOptions
   dbName?: string
   ttl: number
-  createAutoRemoveIdx: boolean
+  createAutoRemoveIdx?: boolean
+  autoRemove: 'native' | 'interval' | 'disabled'
+  autoRemoveInterval: number
   touchAfter: number
   stringify: boolean
   // FIXME: remove those any
@@ -122,6 +126,7 @@ function computeTransformFunctions(options: ConcretConnectMongoOptions) {
 export default class MongoStore extends session.Store {
   private clientP: Promise<MongoClient>
   private crypto: Kruptein | null = null
+  private timer?: NodeJS.Timeout
   collectionP: Promise<Collection>
   private options: ConcretConnectMongoOptions
   // FIXME: remvoe any
@@ -134,7 +139,8 @@ export default class MongoStore extends session.Store {
     collectionName = 'sessions',
     ttl = 1209600,
     mongoOptions = { useUnifiedTopology: true },
-    createAutoRemoveIdx = true,
+    autoRemove = 'native',
+    autoRemoveInterval = 10,
     touchAfter = 0,
     stringify = true,
     crypto,
@@ -146,7 +152,8 @@ export default class MongoStore extends session.Store {
       collectionName,
       ttl,
       mongoOptions,
-      createAutoRemoveIdx,
+      autoRemove,
+      autoRemoveInterval,
       touchAfter,
       stringify,
       crypto: {
@@ -163,9 +170,19 @@ export default class MongoStore extends session.Store {
       },
       ...required,
     }
+    // Check params
     assert(
       options.mongoUrl || options.clientPromise,
       'You must provide either mongoUr|clientPromise in options'
+    )
+    assert(
+      options.createAutoRemoveIdx === null ||
+        options.createAutoRemoveIdx === undefined,
+      'options.createAutoRemoveIdx has been reverted to autoRemove and autoRemoveInterval'
+    )
+    assert(
+      !options.autoRemoveInterval || options.autoRemoveInterval <= 71582,
+      /* (Math.pow(2, 32) - 1) / (1000 * 60) */ 'autoRemoveInterval is too large. options.autoRemoveInterval is in minutes but not seconds nor mills'
     )
     this.transformFunctions = computeTransformFunctions(options)
     let _clientP: Promise<MongoClient>
@@ -182,13 +199,7 @@ export default class MongoStore extends session.Store {
       .then((con) => con.db(options.dbName))
       .then((db) => db.collection(options.collectionName))
       .then((collection) => {
-        if (options.createAutoRemoveIdx) {
-          debug('Creating MongoDB TTL index')
-          collection.createIndex(
-            { expires: 1 },
-            { expireAfterSeconds: 0, ...options.writeOperationOptions }
-          )
-        }
+        this.setAutoRemove(collection)
         return collection
       })
     if (options.crypto.secret) {
@@ -198,6 +209,39 @@ export default class MongoStore extends session.Store {
 
   static create(options: ConnectMongoOptions): MongoStore {
     return new MongoStore(options)
+  }
+
+  private setAutoRemove(collection: Collection) {
+    const removeQuery = () => ({
+      expires: {
+        $lt: new Date(),
+      },
+    })
+    switch (this.options.autoRemove) {
+      case 'native':
+        debug('Creating MongoDB TTL index')
+        collection.createIndex(
+          { expires: 1 },
+          { expireAfterSeconds: 0, ...this.options.writeOperationOptions }
+        )
+        break
+      case 'interval':
+        debug('create Timer to remove expired sessions')
+        this.timer = setInterval(
+          () =>
+            collection.deleteMany(removeQuery(), {
+              ...this.options.writeOperationOptions,
+              w: 0,
+              j: false,
+            }),
+          this.options.autoRemoveInterval * 1000 * 60
+        )
+        this.timer.unref()
+        break
+      case 'disabled':
+      default:
+        break
+    }
   }
 
   private computeStorageId(sessionId: string) {

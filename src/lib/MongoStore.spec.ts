@@ -135,7 +135,6 @@ test.serial('test set default TTL', async (t) => {
   const defaultTTL = 10
   ;({ store, storePromise } = createStoreHelper({
     ttl: defaultTTL,
-    createAutoRemoveIdx: false,
   }))
   const orgSession = makeDataNoCookie()
   const sid = 'test-set-default-ttl'

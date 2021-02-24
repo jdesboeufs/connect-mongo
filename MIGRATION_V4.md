@@ -44,7 +44,6 @@ For the options, you should make the following changes:
 * Change `url` to `mongoUrl`
 * Keep `clientPromise` if you are using it
 * `mongooseConnection` & `clientPromise` have been removed. Please update your application code to use either `mongoUrl` or `clientPromise`
-* Remove `autoRemove` & `autoRemoveInterval` option if your are using and check if you need to set the `createAutoRemoveIdx` option
 * Remove `fallbackMemory` option and if you are using it, you can import from:
 
 ```js

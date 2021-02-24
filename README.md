@@ -18,6 +18,9 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 - [Events](#events)
 - [Session expiration](#session-expiration)
 - [Remove expired sessions](#remove-expired-sessions)
+  - [Set MongoDB to clean expired sessions (default mode)](#set-mongodb-to-clean-expired-sessions-default-mode)
+  - [Set the compatibility mode](#set-the-compatibility-mode)
+  - [Disable expired sessions cleaning](#disable-expired-sessions-cleaning)
 - [Lazy session update](#lazy-session-update)
 - [Transparent encryption/decryption of session data](#transparent-encryptiondecryption-of-session-data)
 - [Options](#options)
@@ -145,19 +148,52 @@ app.use(session({
 __Note:__ Each time an user interacts with the server, its session expiration date is refreshed.
 
 ## Remove expired sessions
-`
-By default, `connect-mongo` uses MongoDB's TTL collection feature (2.2+) to have `mongod` automatically remove expired sessions. `connect-mongo` will create a TTL index for you at startup. But you can disable the creation of index with `createAutoRemoveIdx: false`
+
+By default, `connect-mongo` uses MongoDB's TTL collection feature (2.2+) to have mongod automatically remove expired sessions. But you can change this behavior.
+
+### Set MongoDB to clean expired sessions (default mode)
+
+`connect-mongo` will create a TTL index for you at startup. You MUST have MongoDB 2.2+ and administration permissions.
 
 ```js
 app.use(session({
-  store: MongoStore.create({
+  store: MongoStore.craete({
     mongoUrl: 'mongodb://localhost/test-app',
-    createAutoRemoveIdx: false
+    autoRemove: 'native' // Default
   })
 }));
 ```
 
 __Note:__ If you use `connect-mongo` in a very concurrent environment, you should avoid this mode and prefer setting the index yourself, once!
+
+### Set the compatibility mode
+
+In some cases you can't or don't want to create a TTL index, e.g. Azure Cosmos DB.
+
+`connect-mongo` will take care of removing expired sessions, using defined interval.
+
+```js
+app.use(session({
+  store: MongoStore.craete({
+    mongoUrl: 'mongodb://localhost/test-app',
+    autoRemove: 'interval',
+    autoRemoveInterval: 10 // In minutes. Default
+  })
+}));
+```
+
+### Disable expired sessions cleaning
+
+You are in production environnement and/or you manage the TTL index elsewhere.
+
+```js
+app.use(session({
+  store: MongoStore.craete({
+    mongoUrl: 'mongodb://localhost/test-app',
+    autoRemove: 'disabled'
+  })
+}));
+```
 
 ## Lazy session update
 

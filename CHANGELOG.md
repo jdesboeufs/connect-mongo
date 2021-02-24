@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added mongoose example
+- Revert `createAutoRemoveIdx` and add back `autoRemove` and `autoRemoveInterval`
 
 ### Fixed
 
