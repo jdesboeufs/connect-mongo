@@ -7,6 +7,8 @@ const port = 3000
 
 app.use(session({
   secret: 'foo',
+  resave: false,
+  saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: 'mongodb://root:example@127.0.0.1:27017',
     dbName: "example-db",

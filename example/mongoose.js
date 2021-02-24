@@ -13,11 +13,14 @@ const clientP = mongoose.connect(
 
 app.use(session({
   secret: 'foo',
+  resave: false,
+  saveUninitialized: false,
   store: MongoStore.create({
     clientPromise: clientP,
     dbName: "example-db-mongoose",
     stringify: false,
-    autoRemove: 'interval'
+    autoRemove: 'interval',
+    autoRemoveInterval: 1
   })
 }));
 
