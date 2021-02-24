@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `Warning: Accessing non-existent property 'MongoError' of module exports inside circular dependency` by downgrade to `mongodb@3.6.3`
 - Revert update session when touch (#351)
 - Fix cannot read property `lastModified` of null
+- Fix TS typing error
 
 ## [4.1.0] - 2021-02-22
 

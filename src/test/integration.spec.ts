@@ -7,7 +7,7 @@ import { ConnectMongoOptions } from '../lib/MongoStore'
 
 declare module 'express-session' {
   interface SessionData {
-    views: number
+    [key: string]: any
   }
 }
 

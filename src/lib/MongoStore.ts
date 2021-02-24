@@ -61,7 +61,7 @@ type ConcretConnectMongoOptions = {
   crypto: ConcretCryptoOptions
 }
 
-type ErrorOrNull = Error | null
+// type ErrorOrNull = Error | null
 
 type InternalSessionType = {
   _id: string
@@ -216,7 +216,7 @@ export default class MongoStore extends session.Store {
    */
   get(
     sid: string,
-    callback: (err: ErrorOrNull, session?: session.SessionData | null) => void
+    callback: (err: any, session?: session.SessionData | null) => void
   ): void {
     ;(async () => {
       try {
@@ -267,7 +267,7 @@ export default class MongoStore extends session.Store {
   set(
     sid: string,
     session: session.SessionData,
-    callback: (err: ErrorOrNull) => void = noop
+    callback: (err: any) => void = noop
   ): void {
     ;(async () => {
       try {
@@ -338,7 +338,7 @@ export default class MongoStore extends session.Store {
   touch(
     sid: string,
     session: session.SessionData & { lastModified?: Date },
-    callback: (err: ErrorOrNull) => void = noop
+    callback: (err: any) => void = noop
   ): void {
     ;(async () => {
       try {
@@ -394,7 +394,7 @@ export default class MongoStore extends session.Store {
    */
   all(
     callback: (
-      err: ErrorOrNull,
+      err: any,
       obj?:
         | session.SessionData[]
         | { [sid: string]: session.SessionData }
@@ -435,7 +435,7 @@ export default class MongoStore extends session.Store {
    * Destroy/delete a session from the store given a session ID (sid)
    * @param sid session ID
    */
-  destroy(sid: string, callback: (err: ErrorOrNull) => void = noop): void {
+  destroy(sid: string, callback: (err: any) => void = noop): void {
     debug(`MongoStore#destroy=${sid}`)
     this.collectionP
       .then((colleciton) =>
@@ -454,7 +454,7 @@ export default class MongoStore extends session.Store {
   /**
    * Get the count of all sessions in the store
    */
-  length(callback: (err: ErrorOrNull, length: number) => void): void {
+  length(callback: (err: any, length: number) => void): void {
     debug('MongoStore#length()')
     this.collectionP
       .then((collection) => collection.countDocuments())
@@ -466,7 +466,7 @@ export default class MongoStore extends session.Store {
   /**
    * Delete all sessions from the store.
    */
-  clear(callback: (err: ErrorOrNull) => void = noop): void {
+  clear(callback: (err: any) => void = noop): void {
     debug('MongoStore#clear()')
     this.collectionP
       .then((collection) => collection.drop())
