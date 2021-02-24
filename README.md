@@ -246,7 +246,8 @@ One of the following options should be provided. If more than one option are pro
 |`dbName`||A name of database used for storing sessions. Can be used with `mongoUrl`, or `clientPromise` options. Takes precedence over database name present in the connection string.|
 |`collectionName`|`'sessions'`|A name of collection used for storing sessions.|
 |`ttl`|`1209600`|The maximum lifetime (in seconds) of the session which will be used to set `session.cookie.expires` if it is not yet set. Default is 14 days.|
-|`createAutoRemoveIdx`|`true`|Create TTL index in MongoDB collection or not.|
+|`autoRemove`|`'native'`|Behavior for removing expired sessions. Possible values: `'native'`, `'interval'` and `'disabled'`.|
+|`autoRemoveInterval`|`10`|Interval (in minutes) used when `autoRemove` option is set to `interval`.|
 |`touchAfter`|`0`|Interval (in seconds) between session updates.|
 |`stringify`|`true`|If `true`, connect-mongo will serialize sessions using `JSON.stringify` before setting them, and deserialize them with `JSON.parse` when getting them. This is useful if you are using types that MongoDB doesn't support.|
 |`serialize`||Custom hook for serializing sessions to MongoDB. This is helpful if you need to modify the session before writing it out.|
