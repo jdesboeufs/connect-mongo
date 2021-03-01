@@ -262,7 +262,7 @@ test.serial('basic operation flow with crypto', async (t) => {
   const session = await storePromise.get(sid)
   orgSession = JSON.parse(JSON.stringify(orgSession))
   // @ts-ignore
-  t.deepEqual(JSON.parse(session), orgSession)
+  t.deepEqual(session, orgSession)
 })
 
 test.serial('with touch after and get non-exist session', async (t) => {
