@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix crypto parsing error by upgrading `kruptein` to `v3.0.0` and change encodeas to `base64`
+
 ## [4.2.0] - 2021-02-24
 
 ### Added
