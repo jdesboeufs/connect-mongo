@@ -278,18 +278,12 @@ export default class MongoStore extends session.Store {
           try {
             const plaintext = await cryptoGet(
               this.options.crypto.secret as string,
-              JSON.stringify(
-                this.transformFunctions.unserialize(session.session)
-              )
+              session.session
             ).catch((err) => {
               throw new Error(err)
             })
-            try {
-              // @ts-ignore
-              session.session = JSON.parse(plaintext)
-            } catch (error) {
-              callback(error)
-            }
+            // @ts-ignore
+            session.session = JSON.parse(plaintext)
           } catch (error) {
             callback(error)
           }
