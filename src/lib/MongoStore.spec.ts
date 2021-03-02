@@ -250,7 +250,6 @@ test.serial('touch ops with touchAfter with touch', async (t) => {
   t.truthy(lastModifiedAfterTouch > lastModifiedBeforeTouch)
 })
 
-// Impl still buggy!
 test.serial('basic operation flow with crypto', async (t) => {
   ;({ store, storePromise } = createStoreHelper({
     crypto: { secret: 'secret' },
