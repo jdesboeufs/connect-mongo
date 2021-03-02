@@ -29,11 +29,9 @@ function createSupertetAgent(
     } else {
       req.session.views = 0
     }
-    console.log(req.session)
     res.status(200).send({ views: req.session.views })
   })
   app.get('/ping', function (req, res) {
-    console.log(req.session)
     res.status(200).send({ views: req.session.views })
   })
   const agent = request.agent(app)

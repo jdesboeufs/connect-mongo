@@ -161,7 +161,7 @@ export default class MongoStore extends session.Store {
           secret: false,
           algorithm: 'aes-256-gcm',
           hashing: 'sha512',
-          encodeas: 'hex',
+          encodeas: 'base64',
           key_size: 32,
           iv_size: 16,
           at_size: 16,
@@ -278,14 +278,12 @@ export default class MongoStore extends session.Store {
           try {
             const plaintext = await cryptoGet(
               this.options.crypto.secret as string,
-              JSON.stringify(
-                this.transformFunctions.unserialize(session.session)
-              )
+              session.session
             ).catch((err) => {
               throw new Error(err)
             })
             // @ts-ignore
-            session.session = plaintext
+            session.session = JSON.parse(plaintext)
           } catch (error) {
             callback(error)
           }
