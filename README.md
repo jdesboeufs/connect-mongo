@@ -157,7 +157,7 @@ By default, `connect-mongo` uses MongoDB's TTL collection feature (2.2+) to have
 
 ```js
 app.use(session({
-  store: MongoStore.craete({
+  store: MongoStore.create({
     mongoUrl: 'mongodb://localhost/test-app',
     autoRemove: 'native' // Default
   })
@@ -174,7 +174,7 @@ In some cases you can't or don't want to create a TTL index, e.g. Azure Cosmos D
 
 ```js
 app.use(session({
-  store: MongoStore.craete({
+  store: MongoStore.create({
     mongoUrl: 'mongodb://localhost/test-app',
     autoRemove: 'interval',
     autoRemoveInterval: 10 // In minutes. Default
@@ -188,7 +188,7 @@ You are in production environnement and/or you manage the TTL index elsewhere.
 
 ```js
 app.use(session({
-  store: MongoStore.craete({
+  store: MongoStore.create({
     mongoUrl: 'mongodb://localhost/test-app',
     autoRemove: 'disabled'
   })
