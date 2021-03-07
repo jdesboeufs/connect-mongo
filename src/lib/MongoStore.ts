@@ -173,7 +173,7 @@ export default class MongoStore extends session.Store {
     // Check params
     assert(
       options.mongoUrl || options.clientPromise,
-      'You must provide either mongoUr|clientPromise in options'
+      'You must provide either mongoUrl|clientPromise in options'
     )
     assert(
       options.createAutoRemoveIdx === null ||
