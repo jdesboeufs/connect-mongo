@@ -237,6 +237,7 @@ One of the following options should be provided. If more than one option are pro
 |:------:|------|-----------|
 |1|`mongoUrl`|A [connection string](https://docs.mongodb.com/manual/reference/connection-string/) for creating a new MongoClient connection. If database name is not present in the connection string, database name should be provided using `dbName` option. |
 |2|`clientPromise`|A Promise that is resolved with MongoClient connection. If the connection was established without database name being present in the connection string, database name should be provided using `dbName` option.|
+|3|`client`|An existing MongoClient connection. If the connection was established without database name being present in the connection string, database name should be provided using `dbName` option.|
 
 ### More options
 

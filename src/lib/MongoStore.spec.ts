@@ -1,6 +1,8 @@
 import test from 'ava'
 import { SessionData } from 'express-session'
+import { MongoClient } from 'mongodb'
 
+import MongoStore from './MongoStore'
 import {
   createStoreHelper,
   makeData,
@@ -21,6 +23,30 @@ test.before(async () => {
 
 test.afterEach.always(async () => {
   await storePromise.close()
+})
+
+test.serial('create store w/o provide required options', (t) => {
+  t.throws(() => MongoStore.create({}), {
+    message: /Cannot init client/,
+  })
+})
+
+test.serial('create store with clientPromise', (t) => {
+  const clientP = MongoClient.connect('mongodb://root:example@127.0.0.1:27017')
+  const store = MongoStore.create({ clientPromise: clientP })
+  t.not(store, null)
+  t.not(store, undefined)
+  store.close()
+})
+
+test.serial('create store with client', async (t) => {
+  const client = await MongoClient.connect(
+    'mongodb://root:example@127.0.0.1:27017'
+  )
+  const store = MongoStore.create({ client: client })
+  t.not(store, null)
+  t.not(store, undefined)
+  store.close()
 })
 
 test.serial('length should be 0', async (t) => {

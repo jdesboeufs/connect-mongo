@@ -25,6 +25,7 @@ export type CryptoOptions = {
 export type ConnectMongoOptions = {
   mongoUrl?: string
   clientPromise?: Promise<MongoClient>
+  client?: MongoClient
   collectionName?: string
   mongoOptions?: MongoClientOptions
   dbName?: string
@@ -47,6 +48,7 @@ type ConcretCryptoOptions = Required<CryptoOptions>
 type ConcretConnectMongoOptions = {
   mongoUrl?: string
   clientPromise?: Promise<MongoClient>
+  client?: MongoClient
   collectionName: string
   mongoOptions: MongoClientOptions
   dbName?: string
@@ -64,8 +66,6 @@ type ConcretConnectMongoOptions = {
   // FIXME: remove above any
   crypto: ConcretCryptoOptions
 }
-
-// type ErrorOrNull = Error | null
 
 type InternalSessionType = {
   _id: string
@@ -190,12 +190,15 @@ export default class MongoStore extends session.Store {
       _clientP = MongoClient.connect(options.mongoUrl, options.mongoOptions)
     } else if (options.clientPromise) {
       _clientP = options.clientPromise
+    } else if (options.client) {
+      _clientP = Promise.resolve(options.client)
     } else {
-      throw new Error('Cannot init client')
+      throw new Error('Cannot init client. Please provide correct options')
     }
-    this.clientP = _clientP!
+    assert(!!_clientP, 'Client is null|undefined')
+    this.clientP = _clientP
     this.options = options
-    this.collectionP = _clientP!
+    this.collectionP = _clientP
       .then((con) => con.db(options.dbName))
       .then((db) => db.collection(options.collectionName))
       .then((collection) => {
