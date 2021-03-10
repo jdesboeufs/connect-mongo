@@ -7,6 +7,11 @@ const MongoStore = require('connect-mongo').default
 const app = express()
 const port = 3000
 
+// Starting Server
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
+})
+
 // Mongoose Connection
 const appDBConnection = mongoose
   .createConnection(process.env.APP_DB_URI, {
@@ -55,7 +60,7 @@ router.get('', (req, res) => {
   res.send('Session Updated')
 })
 
-const setup = async () => {
+const setupApp = async () => {
   const connection = await sessionDBConnection
   const mongoClient = connection.getClient()
   const clientPromise = Promise.resolve(mongoClient)
@@ -64,9 +69,4 @@ const setup = async () => {
   // Routes Init
   app.use('/', router)
 }
-// prettier-ignore
-(setup())
-
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+setupApp()
