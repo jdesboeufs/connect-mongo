@@ -4,7 +4,6 @@
   "description": "MongoDB session store for Express and Connect",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
-  "module": "build/module/index.js",
   "keywords": [
     "connect",
     "mongo",
@@ -29,7 +28,6 @@
     "prebuild": "rm -rf build",
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.json",
-    "build:module": "tsc -p tsconfig.module.json",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:lint": "eslint --cache src --ext .ts --fix",
