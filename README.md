@@ -58,7 +58,7 @@ Express `4.x`, `5.0` and Connect `3.x`:
 
 ```js
 const session = require('express-session');
-const MongoStore = require('connect-mongo').default;
+const MongoStore = require('connect-mongo');
 
 app.use(session({
   secret: 'foo',

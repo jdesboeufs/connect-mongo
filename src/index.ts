@@ -1,2 +1,2 @@
 import MongoStore from './lib/MongoStore'
-export default MongoStore
+export = MongoStore

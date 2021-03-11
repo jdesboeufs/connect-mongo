@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### **BREAKING CHANGES**
+
+- Use `export =` for better cjs require without `.default`
+
+### Added
+
+- Add typescript example
+
 ## [4.3.1] - 2021-03-09
 
 ### Fixed

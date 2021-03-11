@@ -1,6 +1,6 @@
 const express = require('express')
 const session = require('express-session')
-const MongoStore = require('connect-mongo').default
+const MongoStore = require('connect-mongo')
 
 const app = express()
 const port = 3000
