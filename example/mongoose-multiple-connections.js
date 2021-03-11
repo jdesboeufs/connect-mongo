@@ -1,7 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const session = require('express-session')
-const MongoStore = require('connect-mongo').default
+const MongoStore = require('connect-mongo')
 
 // App Init
 const app = express()
@@ -14,7 +14,7 @@ app.listen(port, () => {
 
 // Mongoose Connection
 const appDBConnection = mongoose
-  .createConnection(process.env.APP_DB_URI, {
+  .createConnection('mongodb://root:example@127.0.0.1:27017', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -24,7 +24,7 @@ const appDBConnection = mongoose
   })
 
 const sessionDBConnection = mongoose
-  .createConnection(process.env.SESSIONS_DB_URI, {
+  .createConnection('mongodb://root:example@127.0.0.1:27017', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -34,11 +34,11 @@ const sessionDBConnection = mongoose
   })
 
 // Session Init
-const sessionInit = (clientPromise) => {
+const sessionInit = (client) => {
   app.use(
     session({
       store: MongoStore.create({
-        clientPromise,
+        client: client,
         mongoOptions: {
           useNewUrlParser: true,
           useUnifiedTopology: true,
@@ -60,13 +60,9 @@ router.get('', (req, res) => {
   res.send('Session Updated')
 })
 
-const setupApp = async () => {
+(async function () {
   const connection = await sessionDBConnection
   const mongoClient = connection.getClient()
-  const clientPromise = Promise.resolve(mongoClient)
-  // Session Init
-  sessionInit(clientPromise)
-  // Routes Init
+  sessionInit(mongoClient)
   app.use('/', router)
-}
-setupApp()
+})()
