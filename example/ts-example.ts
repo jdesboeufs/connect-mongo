@@ -1,9 +1,15 @@
-const express = require('express')
-const session = require('express-session')
-const MongoStore = require('connect-mongo')
+import express from 'express'
+import session from 'express-session'
+import MongoStore from 'connect-mongo'
 
 const app = express()
 const port = 3000
+
+declare module 'express-session' {
+  interface SessionData {
+    foo: string
+  }
+}
 
 app.use(session({
   secret: 'foo',
