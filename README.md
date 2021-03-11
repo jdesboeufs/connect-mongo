@@ -15,6 +15,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
   - [Express or Connect integration](#express-or-connect-integration)
   - [Connection to MongoDB](#connection-to-mongodb)
 - [Known issues](#known-issues)
+  - [MongoError exports circular dependency](#mongoerror-exports-circular-dependency)
 - [Events](#events)
 - [Session expiration](#session-expiration)
 - [Remove expired sessions](#remove-expired-sessions)
@@ -116,7 +117,16 @@ app.use(session({
 
 ## Known issues
 
-[Known issues](https://github.com/jdesboeufs/connect-mongo/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
+[Known issues](https://github.com/jdesboeufs/connect-mongo/issues?q=is%3Aopen+is%3Aissue+label%3Abug) in GitHub Issues page.
+
+### MongoError exports circular dependency
+
+The following error can be safely ignore from [official reply](https://developer.mongodb.com/community/forums/t/warning-accessing-non-existent-property-mongoerror-of-module-exports-inside-circular-dependency/15411/5).
+
+```
+(node:16580) Warning: Accessing non-existent property 'MongoError' of module exports inside circular dependency
+(Use `node --trace-warnings ...` to show where the warning was created)
+```
 
 ## Events
 
