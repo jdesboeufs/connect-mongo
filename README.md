@@ -40,6 +40,9 @@ npm install connect-mongo
 yarn add connect-mongo
 ```
 
+* If you are upgrading from v3.x to v4, please checkout the [migration guide](./MIGRATION_V4.md) for details.
+* If you are upgrading v4.x to latest version, you may check the [example](./example) and [options](#options) for details.
+
 ## Compatibility
 
 * Support Express up to `5.0`
@@ -59,6 +62,16 @@ Express `4.x`, `5.0` and Connect `3.x`:
 ```js
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+
+app.use(session({
+  secret: 'foo',
+  store: MongoStore.create(options)
+}));
+```
+
+```ts
+import session from 'express-session'
+import MongoStore from 'connect-mongo'
 
 app.use(session({
   secret: 'foo',
