@@ -13,10 +13,10 @@
     "mongodb": "3.6.3"
   },
   "dependencies": {
-    "connect-mongo": "^4.1.0",
+    "connect-mongo": "^4.4.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "mongoose": "5.11.15"
+    "mongoose": "5.12.1"
   },
   "devDependencies": {
     "typescript": "^4.2.3"
