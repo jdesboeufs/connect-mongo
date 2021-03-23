@@ -279,6 +279,8 @@ test.serial('touch ops with touchAfter with touch', async (t) => {
 test.serial('basic operation flow with crypto', async (t) => {
   ;({ store, storePromise } = createStoreHelper({
     crypto: { secret: 'secret' },
+    collectionName: 'crypto-test',
+    autoRemove: 'disabled',
   }))
   let orgSession = makeData()
   const sid = 'test-basic-flow-with-crypto'
@@ -288,6 +290,10 @@ test.serial('basic operation flow with crypto', async (t) => {
   orgSession = JSON.parse(JSON.stringify(orgSession))
   // @ts-ignore
   t.deepEqual(session, orgSession)
+  const sessions = await storePromise.all()
+  t.not(sessions, undefined)
+  t.not(sessions, null)
+  t.is(sessions?.length, 1)
 })
 
 test.serial('with touch after and get non-exist session', async (t) => {

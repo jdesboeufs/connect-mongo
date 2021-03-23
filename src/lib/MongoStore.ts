@@ -258,6 +258,36 @@ export default class MongoStore extends session.Store {
   }
 
   /**
+   * promisify and bind the `this.crypto.get` function.
+   * Please check !!this.crypto === true before using this getter!
+   */
+  private get cryptoGet() {
+    if (!this.crypto) {
+      throw new Error('Check this.crypto before calling this.cryptoGet!')
+    }
+    return util.promisify(this.crypto.get).bind(this.crypto)
+  }
+
+  /**
+   * Decrypt given session data
+   * @param session session data to be decrypt. Mutate the input session.
+   */
+  private async decryptSession(
+    session: session.SessionData | undefined | null
+  ) {
+    if (this.crypto && session) {
+      const plaintext = await this.cryptoGet(
+        this.options.crypto.secret as string,
+        session.session
+      ).catch((err) => {
+        throw new Error(err)
+      })
+      // @ts-ignore
+      session.session = JSON.parse(plaintext)
+    }
+  }
+
+  /**
    * Get a session from the store given a session ID (sid)
    * @param sid session ID
    */
@@ -277,19 +307,7 @@ export default class MongoStore extends session.Store {
           ],
         })
         if (this.crypto && session) {
-          const cryptoGet = util.promisify(this.crypto.get).bind(this.crypto)
-          try {
-            const plaintext = await cryptoGet(
-              this.options.crypto.secret as string,
-              session.session
-            ).catch((err) => {
-              throw new Error(err)
-            })
-            // @ts-ignore
-            session.session = JSON.parse(plaintext)
-          } catch (error) {
-            callback(error)
-          }
+          await this.decryptSession(session).catch((err) => callback(err))
         }
         const s =
           session && this.transformFunctions.unserialize(session.session)
@@ -457,19 +475,14 @@ export default class MongoStore extends session.Store {
           ],
         })
         const results: session.SessionData[] = []
-        sessions.forEach(
-          (session) => {
-            results.push(this.transformFunctions.unserialize(session.session))
-          },
-          (err) => {
-            if (err) {
-              callback(err)
-            } else {
-              this.emit('all', results)
-              callback(null, results)
-            }
+        for await (const session of sessions) {
+          if (this.crypto && session) {
+            await this.decryptSession(session)
           }
-        )
+          results.push(this.transformFunctions.unserialize(session.session))
+        }
+        this.emit('all', results)
+        callback(null, results)
       } catch (error) {
         callback(error)
       }
