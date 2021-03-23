@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.4.1] - 2021-03-23
+
 ### Fixed
 
 - `store.all()` method not working with encrypted store [#410](https://github.com/jdesboeufs/connect-mongo/issues/410) [#411](https://github.com/jdesboeufs/connect-mongo/issues/411)

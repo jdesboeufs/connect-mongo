@@ -1,6 +1,6 @@
 {
   "name": "connect-mongo",
-  "version": "4.4.0",
+  "version": "4.4.1",
   "description": "MongoDB session store for Express and Connect",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
