@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `store.all()` method not working with encrypted store [#410](https://github.com/jdesboeufs/connect-mongo/issues/410) [#411](https://github.com/jdesboeufs/connect-mongo/issues/411)
+- Update and unpin `mongodb` dependency due to upstream fix has been deployed [#409](https://github.com/jdesboeufs/connect-mongo/issues/409)
+
+## [4.4.0] - 2021-03-11
+
 ### **BREAKING CHANGES**
 
 - Use `export =` for better cjs require without `.default`
@@ -41,9 +48,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Use `matchedCount` instead of `modifiedCount` to avoid throwing exceptions when nothing to modify (#390)
+- Use `matchedCount` instead of `modifiedCount` to avoid throwing exceptions when nothing to modify [#390](https://github.com/jdesboeufs/connect-mongo/issues/390)
 - Fixed `Warning: Accessing non-existent property 'MongoError' of module exports inside circular dependency` by downgrade to `mongodb@3.6.3`
-- Revert update session when touch (#351)
+- Revert update session when touch #351
 - Fix cannot read property `lastModified` of null
 - Fix TS typing error
 
