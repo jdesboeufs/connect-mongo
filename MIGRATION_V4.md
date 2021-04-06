@@ -30,7 +30,7 @@ Typescript:
 import MongoStore from 'connect-mongo';
 ```
 
-Create the store using `MongoStore.create({options})` instead of `new MongoStore({options})`
+Create the store using `MongoStore.create(options)` instead of `new MongoStore(options)`
 
 ```js
 app.use(session({
