@@ -15,6 +15,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
   - [Express or Connect integration](#express-or-connect-integration)
   - [Connection to MongoDB](#connection-to-mongodb)
 - [Known issues](#known-issues)
+  - [Native autoRemove causing error on close](#native-autoremove-causing-error-on-close)
   - [MongoError exports circular dependency](#mongoerror-exports-circular-dependency)
 - [Events](#events)
 - [Session expiration](#session-expiration)
@@ -131,6 +132,10 @@ app.use(session({
 ## Known issues
 
 [Known issues](https://github.com/jdesboeufs/connect-mongo/issues?q=is%3Aopen+is%3Aissue+label%3Abug) in GitHub Issues page.
+
+### Native autoRemove causing error on close
+
+- Calling `close()` immediately after creating the session store may cause error when the async index creation is in process when `autoRemove: 'native'`. You may want to manually manage the autoRemove index. [#413](https://github.com/jdesboeufs/connect-mongo/issues/413)
 
 ### MongoError exports circular dependency
 
