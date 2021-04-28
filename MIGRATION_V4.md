@@ -43,7 +43,8 @@ For the options, you should make the following changes:
 
 * Change `url` to `mongoUrl`
 * Keep `clientPromise` if you are using it
-* `mongooseConnection` & `clientPromise` have been removed. Please update your application code to use either `mongoUrl` or `clientPromise`
+* `mongooseConnection` has been removed. Please update your application code to use either `mongoUrl`, `client` or `clientPromise`
+* To reuse an existing mongoose connection retreive the mongoDb driver from you mongoose connection using `Connection.prototype.getClient()` and pass it to the store in the `client`-option.
 * Remove `fallbackMemory` option and if you are using it, you can import from:
 
 ```js
