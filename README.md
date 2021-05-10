@@ -17,6 +17,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 - [Known issues](#known-issues)
   - [Native autoRemove causing error on close](#native-autoremove-causing-error-on-close)
   - [MongoError exports circular dependency](#mongoerror-exports-circular-dependency)
+  - [Existing encrypted v3.2.0 sessions are not decrypted correctly by v4](#existing-encrypted-v320-sessions-are-not-decrypted-correctly-by-v4)
 - [Events](#events)
 - [Session expiration](#session-expiration)
 - [Remove expired sessions](#remove-expired-sessions)
@@ -145,6 +146,10 @@ The following error can be safely ignore from [official reply](https://developer
 (node:16580) Warning: Accessing non-existent property 'MongoError' of module exports inside circular dependency
 (Use `node --trace-warnings ...` to show where the warning was created)
 ```
+
+### Existing encrypted v3.2.0 sessions are not decrypted correctly by v4
+
+v4 cannot decrypt the session encrypted from v3.2 due to a bug. Please take a look on this issue for possible workaround. [#420](https://github.com/jdesboeufs/connect-mongo/issues/420)
 
 ## Events
 
