@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Move `writeConcern` away from top-level option to fix deprecation warning [#422](https://github.com/jdesboeufs/connect-mongo/issues/422)
+
 ## [4.4.1] - 2021-03-23
 
 ### Fixed
