@@ -38,7 +38,7 @@ export type ConnectMongoOptions = {
   // FIXME: remove those any
   serialize?: (a: any) => any
   unserialize?: (a: any) => any
-  writeOperationOptions?: CommonOptions
+  writeOperationOptions?: CommonOptions['writeConcern']
   transformId?: (a: any) => any
   crypto?: CryptoOptions
 }
@@ -61,7 +61,7 @@ type ConcretConnectMongoOptions = {
   // FIXME: remove those any
   serialize?: (a: any) => any
   unserialize?: (a: any) => any
-  writeOperationOptions?: CommonOptions
+  writeOperationOptions?: CommonOptions['writeConcern']
   transformId?: (a: any) => any
   // FIXME: remove above any
   crypto: ConcretCryptoOptions
@@ -225,7 +225,10 @@ export default class MongoStore extends session.Store {
         debug('Creating MongoDB TTL index')
         collection.createIndex(
           { expires: 1 },
-          { expireAfterSeconds: 0, ...this.options.writeOperationOptions }
+          {
+            expireAfterSeconds: 0,
+            writeConcern: this.options.writeOperationOptions,
+          }
         )
         break
       case 'interval':
@@ -233,9 +236,10 @@ export default class MongoStore extends session.Store {
         this.timer = setInterval(
           () =>
             collection.deleteMany(removeQuery(), {
-              ...this.options.writeOperationOptions,
-              w: 0,
-              j: false,
+              writeConcern: {
+                w: 0,
+                j: false,
+              },
             }),
           this.options.autoRemoveInterval * 1000 * 60
         )
@@ -382,7 +386,7 @@ export default class MongoStore extends session.Store {
           { $set: s },
           {
             upsert: true,
-            ...this.options.writeOperationOptions,
+            writeConcern: this.options.writeOperationOptions,
           }
         )
         if (rawResp.upsertedCount > 0) {
@@ -438,7 +442,7 @@ export default class MongoStore extends session.Store {
         const rawResp = await collection.updateOne(
           { _id: this.computeStorageId(sid) },
           { $set: updateFields },
-          this.options.writeOperationOptions
+          { writeConcern: this.options.writeOperationOptions }
         )
         if (rawResp.matchedCount === 0) {
           return callback(new Error('Unable to find the session to touch'))
@@ -499,7 +503,7 @@ export default class MongoStore extends session.Store {
       .then((colleciton) =>
         colleciton.deleteOne(
           { _id: this.computeStorageId(sid) },
-          this.options.writeOperationOptions
+          { writeConcern: this.options.writeOperationOptions }
         )
       )
       .then(() => {
