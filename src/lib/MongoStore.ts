@@ -198,13 +198,13 @@ export default class MongoStore extends session.Store {
     assert(!!_clientP, 'Client is null|undefined')
     this.clientP = _clientP
     this.options = options
-    this.collectionP = _clientP
-      .then((con) => con.db(options.dbName))
-      .then((db) => db.collection(options.collectionName))
-      .then((collection) => {
-        this.setAutoRemove(collection)
-        return collection
-      })
+    this.collectionP = _clientP.then(async (con) => {
+      const collection = con
+        .db(options.dbName)
+        .collection(options.collectionName)
+      await this.setAutoRemove(collection)
+      return collection
+    })
     if (options.crypto.secret) {
       this.crypto = require('kruptein')(options.crypto)
     }
@@ -214,7 +214,7 @@ export default class MongoStore extends session.Store {
     return new MongoStore(options)
   }
 
-  private setAutoRemove(collection: Collection) {
+  private setAutoRemove(collection: Collection): Promise<unknown> {
     const removeQuery = () => ({
       expires: {
         $lt: new Date(),
@@ -223,14 +223,14 @@ export default class MongoStore extends session.Store {
     switch (this.options.autoRemove) {
       case 'native':
         debug('Creating MongoDB TTL index')
-        collection.createIndex(
+        return collection.createIndex(
           { expires: 1 },
           {
+            background: true,
             expireAfterSeconds: 0,
             writeConcern: this.options.writeOperationOptions,
           }
         )
-        break
       case 'interval':
         debug('create Timer to remove expired sessions')
         this.timer = setInterval(
@@ -244,10 +244,10 @@ export default class MongoStore extends session.Store {
           this.options.autoRemoveInterval * 1000 * 60
         )
         this.timer.unref()
-        break
+        return Promise.resolve()
       case 'disabled':
       default:
-        break
+        return Promise.resolve()
     }
   }
 

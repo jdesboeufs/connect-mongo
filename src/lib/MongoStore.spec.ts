@@ -31,11 +31,12 @@ test.serial('create store w/o provide required options', (t) => {
   })
 })
 
-test.serial('create store with clientPromise', (t) => {
+test.serial('create store with clientPromise', async (t) => {
   const clientP = MongoClient.connect('mongodb://root:example@127.0.0.1:27017')
   const store = MongoStore.create({ clientPromise: clientP })
   t.not(store, null)
   t.not(store, undefined)
+  await store.collectionP
   store.close()
 })
 
@@ -46,6 +47,7 @@ test.serial('create store with client', async (t) => {
   const store = MongoStore.create({ client: client })
   t.not(store, null)
   t.not(store, undefined)
+  await store.collectionP
   store.close()
 })
 
