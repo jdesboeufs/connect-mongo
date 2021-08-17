@@ -6,10 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### **BREAKING CHANGES**
+
+- Drop Node 10 support
+
+### Changed
+
+- Upgrade `mongodb` to V4 [#422] [#426]
+
 ### Fixed
 
 - Move `writeConcern` away from top-level option to fix deprecation warning [#422](https://github.com/jdesboeufs/connect-mongo/issues/422)
-- Upgrade `mongodb` to V4 [#422] [#426]
+
 
 ## [4.4.1] - 2021-03-23
 
