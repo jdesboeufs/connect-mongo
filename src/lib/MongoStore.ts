@@ -3,9 +3,9 @@ import util from 'util'
 import * as session from 'express-session'
 import {
   Collection,
-  CommonOptions,
   MongoClient,
   MongoClientOptions,
+  WriteConcernSettings,
 } from 'mongodb'
 import Debug from 'debug'
 import Kruptein from 'kruptein'
@@ -38,7 +38,7 @@ export type ConnectMongoOptions = {
   // FIXME: remove those any
   serialize?: (a: any) => any
   unserialize?: (a: any) => any
-  writeOperationOptions?: CommonOptions['writeConcern']
+  writeOperationOptions?: WriteConcernSettings
   transformId?: (a: any) => any
   crypto?: CryptoOptions
 }
@@ -61,7 +61,7 @@ type ConcretConnectMongoOptions = {
   // FIXME: remove those any
   serialize?: (a: any) => any
   unserialize?: (a: any) => any
-  writeOperationOptions?: CommonOptions['writeConcern']
+  writeOperationOptions?: WriteConcernSettings
   transformId?: (a: any) => any
   // FIXME: remove above any
   crypto: ConcretCryptoOptions
@@ -138,7 +138,7 @@ export default class MongoStore extends session.Store {
   constructor({
     collectionName = 'sessions',
     ttl = 1209600,
-    mongoOptions = { useUnifiedTopology: true },
+    mongoOptions = {},
     autoRemove = 'native',
     autoRemoveInterval = 10,
     touchAfter = 0,
@@ -311,7 +311,9 @@ export default class MongoStore extends session.Store {
           ],
         })
         if (this.crypto && session) {
-          await this.decryptSession(session).catch((err) => callback(err))
+          await this.decryptSession(
+            session as session.SessionData
+          ).catch((err) => callback(err))
         }
         const s =
           session && this.transformFunctions.unserialize(session.session)
@@ -319,7 +321,7 @@ export default class MongoStore extends session.Store {
           s.lastModified = session.lastModified
         }
         this.emit('get', sid)
-        callback(null, s)
+        callback(null, s === undefined ? null : s)
       } catch (error) {
         callback(error)
       }
@@ -481,7 +483,7 @@ export default class MongoStore extends session.Store {
         const results: session.SessionData[] = []
         for await (const session of sessions) {
           if (this.crypto && session) {
-            await this.decryptSession(session)
+            await this.decryptSession(session as session.SessionData)
           }
           results.push(this.transformFunctions.unserialize(session.session))
         }

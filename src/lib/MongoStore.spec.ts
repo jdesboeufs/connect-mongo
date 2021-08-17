@@ -237,10 +237,12 @@ test.serial('touch ops', async (t) => {
   const collection = await store.collectionP
   const session = await collection.findOne({ _id: sid })
   await new Promise((resolve) => setTimeout(resolve, 500))
-  await storePromise.touch(sid, session.session)
+  t.not(session, undefined)
+  await storePromise.touch(sid, session?.session)
   const session2 = await collection.findOne({ _id: sid })
+  t.not(session2, undefined)
   // Check if both expiry date are different
-  t.truthy(session2.expires.getTime() > session.expires.getTime())
+  t.truthy(session2?.expires.getTime() > session?.expires.getTime())
 })
 
 test.serial('touch ops with touchAfter', async (t) => {
@@ -251,10 +253,12 @@ test.serial('touch ops with touchAfter', async (t) => {
   await storePromise.set(sid, orgSession)
   const collection = await store.collectionP
   const session = await collection.findOne({ _id: sid })
-  const lastModifiedBeforeTouch = session.lastModified.getTime()
-  await storePromise.touch(sid, session)
+  const lastModifiedBeforeTouch = session?.lastModified.getTime()
+  t.not(session, undefined)
+  await storePromise.touch(sid, session as SessionData)
   const session2 = await collection.findOne({ _id: sid })
-  const lastModifiedAfterTouch = session2.lastModified.getTime()
+  t.not(session2, undefined)
+  const lastModifiedAfterTouch = session2?.lastModified.getTime()
   // Check if both expiry date are different
   t.is(lastModifiedBeforeTouch, lastModifiedAfterTouch)
 })
@@ -267,11 +271,13 @@ test.serial('touch ops with touchAfter with touch', async (t) => {
   await storePromise.set(sid, orgSession)
   const collection = await store.collectionP
   const session = await collection.findOne({ _id: sid })
-  const lastModifiedBeforeTouch = session.lastModified.getTime()
+  const lastModifiedBeforeTouch = session?.lastModified.getTime()
   await new Promise((resolve) => setTimeout(resolve, 1200))
-  await storePromise.touch(sid, session)
+  t.not(session, undefined)
+  await storePromise.touch(sid, session as SessionData)
   const session2 = await collection.findOne({ _id: sid })
-  const lastModifiedAfterTouch = session2.lastModified.getTime()
+  t.not(session2, undefined)
+  const lastModifiedAfterTouch = session2?.lastModified.getTime()
   // Check if both expiry date are different
   t.truthy(lastModifiedAfterTouch > lastModifiedBeforeTouch)
 })
