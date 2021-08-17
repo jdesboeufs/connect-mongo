@@ -44,7 +44,7 @@ export const makeDataNoCookie = () => {
 export const createStoreHelper = (opt: Partial<ConnectMongoOptions> = {}) => {
   const store = MongoStore.create({
     mongoUrl: 'mongodb://root:example@127.0.0.1:27017',
-    mongoOptions: { useUnifiedTopology: true },
+    mongoOptions: {},
     dbName: 'testDb',
     collectionName: 'test-collection',
     ...opt,

@@ -3,9 +3,9 @@ import util from 'util'
 import * as session from 'express-session'
 import {
   Collection,
-  CommonOptions,
   MongoClient,
   MongoClientOptions,
+  WriteConcernSettings,
 } from 'mongodb'
 import Debug from 'debug'
 import Kruptein from 'kruptein'
@@ -38,7 +38,7 @@ export type ConnectMongoOptions = {
   // FIXME: remove those any
   serialize?: (a: any) => any
   unserialize?: (a: any) => any
-  writeOperationOptions?: CommonOptions['writeConcern']
+  writeOperationOptions?: WriteConcernSettings
   transformId?: (a: any) => any
   crypto?: CryptoOptions
 }
@@ -61,7 +61,7 @@ type ConcretConnectMongoOptions = {
   // FIXME: remove those any
   serialize?: (a: any) => any
   unserialize?: (a: any) => any
-  writeOperationOptions?: CommonOptions['writeConcern']
+  writeOperationOptions?: WriteConcernSettings
   transformId?: (a: any) => any
   // FIXME: remove above any
   crypto: ConcretCryptoOptions
@@ -138,7 +138,7 @@ export default class MongoStore extends session.Store {
   constructor({
     collectionName = 'sessions',
     ttl = 1209600,
-    mongoOptions = { useUnifiedTopology: true },
+    mongoOptions = {},
     autoRemove = 'native',
     autoRemoveInterval = 10,
     touchAfter = 0,
@@ -198,13 +198,13 @@ export default class MongoStore extends session.Store {
     assert(!!_clientP, 'Client is null|undefined')
     this.clientP = _clientP
     this.options = options
-    this.collectionP = _clientP
-      .then((con) => con.db(options.dbName))
-      .then((db) => db.collection(options.collectionName))
-      .then((collection) => {
-        this.setAutoRemove(collection)
-        return collection
-      })
+    this.collectionP = _clientP.then(async (con) => {
+      const collection = con
+        .db(options.dbName)
+        .collection(options.collectionName)
+      await this.setAutoRemove(collection)
+      return collection
+    })
     if (options.crypto.secret) {
       this.crypto = require('kruptein')(options.crypto)
     }
@@ -214,7 +214,7 @@ export default class MongoStore extends session.Store {
     return new MongoStore(options)
   }
 
-  private setAutoRemove(collection: Collection) {
+  private setAutoRemove(collection: Collection): Promise<unknown> {
     const removeQuery = () => ({
       expires: {
         $lt: new Date(),
@@ -223,14 +223,14 @@ export default class MongoStore extends session.Store {
     switch (this.options.autoRemove) {
       case 'native':
         debug('Creating MongoDB TTL index')
-        collection.createIndex(
+        return collection.createIndex(
           { expires: 1 },
           {
+            background: true,
             expireAfterSeconds: 0,
             writeConcern: this.options.writeOperationOptions,
           }
         )
-        break
       case 'interval':
         debug('create Timer to remove expired sessions')
         this.timer = setInterval(
@@ -244,10 +244,10 @@ export default class MongoStore extends session.Store {
           this.options.autoRemoveInterval * 1000 * 60
         )
         this.timer.unref()
-        break
+        return Promise.resolve()
       case 'disabled':
       default:
-        break
+        return Promise.resolve()
     }
   }
 
@@ -311,7 +311,9 @@ export default class MongoStore extends session.Store {
           ],
         })
         if (this.crypto && session) {
-          await this.decryptSession(session).catch((err) => callback(err))
+          await this.decryptSession(
+            session as session.SessionData
+          ).catch((err) => callback(err))
         }
         const s =
           session && this.transformFunctions.unserialize(session.session)
@@ -319,7 +321,7 @@ export default class MongoStore extends session.Store {
           s.lastModified = session.lastModified
         }
         this.emit('get', sid)
-        callback(null, s)
+        callback(null, s === undefined ? null : s)
       } catch (error) {
         callback(error)
       }
@@ -481,7 +483,7 @@ export default class MongoStore extends session.Store {
         const results: session.SessionData[] = []
         for await (const session of sessions) {
           if (this.crypto && session) {
-            await this.decryptSession(session)
+            await this.decryptSession(session as session.SessionData)
           }
           results.push(this.transformFunctions.unserialize(session.session))
         }
