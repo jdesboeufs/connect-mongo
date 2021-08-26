@@ -56,10 +56,12 @@
   "engines": {
     "node": ">=10"
   },
+  "peerDependencies": {
+    "mongodb": "^4.1.0"
+  },
   "dependencies": {
     "debug": "^4.3.1",
     "kruptein": "^3.0.0",
-    "mongodb": "4.1.0"
   },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
