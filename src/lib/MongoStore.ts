@@ -397,10 +397,11 @@ export default class MongoStore extends session.Store {
           this.emit('update', sid)
         }
         this.emit('set', sid)
-        callback(null)
       } catch (error) {
         callback(error)
+        return
       }
+      callback(null)
     })()
   }
 
