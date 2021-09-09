@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Moved `mongodb` to a peer dependency (and also as a dev dependency for `connect-mongo` developers).  This allows end users to avoid errors due to Typescript definition changes when moving to new versions of `mongodb`.  Users can use any version of `mongodb` that provides a compatible (non-breaking) interface to `mongodb ^4.1.0`.  Should fix: [#433](https://github.com/jdesboeufs/connect-mongo/issues/433) [#434](https://github.com/jdesboeufs/connect-mongo/issues/434) [#436](https://github.com/jdesboeufs/connect-mongo/issues/436)
+- Moved `mongodb` to a peer dependency (and also as a dev dependency for `connect-mongo` developers).  `connect-mongo` is no longer pinned to a specific version of `mongodb`.  This allows end users to avoid errors due to Typescript definition changes when moving to new versions of `mongodb`.  Users can use any version of `mongodb` that provides a compatible (non-breaking) interface to `mongodb ^4.1.0`.  Tested on `mongodb` `4.1.0` and `4.1.1`.  Should fix: [#433](https://github.com/jdesboeufs/connect-mongo/issues/433) [#434](https://github.com/jdesboeufs/connect-mongo/issues/434) [#436](https://github.com/jdesboeufs/connect-mongo/issues/436)
 
 ## [4.5.0] - 2021-08-17
 
