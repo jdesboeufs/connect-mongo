@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Moved `mongodb` to a peer dependency.  This allows end users to avoid errors due to Typescript definition changes when moving to new versions of `mongodb`.  Users can use any version of `mongodb` that provides a compatible (non-breaking) interface to mongodb ^4.1.0.  
+
 ## [4.5.0] - 2021-08-17
 
 ### **BREAKING CHANGES**
