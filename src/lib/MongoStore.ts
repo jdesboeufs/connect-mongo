@@ -370,17 +370,13 @@ export default class MongoStore extends session.Store {
         }
         if (this.crypto) {
           const cryptoSet = util.promisify(this.crypto.set).bind(this.crypto)
-          try {
-            const data = await cryptoSet(
-              this.options.crypto.secret as string,
-              s.session
-            ).catch((err) => {
-              throw new Error(err)
-            })
-            s.session = (data as unknown) as session.SessionData
-          } catch (error) {
-            callback(error)
-          }
+          const data = await cryptoSet(
+            this.options.crypto.secret as string,
+            s.session
+          ).catch((err) => {
+            throw new Error(err)
+          })
+          s.session = (data as unknown) as session.SessionData
         }
         const collection = await this.collectionP
         const rawResp = await collection.updateOne(
@@ -397,10 +393,10 @@ export default class MongoStore extends session.Store {
           this.emit('update', sid)
         }
         this.emit('set', sid)
-        callback(null)
       } catch (error) {
-        callback(error)
+        return callback(error)
       }
+      return callback(null)
     })()
   }
 
