@@ -56,16 +56,19 @@
   "engines": {
     "node": ">=10"
   },
+  "peerDependencies": {
+    "mongodb": "^4.1.0"
+  },
   "dependencies": {
     "debug": "^4.3.1",
-    "kruptein": "^3.0.0",
-    "mongodb": "4.1.0"
+    "kruptein": "^3.0.0"
   },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/debug": "^4.1.7",
     "@types/express": "^4.17.13",
     "@types/express-session": "^1.17.4",
     "@types/node": "^14.14.20",
@@ -91,6 +94,7 @@
     "gh-pages": "^3.1.0",
     "husky": "4",
     "lint-staged": "^10.5.4",
+    "mongodb": "^4.1.0",
     "npm-run-all": "^4.1.5",
     "nyc": "^15.1.0",
     "open-cli": "^6.0.1",
