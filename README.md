@@ -42,6 +42,7 @@ npm install connect-mongo
 yarn add connect-mongo
 ```
 
+* You may also need to run install `mongodb` if you do not have it installed already because `mongodb` is not a `peerDependencies` instead.
 * If you are upgrading from v3.x to v4, please checkout the [migration guide](./MIGRATION_V4.md) for details.
 * If you are upgrading v4.x to latest version, you may check the [example](./example) and [options](#options) for details.
 
