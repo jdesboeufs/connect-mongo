@@ -141,7 +141,7 @@ app.use(session({
 
 ### MongoError exports circular dependency
 
-The following error can be safely ignore from [official reply](https://developer.mongodb.com/community/forums/t/warning-accessing-non-existent-property-mongoerror-of-module-exports-inside-circular-dependency/15411/5).
+The following error can be safely ignored from [official reply](https://developer.mongodb.com/community/forums/t/warning-accessing-non-existent-property-mongoerror-of-module-exports-inside-circular-dependency/15411/5).
 
 ```
 (node:16580) Warning: Accessing non-existent property 'MongoError' of module exports inside circular dependency
@@ -179,11 +179,11 @@ app.use(session({
 }));
 ```
 
-__Note:__ Each time an user interacts with the server, its session expiration date is refreshed.
+__Note:__ Each time a user interacts with the server, its session expiration date is refreshed.
 
 ## Remove expired sessions
 
-By default, `connect-mongo` uses MongoDB's TTL collection feature (2.2+) to have mongod automatically remove expired sessions. But you can change this behavior.
+By default, `connect-mongo` uses MongoDB's TTL collection feature (2.2+) to have mongodb automatically remove expired sessions. But you can change this behavior.
 
 ### Set MongoDB to clean expired sessions (default mode)
 
@@ -231,7 +231,7 @@ app.use(session({
 
 ## Lazy session update
 
-If you are using [express-session](https://github.com/expressjs/session) >= [1.10.0](https://github.com/expressjs/session/releases/tag/v1.10.0) and don't want to resave all the session on database every single time that the user refresh the page, you can lazy update the session, by limiting a period of time.
+If you are using [express-session](https://github.com/expressjs/session) >= [1.10.0](https://github.com/expressjs/session/releases/tag/v1.10.0) and don't want to resave all the session on database every single time that the user refreshes the page, you can lazy update the session, by limiting a period of time.
 
 ```js
 app.use(express.session({
