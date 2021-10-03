@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Change `engines` to require Node 12.9 or newer, matching the upgrade to `mongodb` that occurred in `v4.5.0`
+
 ## [4.6.0] - 2021-09-17
 
 ### Changed
