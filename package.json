@@ -54,7 +54,7 @@
     "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=12.9.0"
   },
   "peerDependencies": {
     "mongodb": "^4.1.0"
