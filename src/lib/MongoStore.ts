@@ -230,7 +230,6 @@ export default class MongoStore extends session.Store {
           {
             background: true,
             expireAfterSeconds: 0,
-            writeConcern: this.options.writeOperationOptions,
           }
         )
       case 'interval':
