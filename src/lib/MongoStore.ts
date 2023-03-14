@@ -127,7 +127,7 @@ export default class MongoStore extends session.Store {
   private clientP: Promise<MongoClient>
   private crypto: Kruptein | null = null
   private timer?: NodeJS.Timeout
-  collectionP: Promise<Collection>
+  collectionP: Promise<Collection<InternalSessionType>>
   private options: ConcretConnectMongoOptions
   // FIXME: remvoe any
   private transformFunctions: {
@@ -201,7 +201,7 @@ export default class MongoStore extends session.Store {
     this.collectionP = _clientP.then(async (con) => {
       const collection = con
         .db(options.dbName)
-        .collection(options.collectionName)
+        .collection<InternalSessionType>(options.collectionName)
       await this.setAutoRemove(collection)
       return collection
     })
@@ -214,7 +214,9 @@ export default class MongoStore extends session.Store {
     return new MongoStore(options)
   }
 
-  private setAutoRemove(collection: Collection): Promise<unknown> {
+  private setAutoRemove(
+    collection: Collection<InternalSessionType>
+  ): Promise<unknown> {
     const removeQuery = () => ({
       expires: {
         $lt: new Date(),
@@ -312,7 +314,7 @@ export default class MongoStore extends session.Store {
         })
         if (this.crypto && session) {
           await this.decryptSession(
-            session as session.SessionData
+            (session as unknown) as session.SessionData
           ).catch((err) => callback(err))
         }
         const s =
@@ -479,7 +481,9 @@ export default class MongoStore extends session.Store {
         const results: session.SessionData[] = []
         for await (const session of sessions) {
           if (this.crypto && session) {
-            await this.decryptSession(session as session.SessionData)
+            await this.decryptSession(
+              (session as unknown) as session.SessionData
+            )
           }
           results.push(this.transformFunctions.unserialize(session.session))
         }

@@ -172,8 +172,12 @@ test.serial('test set default TTL', async (t) => {
   const collection = await store.collectionP
   const session = await collection.findOne({ _id: sid })
   const timeAfterSet = new Date().valueOf()
-  t.truthy(timeBeforeSet + defaultTTL * 1000 <= session?.expires.valueOf())
-  t.truthy(session?.expires.valueOf() <= timeAfterSet + defaultTTL * 1000)
+  const expires = session?.expires?.valueOf()
+  t.truthy(expires)
+  if (expires) {
+    t.truthy(timeBeforeSet + defaultTTL * 1000 <= expires)
+    t.truthy(expires <= timeAfterSet + defaultTTL * 1000)
+  }
 })
 
 test.serial('test default TTL', async (t) => {
@@ -187,8 +191,12 @@ test.serial('test default TTL', async (t) => {
   const collection = await store.collectionP
   const session = await collection.findOne({ _id: sid })
   const timeAfterSet = new Date().valueOf()
-  t.truthy(timeBeforeSet + defaultExpirationTime <= session?.expires.valueOf())
-  t.truthy(session?.expires.valueOf() <= timeAfterSet + defaultExpirationTime)
+  const expires = session?.expires?.valueOf()
+  t.truthy(expires)
+  if (expires) {
+    t.truthy(timeBeforeSet + defaultExpirationTime <= expires)
+    t.truthy(expires <= timeAfterSet + defaultExpirationTime)
+  }
 })
 
 test.serial('test custom serializer', async (t) => {
@@ -244,7 +252,11 @@ test.serial('touch ops', async (t) => {
   const session2 = await collection.findOne({ _id: sid })
   t.not(session2, undefined)
   // Check if both expiry date are different
-  t.truthy(session2?.expires.getTime() > session?.expires.getTime())
+  t.truthy(session2?.expires?.getTime())
+  t.truthy(session?.expires?.getTime())
+  if (session?.expires?.getTime() && session2?.expires?.getTime()) {
+    t.truthy(session2?.expires.getTime() > session?.expires.getTime())
+  }
 })
 
 test.serial('touch ops with touchAfter', async (t) => {
@@ -255,12 +267,12 @@ test.serial('touch ops with touchAfter', async (t) => {
   await storePromise.set(sid, orgSession)
   const collection = await store.collectionP
   const session = await collection.findOne({ _id: sid })
-  const lastModifiedBeforeTouch = session?.lastModified.getTime()
+  const lastModifiedBeforeTouch = session?.lastModified?.getTime()
   t.not(session, undefined)
-  await storePromise.touch(sid, session as SessionData)
+  await storePromise.touch(sid, (session as unknown) as SessionData)
   const session2 = await collection.findOne({ _id: sid })
   t.not(session2, undefined)
-  const lastModifiedAfterTouch = session2?.lastModified.getTime()
+  const lastModifiedAfterTouch = session2?.lastModified?.getTime()
   // Check if both expiry date are different
   t.is(lastModifiedBeforeTouch, lastModifiedAfterTouch)
 })
@@ -273,15 +285,19 @@ test.serial('touch ops with touchAfter with touch', async (t) => {
   await storePromise.set(sid, orgSession)
   const collection = await store.collectionP
   const session = await collection.findOne({ _id: sid })
-  const lastModifiedBeforeTouch = session?.lastModified.getTime()
+  const lastModifiedBeforeTouch = session?.lastModified?.getTime()
   await new Promise((resolve) => setTimeout(resolve, 1200))
   t.not(session, undefined)
-  await storePromise.touch(sid, session as SessionData)
+  await storePromise.touch(sid, (session as unknown) as SessionData)
   const session2 = await collection.findOne({ _id: sid })
   t.not(session2, undefined)
-  const lastModifiedAfterTouch = session2?.lastModified.getTime()
+  const lastModifiedAfterTouch = session2?.lastModified?.getTime()
   // Check if both expiry date are different
-  t.truthy(lastModifiedAfterTouch > lastModifiedBeforeTouch)
+  t.truthy(lastModifiedAfterTouch)
+  t.truthy(lastModifiedBeforeTouch)
+  if (lastModifiedAfterTouch && lastModifiedBeforeTouch) {
+    t.truthy(lastModifiedAfterTouch > lastModifiedBeforeTouch)
+  }
 })
 
 test.serial('basic operation flow with crypto', async (t) => {
