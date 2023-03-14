@@ -57,6 +57,7 @@
     "node": ">=12.9.0"
   },
   "peerDependencies": {
+    "express-session": "^1.17.1",
     "mongodb": "^5.1.0"
   },
   "dependencies": {

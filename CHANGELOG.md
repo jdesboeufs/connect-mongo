@@ -6,15 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- Change `engines` to require Node 12.9 or newer, matching the upgrade to `mongodb` that occurred in `v4.5.0`
-
-## [5.0.0] - 2023-03-13
+## [5.0.0] - 2023-03-14
 
 ### **BREAKING CHANGES**
 
 - Upgraded peer dependency `mongodb` to 5.0.0
+- Change `engines` to require Node 12.9 or newer, matching the upgrade to `mongodb` that occurred in `v4.5.0`
+
+### Fixed
+
+- Declare `express-session` as a peer dependency.
 
 ## [4.6.0] - 2021-09-17
 
