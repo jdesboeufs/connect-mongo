@@ -313,7 +313,7 @@ export default class MongoStore extends session.Store {
         })
         if (this.crypto && session) {
           await this.decryptSession(
-            (session as unknown) as session.SessionData
+            session as unknown as session.SessionData
           ).catch((err) => callback(err))
         }
         const s =
@@ -377,7 +377,7 @@ export default class MongoStore extends session.Store {
           ).catch((err) => {
             throw new Error(err)
           })
-          s.session = (data as unknown) as session.SessionData
+          s.session = data as unknown as session.SessionData
         }
         const collection = await this.collectionP
         const rawResp = await collection.updateOne(
@@ -480,9 +480,7 @@ export default class MongoStore extends session.Store {
         const results: session.SessionData[] = []
         for await (const session of sessions) {
           if (this.crypto && session) {
-            await this.decryptSession(
-              (session as unknown) as session.SessionData
-            )
+            await this.decryptSession(session as unknown as session.SessionData)
           }
           results.push(this.transformFunctions.unserialize(session.session))
         }
