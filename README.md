@@ -49,7 +49,7 @@ yarn add connect-mongo
 ## Compatibility
 
 * Support Express up to `5.0`
-* Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `>= 5.0`
+* Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `5` and `6`
 * Support Node.js 14, 16 and 18
 * Support [MongoDB](https://www.mongodb.com/) `3.6+`
 

@@ -33,6 +33,8 @@ jobs:
             ${{ runner.os }}-yarn-
       - run: yarn install
       - run: yarn test
+      - run: yarn add mongodb@6 && yarn test
+        if: ${{ matrix.node-version != '14.x' }} 
       - run: yarn cov:send
       - run: yarn cov:check
       - run: yarn build

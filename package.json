@@ -58,7 +58,7 @@
   },
   "peerDependencies": {
     "express-session": "^1.17.1",
-    "mongodb": "^5.1.0"
+    "mongodb": ">= 5.1.0 < 7"
   },
   "dependencies": {
     "debug": "^4.3.1",
