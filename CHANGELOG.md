@@ -6,12 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [6.0.0] - 2023-08-28
-
-### **BREAKING CHANGES**
-
-- Upgraded peer dependency `mongodb` to 6.0.0
-- Change `engines` to require Node 16.20.1 or newer, matching the upgrade to `mongodb` that occurred in `v6.0.0`
+- Upgrade peer dependency `mongodb` to v5 or v6
 
 ### Changed
 
