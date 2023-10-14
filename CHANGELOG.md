@@ -6,10 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Upgrade peer dependency `mongodb` to v5 or v6
+## [5.1.0] - 2023-10-14
 
 ### Changed
 
+- Extend `mongodb` peer dependency allowed versions to `6.x`
 - Upgrade dependency
 
 ## [5.0.0] - 2023-03-14
