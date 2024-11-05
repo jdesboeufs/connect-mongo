@@ -26,5 +26,7 @@ jobs:
       - run: yarn test
       - run: yarn add mongodb@6 && yarn test
       - run: yarn cov:send
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - run: yarn cov:check
       - run: yarn build
