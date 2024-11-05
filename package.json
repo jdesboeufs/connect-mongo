@@ -54,7 +54,7 @@
     "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish"
   },
   "engines": {
-    "node": ">=12.9.0"
+    "node": ">=18.12.0"
   },
   "peerDependencies": {
     "express-session": "^1.17.1",

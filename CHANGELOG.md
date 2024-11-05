@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Drop Node 12, 14, 16 support
+- Add Node 20, 22, 23 support
+
 ## [5.1.0] - 2023-10-14
 
 ### Changed
