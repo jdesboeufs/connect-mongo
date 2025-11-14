@@ -6,8 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Drop Node 12, 14, 16 support
+- Drop Node 12, 14, 16, 18 support
 - Add Node 20, 22, 23 support
+- Extend `mongodb` peer dependency allowed versions to `7.x`
 
 ## [5.1.0] - 2023-10-14
 
