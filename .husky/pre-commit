@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+[ "${HUSKY-}" = "0" ] && exit 0
+
+yarn lint-staged

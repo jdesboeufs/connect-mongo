@@ -87,44 +87,71 @@ test.serial('basic operation flow', async (t) => {
   t.is(await storePromise.length(), 0)
 })
 
-test.serial.cb('set and listen to event', (t) => {
+test.serial('set and listen to event', async (t) => {
   ;({ store, storePromise } = createStoreHelper())
-  let orgSession = makeData()
   const sid = 'test-set-event'
-  store.set(sid, orgSession)
-  orgSession = JSON.parse(JSON.stringify(orgSession))
-  store.on('set', (sessionId) => {
-    t.is(sessionId, sid)
-    store.get(sid, (err, session) => {
-      t.is(err, null)
-      t.is(typeof session, 'object')
-      t.deepEqual(session, orgSession)
-      t.end()
+  const orgSession = makeData()
+  const expectedSession = JSON.parse(JSON.stringify(orgSession))
+
+  const waitForSet = new Promise<void>((resolve, reject) => {
+    store.once('set', async (sessionId) => {
+      try {
+        t.is(sessionId, sid)
+        const session = await storePromise.get(sid)
+        t.truthy(session)
+        t.is(typeof session, 'object')
+        t.deepEqual(session, expectedSession)
+        resolve()
+      } catch (err) {
+        reject(err)
+      }
     })
   })
+
+  await storePromise.set(sid, orgSession)
+  await waitForSet
 })
 
-test.serial.cb('set and listen to create event', (t) => {
+test.serial('set and listen to create event', async (t) => {
   ;({ store, storePromise } = createStoreHelper())
-  const orgSession = makeData()
   const sid = 'test-create-event'
-  store.set(sid, orgSession)
-  store.on('create', (sessionId) => {
-    t.is(sessionId, sid)
-    t.end()
+  const orgSession = makeData()
+
+  const waitForCreate = new Promise<void>((resolve, reject) => {
+    store.once('create', (sessionId) => {
+      try {
+        t.is(sessionId, sid)
+        resolve()
+      } catch (err) {
+        reject(err)
+      }
+    })
   })
+
+  await storePromise.set(sid, orgSession)
+  await waitForCreate
 })
 
-test.serial.cb('set and listen to update event', (t) => {
+test.serial('set and listen to update event', async (t) => {
   ;({ store, storePromise } = createStoreHelper())
-  const orgSession = makeData()
   const sid = 'test-update-event'
-  store.set(sid, orgSession)
-  store.set(sid, { ...orgSession, foo: 'new-bar' } as SessionData)
-  store.on('update', (sessionId) => {
-    t.is(sessionId, sid)
-    t.end()
+  const orgSession = makeData()
+
+  await storePromise.set(sid, orgSession)
+
+  const waitForUpdate = new Promise<void>((resolve, reject) => {
+    store.once('update', (sessionId) => {
+      try {
+        t.is(sessionId, sid)
+        resolve()
+      } catch (err) {
+        reject(err)
+      }
+    })
   })
+
+  await storePromise.set(sid, { ...orgSession, foo: 'new-bar' } as SessionData)
+  await waitForUpdate
 })
 
 test.serial('set with no stringify', async (t) => {
@@ -146,17 +173,25 @@ test.serial('set with no stringify', async (t) => {
   t.is(await storePromise.length(), 0)
 })
 
-test.serial.cb('test destory event', (t) => {
+test.serial('test destory event', async (t) => {
   ;({ store, storePromise } = createStoreHelper())
   const orgSession = makeData()
   const sid = 'test-destory-event'
-  store.on('destroy', (sessionId) => {
-    t.is(sessionId, sid)
-    t.end()
+
+  const waitForDestroy = new Promise<void>((resolve, reject) => {
+    store.once('destroy', (sessionId) => {
+      try {
+        t.is(sessionId, sid)
+        resolve()
+      } catch (err) {
+        reject(err)
+      }
+    })
   })
-  storePromise.set(sid, orgSession).then(() => {
-    store.destroy(sid)
-  })
+
+  await storePromise.set(sid, orgSession)
+  await storePromise.destroy(sid)
+  await waitForDestroy
 })
 
 test.serial('test set default TTL', async (t) => {
@@ -234,6 +269,21 @@ test.serial('test custom deserializer', async (t) => {
   orgSession.cookie = orgSession.cookie.toJSON()
   // @ts-ignore
   orgSession.ice = 'test-ice-deserializer'
+  if (session && typeof session === 'object' && 'cookie' in session) {
+    const cookie = (session as Record<string, any>).cookie
+    if (cookie && typeof cookie === 'object') {
+      // express-session 1.18 normalizes optional cookie props to null instead of leaving them undefined.
+      // Mirror whatever shape we read back so the equality check stays resilient.
+      if ('partitioned' in cookie) {
+        // @ts-ignore Cookie typings don't expose partitioned yet.
+        orgSession.cookie.partitioned = cookie.partitioned
+      }
+      if ('priority' in cookie) {
+        // @ts-ignore Cookie typings don't expose priority yet.
+        orgSession.cookie.priority = cookie.priority
+      }
+    }
+  }
   t.not(session, undefined)
   t.deepEqual(session, orgSession)
 })

@@ -11,10 +11,15 @@ declare module 'express-session' {
   }
 }
 
-function createSupertetAgent(
+type AgentWithCleanup = {
+  agent: ReturnType<typeof request.agent>
+  cleanup: () => Promise<void>
+}
+
+function createSupertestAgent(
   sessionOpts: SessionOptions,
   mongoStoreOpts: ConnectMongoOptions
-) {
+): AgentWithCleanup {
   const app = express()
   const store = MongoStore.create(mongoStoreOpts)
   app.use(
@@ -35,14 +40,19 @@ function createSupertetAgent(
     res.status(200).send({ views: req.session.views })
   })
   const agent = request.agent(app)
-  return agent
+  return {
+    agent,
+    cleanup: async () => {
+      await store.close()
+    },
+  }
 }
 
-function createSupertetAgentWithDefault(
+function createSupertestAgentWithDefault(
   sessionOpts: Omit<SessionOptions, 'secret'> = {},
   mongoStoreOpts: ConnectMongoOptions = {}
 ) {
-  return createSupertetAgent(
+  return createSupertestAgent(
     { secret: 'foo', ...sessionOpts },
     {
       mongoUrl: 'mongodb://root:example@127.0.0.1:27017',
@@ -53,53 +63,31 @@ function createSupertetAgentWithDefault(
   )
 }
 
-test.serial.cb('simple case', (t) => {
-  const agent = createSupertetAgentWithDefault()
-  agent
-    .get('/')
-    .expect(200)
-    .then((response) => response.headers['set-cookie'])
-    .then((cookie) => {
-      agent
-        .get('/')
-        .expect(200)
-        .end((err, res) => {
-          t.is(err, null)
-          t.deepEqual(res.body, { views: 1 })
-          return t.end()
-        })
-    })
+test.serial('simple case', async (t) => {
+  const { agent, cleanup } = createSupertestAgentWithDefault()
+  try {
+    await agent.get('/').expect(200)
+    const res = await agent.get('/').expect(200)
+    t.deepEqual(res.body, { views: 1 })
+  } finally {
+    await cleanup()
+  }
 })
 
-test.serial.cb('simple case with touch after', (t) => {
-  const agent = createSupertetAgentWithDefault(
+test.serial('simple case with touch after', async (t) => {
+  const { agent, cleanup } = createSupertestAgentWithDefault(
     { resave: false, saveUninitialized: false, rolling: true },
     { touchAfter: 1 }
   )
-  agent
-    .get('/')
-    .expect(200)
-    .then(() => {
-      agent
-        .get('/')
-        .expect(200)
-        .end((err, res) => {
-          t.is(err, null)
-          t.deepEqual(res.body, { views: 1 })
-          new Promise<void>((resolve) => {
-            setTimeout(() => {
-              resolve()
-            }, 1200)
-          }).then(() => {
-            agent
-              .get('/ping')
-              .expect(200)
-              .end((err, res) => {
-                t.is(err, null)
-                t.deepEqual(res.body, { views: 1 })
-                return t.end()
-              })
-          })
-        })
-    })
+
+  try {
+    await agent.get('/').expect(200)
+    const res = await agent.get('/').expect(200)
+    t.deepEqual(res.body, { views: 1 })
+    await new Promise((resolve) => setTimeout(resolve, 1200))
+    const pingRes = await agent.get('/ping').expect(200)
+    t.deepEqual(pingRes.body, { views: 1 })
+  } finally {
+    await cleanup()
+  }
 })

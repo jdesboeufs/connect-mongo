@@ -2,8 +2,11 @@
   - Bring the published compatibility story in sync with reality: engines.node still only asserts >=18.12.0, MongoDB is capped to <7, and the README claims MongoDB server 3.6+ (EOL for years) while also saying “mongodb is not a peer dependency” even though it now is (package.json:56-63, README.md:45-55). Bump the
     engine floor so the metadata and docs explicitly cover the currently maintained Node LTS releases (18, 20, 22, 24), extend the peer range to cover MongoDB driver >=5 and <8 plus server 4.4-8.0 (and add corresponding tests), and fix the user-facing docs/badges so consumers aren't misled.
     - [done 2025-11-15] Refine compatibility statements + CI matrix for Node 18/20/22/24, MongoDB server 4.4-8.0, driver >=5<8 (agent: Codex)
+    - TODO(agent): drop src/types/async-disposable.d.ts once tsconfig enables the built-in esnext.disposable lib and the shim is redundant.
   - Refresh the tooling stack: virtually every dev dependency is from 2020 (TypeScript 4.0, Ava 3, ESLint 7, Husky 4, Prettier 2, commitlint 11, etc.), which misses hundreds of bug fixes and no longer understands Node 20/22 typings (package.json:67-107). Plan an across-the-board upgrade (TS ≥5.6, Ava 6, ESLint 9,
     Prettier 3, Husky 9/Lint‑Staged 15, latest @types/*) and run yarn dedupe afterwards.
+    - [done 2025-11-15] Upgrade TS/AVA/ESLint/prettier/husky stacks while keeping Node 18 compatibility (agent: Codex)
+    - TODO(agent): migrate from .eslintrc.yml to an eslint.config.js flat config so ESLINT_USE_FLAT_CONFIG shim can be removed.
   - Examples and fixtures lag far behind: the sample app still consumes connect-mongo@^4.4.0, forces MongoDB 3.6 via Yarn resolutions, and docker-compose.yaml spins up Mongo 4.4 (example/package.json:12-23, docker-compose.yaml:1-11). Update those to your current major, exercise Mongo server 7+, and document SRV/TLS
     flows so contributors can reproduce issues without pinning to obsolete builds.
   - Modernize packaging: you only emit CommonJS (main + typings) yet advertise a non-existent build/module artifact and lack an exports map or dual entry points (package.json:5-8, 28-33, 109-118). Add a build:module/Rollup step (or at least exports: { ".": { "require": "./build/main/index.js", "import": "./build/main/

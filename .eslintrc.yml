@@ -3,29 +3,31 @@ env:
   node: true
   es6: true
 
+ignorePatterns:
+  - node_modules/*
+  - build/*
+  - coverage/*
+  - example/*
+
 parser: '@typescript-eslint/parser'
 
 parserOptions:
-  ecmaVersion: 9
+  ecmaVersion: 2022
   project: './tsconfig.json'
 
 extends:
-  - standard
-  - prettier
-  - prettier/standard
-  - plugin:eslint-comments/recommended
+  - eslint:recommended
   - plugin:@typescript-eslint/recommended
-  - prettier/@typescript-eslint
+  - plugin:@typescript-eslint/stylistic
+  - plugin:eslint-comments/recommended
+  - plugin:prettier/recommended
 
 plugins:
   - eslint-comments
-  - prettier
   - '@typescript-eslint'
 
 rules:
-  prettier/prettier: error
   camelcase: warn
-  standard/no-callback-literal: off
   '@typescript-eslint/no-unused-vars':
     - warn
     - args: none
@@ -37,5 +39,11 @@ rules:
       ignoreReadBeforeAssign: false
   '@typescript-eslint/explicit-function-return-type': off
   '@typescript-eslint/no-var-requires': off
-  '@typescript-eslint/interface-name-prefix': off
   '@typescript-eslint/ban-ts-comment': off
+  '@typescript-eslint/no-explicit-any': off
+  '@typescript-eslint/consistent-type-definitions': off
+  '@typescript-eslint/consistent-indexed-object-style': off
+  '@typescript-eslint/no-require-imports': off
+
+# TODO(agent): migrate to the flat eslint.config.js format so we can drop the
+# ESLINT_USE_FLAT_CONFIG shim once TypeScript rules are fully modernized.
