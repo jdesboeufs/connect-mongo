@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   mongo:
-    image: mongo:4.4
+    image: "mongo:${MONGO_SERVER_TAG:-4.4}"
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root

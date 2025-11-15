@@ -42,16 +42,18 @@ npm install connect-mongo
 yarn add connect-mongo
 ```
 
-* You may also need to run install `mongodb` if you do not have it installed already because `mongodb` is not a `peerDependencies` instead.
+* Install `mongodb` alongside `connect-mongo`; it is a required peer dependency so you pick the driver version that matches your cluster.
 * If you are upgrading from v3.x to v4, please checkout the [migration guide](./MIGRATION_V4.md) for details.
 * If you are upgrading v4.x to latest version, you may check the [example](./example) and [options](#options) for details.
 
 ## Compatibility
 
 * Support Express up to `5.0`
-* Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `5` and `6`
-* Support Node.js 18, 20, 22 and 23
-* Support [MongoDB](https://www.mongodb.com/) `3.6+`
+* Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `5.x` - `7.x` (peer dependency range `>=5 <8`)
+* Support Node.js 18 LTS, 20 LTS, 22 LTS and 24 LTS
+* Support [MongoDB](https://www.mongodb.com/) server versions `4.4` - `8.0`
+
+We follow MongoDB's official [Node.js driver compatibility tables](https://www.mongodb.com/docs/drivers/compatibility/?driver-language=javascript&javascript-driver-framework=nodejs) and exercise **every** combination of the versions above (4 Node LTS releases × 3 driver majors × 5 server tags) in CI so that mismatches surface quickly. Note that driver 5.x officially supports Node 18/20, while Node 22/24 coverage relies on driver 6.x/7.x, matching the upstream guidance.
 
 For extended compatibility, see previous versions [v3.x](https://github.com/jdesboeufs/connect-mongo/tree/v3.x).
 But please note that we are not maintaining v3.x anymore.

@@ -1,6 +1,7 @@
 - Platform & Dependencies
   - Bring the published compatibility story in sync with reality: engines.node still only asserts >=18.12.0, MongoDB is capped to <7, and the README claims MongoDB server 3.6+ (EOL for years) while also saying “mongodb is not a peer dependency” even though it now is (package.json:56-63, README.md:45-55). Bump the
-    engine floor to the active LTS (Node 20/22), extend the peer range to cover driver 7/8 (and add corresponding tests), and fix the user-facing docs/badges so consumers aren't misled.
+    engine floor so the metadata and docs explicitly cover the currently maintained Node LTS releases (18, 20, 22, 24), extend the peer range to cover MongoDB driver >=5 and <8 plus server 4.4-8.0 (and add corresponding tests), and fix the user-facing docs/badges so consumers aren't misled.
+    - [done 2025-11-15] Refine compatibility statements + CI matrix for Node 18/20/22/24, MongoDB server 4.4-8.0, driver >=5<8 (agent: Codex)
   - Refresh the tooling stack: virtually every dev dependency is from 2020 (TypeScript 4.0, Ava 3, ESLint 7, Husky 4, Prettier 2, commitlint 11, etc.), which misses hundreds of bug fixes and no longer understands Node 20/22 typings (package.json:67-107). Plan an across-the-board upgrade (TS ≥5.6, Ava 6, ESLint 9,
     Prettier 3, Husky 9/Lint‑Staged 15, latest @types/*) and run yarn dedupe afterwards.
   - Examples and fixtures lag far behind: the sample app still consumes connect-mongo@^4.4.0, forces MongoDB 3.6 via Yarn resolutions, and docker-compose.yaml spins up Mongo 4.4 (example/package.json:12-23, docker-compose.yaml:1-11). Update those to your current major, exercise Mongo server 7+, and document SRV/TLS

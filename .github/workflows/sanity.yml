@@ -2,17 +2,28 @@ name: Sanity check
 
 on:
   push:
-    branches: master
+    branches:
+      - master
+      - 2025-review
   pull_request:
-    branches: master
+    branches:
+      - master
+      - 2025-review
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [18.x, 20.x, 22.x, 23.x]
+        node-version: [18.x, 20.x, 22.x, 24.x]
+        mongodb-driver: ['5.0.0', '5.6.0', '5.9.2', '6', '6.11.0', '6.21.0', '7.0.0']
+        mongo-server: ['4.4', '5.0', '6.0', '7.0', '8.0']
+
+    env:
+      MONGODB_DRIVER_VERSION: ${{ matrix.mongodb-driver }}
+      MONGO_SERVER_TAG: ${{ matrix.mongo-server }}
 
     steps:
       - uses: actions/checkout@v4
@@ -21,12 +32,36 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
-      - run: docker compose up -d
-      - run: yarn install
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Install MongoDB driver ${{ matrix.mongodb-driver }}
+        run: |
+          npm install mongodb@${MONGODB_DRIVER_VERSION} --no-save --no-audit --legacy-peer-deps
+          rm -f package-lock.json npm-shrinkwrap.json
+      - name: Start MongoDB ${{ matrix.mongo-server }}
+        run: docker compose up -d
+      - name: Wait for MongoDB to accept connections
+        run: |
+          for i in {1..30}; do
+            if docker compose exec -T mongo /bin/sh -c 'if command -v mongosh >/dev/null 2>&1; then mongosh --quiet --eval "db.runCommand({ ping: 1 })"; else mongo --quiet --eval "db.runCommand({ ping: 1 })"; fi' >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "MongoDB failed to start" >&2
+          exit 1
       - run: yarn test
-      - run: yarn add mongodb@6 && yarn test
-      - run: yarn cov:send
+      - name: Upload coverage
+        if: matrix.node-version == '22.x' && matrix.mongodb-driver == '6' && matrix.mongo-server == '6.0'
+        run: yarn cov:send
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      - run: yarn cov:check
-      - run: yarn build
+      - name: Check coverage threshold
+        if: matrix.node-version == '22.x' && matrix.mongodb-driver == '6' && matrix.mongo-server == '6.0'
+        run: yarn cov:check
+      - name: Build artifacts
+        if: matrix.node-version == '22.x' && matrix.mongodb-driver == '6' && matrix.mongo-server == '6.0'
+        run: yarn build
+      - name: Tear down MongoDB
+        if: always()
+        run: docker compose down -v

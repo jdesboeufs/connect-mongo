@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Drop Node 12, 14, 16 support
-- Add Node 20, 22, 23 support
+- Add Node 20, 22, 24 support
+- Clarify compatibility guarantees: require Node >=18.19.0, acknowledge Node 18/20/22/24 LTS plus MongoDB server 4.4-8.0, limit the mongodb peer dependency range to >=5 <8, and expand CI to cover every Node/driver/server combination (drivers 5.x-7.x, servers 4.4-8.0).
 
 ## [5.1.0] - 2023-10-14
 
