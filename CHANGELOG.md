@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Drop Node 12, 14, 16 support
 - Add Node 20, 22, 24 support
-- Clarify compatibility guarantees: require Node >=18.19.0, acknowledge Node 18/20/22/24 LTS plus MongoDB server 4.4-8.0, limit the mongodb peer dependency range to >=5 <8, and expand CI to cover every Node/driver/server combination (drivers 5.x-7.x, servers 4.4-8.0).
-- Refresh developer tooling: bump TypeScript (5.9), Ava (6.x), ESLint (9.x), Prettier (3.x), Husky (9), lint-staged (16), commitlint (20), ts-node (10.9), TypeDoc (0.28), and the @types/* packages so the repo matches modern Node 18+ environments.
+- Drop Node 18 support and require Node >=20.8.0 to align with the Ava/@ava/typescript 6.x toolchain
+- Clarify compatibility guarantees: require Node >=20.8.0, acknowledge Node 20/22/24 plus MongoDB server 4.4-8.0, limit the mongodb peer dependency range to >=5 <8, and expand CI to cover every Node/driver/server combination (drivers 5.x-7.x, servers 4.4-8.0).
+- Upgrade dependencies: ava 6.4.1, @ava/typescript 6.0.0, cspell 9.3.2, debug 4.4.3, express 4.21.2, express-session 1.18.2, gh-pages 6.3.0, kruptein 3.0.8, mongodb 7.0.0, nyc 17.1.0, open-cli 8.0.0, supertest 7.1.4.
+- Refresh developer tooling: bump TypeScript (5.9), Ava (6.x), ESLint (9.x), Prettier (3.x), Husky (9), lint-staged (16), commitlint (20), ts-node (10.9), TypeDoc (0.28), and the @types/* packages so the repo matches modern Node 20+ environments.
 
 ## [5.1.0] - 2023-10-14
 

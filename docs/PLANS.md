@@ -1,7 +1,8 @@
 - Platform & Dependencies
-  - Bring the published compatibility story in sync with reality: engines.node still only asserts >=18.12.0, MongoDB is capped to <7, and the README claims MongoDB server 3.6+ (EOL for years) while also saying “mongodb is not a peer dependency” even though it now is (package.json:56-63, README.md:45-55). Bump the
-    engine floor so the metadata and docs explicitly cover the currently maintained Node LTS releases (18, 20, 22, 24), extend the peer range to cover MongoDB driver >=5 and <8 plus server 4.4-8.0 (and add corresponding tests), and fix the user-facing docs/badges so consumers aren't misled.
+  - Bring the published compatibility story in sync with reality: engines.node must track the active LTS baseline, MongoDB is capped to <7, and the README claims MongoDB server 3.6+ (EOL for years) while also saying “mongodb is not a peer dependency” even though it now is (package.json:56-63, README.md:45-55). Bump the
+    engine floor so the metadata and docs explicitly cover the currently maintained Node releases (20, 22, 24), extend the peer range to cover MongoDB driver >=5 and <8 plus server 4.4-8.0 (and add corresponding tests), and fix the user-facing docs/badges so consumers aren't misled.
     - [done 2025-11-15] Refine compatibility statements + CI matrix for Node 18/20/22/24, MongoDB server 4.4-8.0, driver >=5<8 (agent: Codex)
+    - [done 2025-11-16] Drop Node 18 baseline and require Node >=20.8.0 so Ava/@ava/typescript latest releases remain supported (agent: Codex)
     - TODO(agent): drop src/types/async-disposable.d.ts once tsconfig enables the built-in esnext.disposable lib and the shim is redundant.
   - Refresh the tooling stack: virtually every dev dependency is from 2020 (TypeScript 4.0, Ava 3, ESLint 7, Husky 4, Prettier 2, commitlint 11, etc.), which misses hundreds of bug fixes and no longer understands Node 20/22 typings (package.json:67-107). Plan an across-the-board upgrade (TS ≥5.6, Ava 6, ESLint 9,
     Prettier 3, Husky 9/Lint‑Staged 15, latest @types/*) and run yarn dedupe afterwards.

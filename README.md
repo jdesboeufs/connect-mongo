@@ -50,10 +50,10 @@ yarn add connect-mongo
 
 * Support Express up to `5.0`
 * Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `5.x` - `7.x` (peer dependency range `>=5 <8`)
-* Support Node.js 18 LTS, 20 LTS, 22 LTS and 24 LTS
+* Support Node.js 20 LTS, 22 LTS and 24 (Current)
 * Support [MongoDB](https://www.mongodb.com/) server versions `4.4` - `8.0`
 
-We follow MongoDB's official [Node.js driver compatibility tables](https://www.mongodb.com/docs/drivers/compatibility/?driver-language=javascript&javascript-driver-framework=nodejs) and exercise **every** combination of the versions above (4 Node LTS releases × 3 driver majors × 5 server tags) in CI so that mismatches surface quickly. Note that driver 5.x officially supports Node 18/20, while Node 22/24 coverage relies on driver 6.x/7.x, matching the upstream guidance.
+We follow MongoDB's official [Node.js driver compatibility tables](https://www.mongodb.com/docs/drivers/compatibility/?driver-language=javascript&javascript-driver-framework=nodejs) and exercise **every** combination of the versions above (3 Node releases × 3 driver majors × 5 server tags) in CI so that mismatches surface quickly. Note that driver 5.x officially supports Node 20, while Node 22/24 coverage relies on driver 6.x/7.x, matching the upstream guidance.
 
 For extended compatibility, see previous versions [v3.x](https://github.com/jdesboeufs/connect-mongo/tree/v3.x).
 But please note that we are not maintaining v3.x anymore.
