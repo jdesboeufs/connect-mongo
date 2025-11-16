@@ -256,8 +256,12 @@ test.serial('test custom serializer', async (t) => {
 test.serial('test custom deserializer', async (t) => {
   ;({ store, storePromise } = createStoreHelper({
     unserialize: (obj) => {
-      obj.ice = 'test-ice-deserializer'
-      return obj
+      const materialized =
+        typeof obj === 'string'
+          ? (JSON.parse(obj) as unknown as SessionData)
+          : (obj as SessionData)
+      ;(materialized as Record<string, unknown>).ice = 'test-ice-deserializer'
+      return materialized
     },
   }))
   const orgSession = makeData()
@@ -298,7 +302,7 @@ test.serial('touch ops', async (t) => {
   const session = await collection.findOne({ _id: sid })
   await new Promise((resolve) => setTimeout(resolve, 500))
   t.not(session, undefined)
-  await storePromise.touch(sid, session?.session)
+  await storePromise.touch(sid, session?.session as SessionData)
   const session2 = await collection.findOne({ _id: sid })
   t.not(session2, undefined)
   // Check if both expiry date are different

@@ -24,6 +24,7 @@
     default majority-safe options.
   - Type safety is paper-thin: option hooks (serialize, transformId, crypto) stay typed as any and defaultSerializeFunction is littered with @ts-ignore (src/lib/MongoStore.ts:61-124). Once you enable the stricter compiler flags below, refactor this class into generics (MongoStore<T extends SessionData>) so public
     types match reality.
+    - [done 2025-11-16] Improve type safety with generics/typed hooks (agent: Codex)
 
 - Tooling & CI
   - Tighten the compiler and target modern runtimes: tsconfig.json still emits ES2018/CommonJS, disables strictFunctionTypes, noImplicitAny, and noUnused*, and forces inline source maps that bloat npm tarballs (tsconfig.json:2-44). Move to target: es2022, enable the strict diagnostics, emit external .map files, and
