@@ -6,6 +6,7 @@ Welcome! This file keeps lightweight coordination notes for anyone (human or AI)
 
 1. Follow `docs/PLANS.md` for the prioritized maintenance backlog.
 2. When picking up a task, append a short status note under the relevant section in `docs/PLANS.md` (e.g. `- [started YYYY-MM-DD] <task>`), then remove or update it when you finish.
+3. Local sanity checks confirm `yarn build`, `yarn test:lint`, and `yarn test:prettier` pass (lint only warns on crypto key_size/iv_size/at_size camelCase). Full `yarn test` should be run from a host environment with MongoDB (e.g., docker compose up) until tests are migrated to mongodb-memory-server.
 
 ## Workflow Expectations
 

@@ -32,8 +32,8 @@
     - [done 2025-11-16] Tighten the compiler and target modern runtimes (agent: Codex)
   - Several npm scripts are broken or dangerous. check-cli/diff-integration-tests copy a top-level test folder that no longer exists, so they fail immediately, and reset-hard runs git clean -dfx && git reset --hard, which can nuke a contributor's worktree (package.json:38-55). Replace these with working integration-
     test helpers (perhaps building to build/test) and document a safer reset flow.
-    - [done 2025-11-16] Replace broken integration scripts and blunt destructive reset-hard (agent: Codex)
-    - TODO(agent): test:integration still expects a MongoDB instance at 127.0.0.1:27017; migrate to mongodb-memory-server to make the helper self-contained.
+    - [todo] Rework integration scripts and provide a safe reset flow; earlier attempt was reset (agent: Codex)
+    - TODO(agent): test:integration currently depends on host MongoDB (docker compose); migrate to mongodb-memory-server to make the helper self-contained.
   - CI mutates the repo (yarn add mongodb@6 && yarn test) and relies on docker compose up -d without health checks or teardown, all while testing only Mongo 4.4 ( .github/workflows/sanity.yml:15-32, docker-compose.yaml:1-11). Introduce a job matrix that pins Mongo driver versions via yarn add --no-lockfile --dev
     mongodb@x in a temporary workspace, waits for Mongo 7.x containers to report ready, and always runs docker compose down in a finally step.
   - Critical behaviors lack automated coverage: the unit/integration suites don't cover crypto, autoRemove, touchAfter, or transformId at all—only the happy-path AVA specs exist (src/lib/MongoStore.spec.ts:1-154, src/test/integration.spec.ts:1-72). Add targeted tests using mongodb-memory-server to keep CI fast and
