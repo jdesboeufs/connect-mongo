@@ -2,67 +2,69 @@ const express = require('express')
 const mongoose = require('mongoose')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
+const { getMongoConfig } = require('./shared/mongo-config')
 
-// App Init
 const app = express()
 const port = 3000
 
-// Starting Server
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+const {
+  mongoUrl,
+  mongoOptions,
+  dbName,
+  sessionSecret,
+  cryptoSecret
+} = getMongoConfig()
+
+const appDbUrl = process.env.APP_MONGO_URL || mongoUrl
+const appDbName = process.env.APP_DB_NAME || `${dbName}-app`
+
+const appConnection = mongoose.createConnection(appDbUrl, {
+  dbName: appDbName,
+  ...mongoOptions
 })
 
-// Mongoose Connection
-const appDBConnection = mongoose
-  .createConnection('mongodb://root:example@127.0.0.1:27017', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then((connection) => {
-    console.log('Connected to AppDB.')
-    return connection
-  })
+const sessionConnection = mongoose.createConnection(mongoUrl, {
+  dbName,
+  ...mongoOptions
+})
 
-const sessionDBConnection = mongoose
-  .createConnection('mongodb://root:example@127.0.0.1:27017', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then((connection) => {
-    console.log('Connected to SessionsDB.')
-    return connection
-  })
-
-// Session Init
 const sessionInit = (client) => {
   app.use(
     session({
       store: MongoStore.create({
-        client: client,
-        mongoOptions: {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-        },
+        client,
+        dbName,
+        mongoOptions,
+        ...(cryptoSecret ? { crypto: { secret: cryptoSecret } } : {})
       }),
-      secret: 'hello',
+      secret: sessionSecret,
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 24 * 60 * 60 * 1000 },
+      cookie: { maxAge: 24 * 60 * 60 * 1000 }
     })
   )
 }
 
-// Router Init
-const router = express.Router()
-
-router.get('', (req, res) => {
-  req.session.foo = 'bar'
-  res.send('Session Updated')
-})
-
-(async function () {
-  const connection = await sessionDBConnection
-  const mongoClient = connection.getClient()
+async function bootstrap() {
+  await Promise.all([appConnection.asPromise(), sessionConnection.asPromise()])
+  console.log('Connected to AppDB and SessionsDB.')
+  const mongoClient = sessionConnection.getClient()
   sessionInit(mongoClient)
+
+  const router = express.Router()
+  router.get('/', (req, res) => {
+    req.session.foo = 'bar'
+    res.send('Session Updated')
+  })
+
   app.use('/', router)
-})()
+
+  app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`)
+  })
+}
+
+bootstrap().catch((err) => {
+  console.error('Unable to initialize Mongo connections', err)
+  process.exitCode = 1
+})

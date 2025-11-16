@@ -52,7 +52,8 @@
     "version": "standard-version",
     "reset-hard": "git clean -dfx && git reset --hard && yarn",
     "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish",
-    "prepare": "husky"
+    "prepare": "husky",
+    "tls:setup": "bash ./scripts/generate-mongo-tls.sh"
   },
   "engines": {
     "node": ">=18.19.0"

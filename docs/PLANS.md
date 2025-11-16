@@ -9,6 +9,8 @@
     - TODO(agent): migrate from .eslintrc.yml to an eslint.config.js flat config so ESLINT_USE_FLAT_CONFIG shim can be removed.
   - Examples and fixtures lag far behind: the sample app still consumes connect-mongo@^4.4.0, forces MongoDB 3.6 via Yarn resolutions, and docker-compose.yaml spins up Mongo 4.4 (example/package.json:12-23, docker-compose.yaml:1-11). Update those to your current major, exercise Mongo server 7+, and document SRV/TLS
     flows so contributors can reproduce issues without pinning to obsolete builds.
+    - [done 2025-11-16] Refresh example deps/fixtures, add TLS profile + docs for SRV/TLS workflows (agent: Codex)
+    - TODO(agent): add a local SRV/DNS helper once we can run a lightweight resolver inside docker compose.
   - Modernize packaging: you only emit CommonJS (main + typings) yet advertise a non-existent build/module artifact and lack an exports map or dual entry points (package.json:5-8, 28-33, 109-118). Add a build:module/Rollup step (or at least exports: { ".": { "require": "./build/main/index.js", "import": "./build/main/
     index.mjs", "types": "./build/main/index.d.ts" } }) and fix the repository/bugs URLs which still point at jdesboeufs (package.json:20-26).
 

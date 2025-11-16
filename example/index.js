@@ -1,19 +1,32 @@
 const express = require('express')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
+const { getMongoConfig } = require('./shared/mongo-config')
 
 const app = express()
 const port = 3000
 
+const {
+  mongoUrl,
+  mongoOptions,
+  dbName,
+  sessionSecret,
+  cryptoSecret
+} = getMongoConfig()
+
+const store = MongoStore.create({
+  mongoUrl,
+  dbName,
+  mongoOptions,
+  stringify: false,
+  ...(cryptoSecret ? { crypto: { secret: cryptoSecret } } : {})
+})
+
 app.use(session({
-  secret: 'foo',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: 'mongodb://root:example@127.0.0.1:27017',
-    dbName: "example-db",
-    stringify: false,
-  })
+  store
 }));
 
 app.get('/', (req, res) => {

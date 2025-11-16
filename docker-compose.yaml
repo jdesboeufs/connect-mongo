@@ -1,11 +1,24 @@
-version: '3.1'
-
 services:
   mongo:
-    image: "mongo:${MONGO_SERVER_TAG:-4.4}"
-    restart: always
+    image: "mongo:${MONGO_SERVER_TAG:-7.0}"
+    container_name: connect-mongo-dev
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     ports:
       - '27017:27017'
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --quiet mongodb://root:example@localhost:27017/admin --eval 'db.runCommand({ ping: 1 })'"
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

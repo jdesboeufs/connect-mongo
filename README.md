@@ -309,21 +309,33 @@ One of the following options should be provided. If more than one option are pro
 
 ```
 yarn install
-docker-compose up -d
-# Run these 2 lines in 2 shell
+docker compose up -d
+# Run these 2 lines in two shells
 yarn watch:build
 yarn watch:test
 ```
 
+### TLS & SRV fixtures
+
+- Generate local certificates once with `yarn tls:setup` (drops files in `docker/tls`).
+- Launch the optional TLS container with `docker compose -f docker-compose.yaml -f docker-compose.tls.yaml --profile tls up -d`.
+- Copy `example/.env.example` to `example/.env` and point `MONGO_URL` to the TLS port (`mongodb://root:example@127.0.0.1:27443/example-db?authSource=admin`). Add `MONGO_TLS_CA_FILE=../docker/tls/ca.crt` so the driver trusts the self-signed CA. Set `MONGO_TLS_CERT_KEY_FILE=../docker/tls/client.pem` if you need mutual TLS.
+- To exercise SRV/TLS against a managed cluster (Atlas, DocumentDB, CosmosDB), set `MONGO_URL` to your `mongodb+srv://` string and either `MONGO_TLS_CA_FILE` or `NODE_EXTRA_CA_CERTS` to the provider CA bundle. The example scripts automatically reuse those settings in every variant (plain JS, Mongoose, and TS).
+
 ### Example application
 
 ```
+# from the repo root
+cp example/.env.example example/.env
 yarn link
 cd example
-yarn link "connect-mongo"
+yarn link "connect-mongo"   # optional if you want live code from this checkout
 yarn install
-yarn start
+yarn start:js
+# or yarn start:mongoose / yarn start:ts
 ```
+
+After the first run you can edit `example/.env` to swap between the local docker fixture, the TLS profile, or any `mongodb+srv://` cluster without changing the code.
 
 ### Release
 

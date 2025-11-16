@@ -1,26 +1,39 @@
 const express = require('express')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
+const { getMongoConfig } = require('./shared/mongo-config')
 
 const app = express()
 const port = 3000
 
-const clientP = mongoose.connect(
-  'mongodb://root:example@127.0.0.1:27017',
-  { useNewUrlParser: true, useUnifiedTopology: true }
-).then(m => m.connection.getClient())
+const {
+  mongoUrl,
+  mongoOptions,
+  dbName,
+  sessionSecret,
+  cryptoSecret
+} = getMongoConfig()
+
+const clientPromise = mongoose.connect(
+  mongoUrl,
+  {
+    dbName,
+    ...mongoOptions
+  }
+).then((connection) => connection.connection.getClient())
 
 app.use(session({
-  secret: 'foo',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    clientPromise: clientP,
-    dbName: "example-db-mongoose",
+    clientPromise,
+    dbName,
     stringify: false,
     autoRemove: 'interval',
-    autoRemoveInterval: 1
+    autoRemoveInterval: 1,
+    ...(cryptoSecret ? { crypto: { secret: cryptoSecret } } : {})
   })
 }));
 

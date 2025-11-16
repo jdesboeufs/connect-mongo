@@ -1,0 +1,30 @@
+services:
+  mongo-tls:
+    profiles:
+      - tls
+    image: "mongo:${MONGO_SERVER_TAG:-7.0}"
+    container_name: connect-mongo-dev-tls
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    command: >
+      mongod --bind_ip_all --tlsMode requireTLS --tlsCertificateKeyFile /certs/server.pem
+      --tlsCAFile /certs/ca.crt
+    ports:
+      - '27443:27017'
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --quiet --tls --tlsCAFile /certs/ca.crt --tlsCertificateKeyFile /certs/server.pem mongodb://root:example@localhost:27017/admin --eval 'db.runCommand({ ping: 1 })'"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - mongo-tls-data:/data/db
+      - ./docker/tls:/certs:ro
+
+volumes:
+  mongo-tls-data:
