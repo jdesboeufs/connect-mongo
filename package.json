@@ -60,7 +60,7 @@
   },
   "peerDependencies": {
     "express-session": "^1.17.1",
-    "mongodb": ">=5.0.0 <8"
+    "mongodb": ">=5.0.0"
   },
   "dependencies": {
     "debug": "^4.4.3",
