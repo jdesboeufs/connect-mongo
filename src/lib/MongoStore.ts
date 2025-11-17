@@ -1,5 +1,4 @@
 import { assert } from 'console'
-import util from 'util'
 import * as session from 'express-session'
 import {
   Collection,
@@ -7,20 +6,19 @@ import {
   MongoClientOptions,
   WriteConcernSettings,
 } from 'mongodb'
-import Debug from 'debug'
-import Kruptein from 'kruptein'
+import createWebCryptoAdapter from './createWebCryptoAdapter'
 
-const debug = Debug('connect-mongo')
-
-export type CryptoOptions = {
-  secret: false | string
-  algorithm?: string
-  hashing?: string
-  encodeas?: string
-  key_size?: number
-  iv_size?: number
-  at_size?: number
+export interface CryptoAdapter {
+  // If not provided we use WebCrypto
+  encrypt: (unencryptedPayload: string) => Promise<string>
+  decrypt: (encryptedPayload: string) => Promise<string>
 }
+
+export type CryptoOptions =
+  | {
+      secret: string
+    }
+  | CryptoAdapter
 
 export type ConnectMongoOptions = {
   mongoUrl?: string
@@ -43,8 +41,6 @@ export type ConnectMongoOptions = {
   crypto?: CryptoOptions
 }
 
-type ConcretCryptoOptions = Required<CryptoOptions>
-
 type ConcretConnectMongoOptions = {
   mongoUrl?: string
   clientPromise?: Promise<MongoClient>
@@ -64,7 +60,7 @@ type ConcretConnectMongoOptions = {
   writeOperationOptions?: WriteConcernSettings
   transformId?: (a: any) => any
   // FIXME: remove above any
-  crypto: ConcretCryptoOptions
+  crypto?: CryptoAdapter
 }
 
 type InternalSessionType = {
@@ -125,7 +121,7 @@ function computeTransformFunctions(options: ConcretConnectMongoOptions) {
 
 export default class MongoStore extends session.Store {
   private clientP: Promise<MongoClient>
-  private crypto: Kruptein | null = null
+  private crypto?: CryptoAdapter
   private timer?: NodeJS.Timeout
   collectionP: Promise<Collection<InternalSessionType>>
   private options: ConcretConnectMongoOptions
@@ -147,7 +143,7 @@ export default class MongoStore extends session.Store {
     ...required
   }: ConnectMongoOptions) {
     super()
-    debug('create MongoStore instance')
+    console.debug('create MongoStore instance')
     const options: ConcretConnectMongoOptions = {
       collectionName,
       ttl,
@@ -156,18 +152,6 @@ export default class MongoStore extends session.Store {
       autoRemoveInterval,
       touchAfter,
       stringify,
-      crypto: {
-        ...{
-          secret: false,
-          algorithm: 'aes-256-gcm',
-          hashing: 'sha512',
-          encodeas: 'base64',
-          key_size: 32,
-          iv_size: 16,
-          at_size: 16,
-        },
-        ...crypto,
-      },
       ...required,
     }
     // Check params
@@ -205,8 +189,13 @@ export default class MongoStore extends session.Store {
       await this.setAutoRemove(collection)
       return collection
     })
-    if (options.crypto.secret) {
-      this.crypto = require('kruptein')(options.crypto)
+
+    if (crypto) {
+      if ('secret' in crypto) {
+        this.crypto = createWebCryptoAdapter(crypto.secret)
+      } else {
+        this.crypto = crypto
+      }
     }
   }
 
@@ -224,7 +213,7 @@ export default class MongoStore extends session.Store {
     })
     switch (this.options.autoRemove) {
       case 'native':
-        debug('Creating MongoDB TTL index')
+        console.debug('Creating MongoDB TTL index')
         return collection.createIndex(
           { expires: 1 },
           {
@@ -233,7 +222,7 @@ export default class MongoStore extends session.Store {
           }
         )
       case 'interval':
-        debug('create Timer to remove expired sessions')
+        console.debug('create Timer to remove expired sessions')
         this.timer = setInterval(
           () =>
             collection.deleteMany(removeQuery(), {
@@ -263,17 +252,6 @@ export default class MongoStore extends session.Store {
   }
 
   /**
-   * promisify and bind the `this.crypto.get` function.
-   * Please check !!this.crypto === true before using this getter!
-   */
-  private get cryptoGet() {
-    if (!this.crypto) {
-      throw new Error('Check this.crypto before calling this.cryptoGet!')
-    }
-    return util.promisify(this.crypto.get).bind(this.crypto)
-  }
-
-  /**
    * Decrypt given session data
    * @param session session data to be decrypt. Mutate the input session.
    */
@@ -281,14 +259,13 @@ export default class MongoStore extends session.Store {
     session: session.SessionData | undefined | null
   ) {
     if (this.crypto && session) {
-      const plaintext = await this.cryptoGet(
-        this.options.crypto.secret as string,
-        session.session
-      ).catch((err) => {
-        throw new Error(err)
-      })
+      const plaintext = await this.crypto
+        .decrypt(session.session)
+        .catch((err) => {
+          throw new Error(err)
+        })
       // @ts-ignore
-      session.session = JSON.parse(plaintext)
+      session.session = plaintext
     }
   }
 
@@ -302,7 +279,7 @@ export default class MongoStore extends session.Store {
   ): void {
     ;(async () => {
       try {
-        debug(`MongoStore#get=${sid}`)
+        console.debug(`MongoStore#get=${sid}`)
         const collection = await this.collectionP
         const session = await collection.findOne({
           _id: this.computeStorageId(sid),
@@ -341,7 +318,7 @@ export default class MongoStore extends session.Store {
   ): void {
     ;(async () => {
       try {
-        debug(`MongoStore#set=${sid}`)
+        console.debug(`MongoStore#set=${sid}`)
         // Removing the lastModified prop from the session object before update
         // @ts-ignore
         if (this.options.touchAfter > 0 && session?.lastModified) {
@@ -370,13 +347,7 @@ export default class MongoStore extends session.Store {
           s.lastModified = new Date()
         }
         if (this.crypto) {
-          const cryptoSet = util.promisify(this.crypto.set).bind(this.crypto)
-          const data = await cryptoSet(
-            this.options.crypto.secret as string,
-            s.session
-          ).catch((err) => {
-            throw new Error(err)
-          })
+          const data = await this.crypto.encrypt(s.session)
           s.session = data as unknown as session.SessionData
         }
         const collection = await this.collectionP
@@ -408,7 +379,7 @@ export default class MongoStore extends session.Store {
   ): void {
     ;(async () => {
       try {
-        debug(`MongoStore#touch=${sid}`)
+        console.debug(`MongoStore#touch=${sid}`)
         const updateFields: {
           lastModified?: Date
           expires?: Date
@@ -426,7 +397,7 @@ export default class MongoStore extends session.Store {
         if (touchAfter > 0 && lastModified > 0) {
           const timeElapsed = currentDate.getTime() - lastModified
           if (timeElapsed < touchAfter) {
-            debug(`Skip touching session=${sid}`)
+            console.debug(`Skip touching session=${sid}`)
             return callback(null)
           }
           updateFields.lastModified = currentDate
@@ -469,7 +440,7 @@ export default class MongoStore extends session.Store {
   ): void {
     ;(async () => {
       try {
-        debug('MongoStore#all()')
+        console.debug('MongoStore#all()')
         const collection = await this.collectionP
         const sessions = collection.find({
           $or: [
@@ -497,7 +468,7 @@ export default class MongoStore extends session.Store {
    * @param sid session ID
    */
   destroy(sid: string, callback: (err: any) => void = noop): void {
-    debug(`MongoStore#destroy=${sid}`)
+    console.debug(`MongoStore#destroy=${sid}`)
     this.collectionP
       .then((colleciton) =>
         colleciton.deleteOne(
@@ -516,7 +487,7 @@ export default class MongoStore extends session.Store {
    * Get the count of all sessions in the store
    */
   length(callback: (err: any, length: number) => void): void {
-    debug('MongoStore#length()')
+    console.debug('MongoStore#length()')
     this.collectionP
       .then((collection) => collection.countDocuments())
       .then((c) => callback(null, c))
@@ -528,7 +499,7 @@ export default class MongoStore extends session.Store {
    * Delete all sessions from the store.
    */
   clear(callback: (err: any) => void = noop): void {
-    debug('MongoStore#clear()')
+    console.debug('MongoStore#clear()')
     this.collectionP
       .then((collection) => collection.drop())
       .then(() => callback(null))
@@ -539,7 +510,7 @@ export default class MongoStore extends session.Store {
    * Close database connection
    */
   close(): Promise<void> {
-    debug('MongoStore#close()')
+    console.debug('MongoStore#close()')
     return this.clientP.then((c) => c.close())
   }
 }

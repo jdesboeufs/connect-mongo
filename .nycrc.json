@@ -3,5 +3,5 @@
   "lines": 80,
   "functions": 78,
   "statements": 80,
-  "exclude": ["src/test", "src/lib/MongoStore.spec.ts"]
+  "exclude": ["src/test", "src/lib/MongoStore.spec.ts", "src/lib/createWebCryptoAdapter.spec.ts", "src/lib/createKrupteinAdapter.spec.ts"]
 }
