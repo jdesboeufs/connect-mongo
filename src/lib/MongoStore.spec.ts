@@ -173,6 +173,25 @@ test.serial('set with no stringify', async (t) => {
   t.is(await storePromise.length(), 0)
 })
 
+test.serial('clear preserves TTL index and is idempotent', async (t) => {
+  ;({ store, storePromise } = createStoreHelper({ autoRemove: 'native' }))
+  const collection = await store.collectionP
+  await collection.insertOne({
+    _id: 'clear-ttl-index',
+    session: makeData(),
+    expires: new Date(Date.now() + 1000),
+  })
+  const indexesBefore = await collection.listIndexes().toArray()
+  t.true(indexesBefore.some((idx) => idx.name === 'expires_1'))
+
+  await t.notThrowsAsync(() => storePromise.clear())
+
+  const indexesAfter = await collection.listIndexes().toArray()
+  t.true(indexesAfter.some((idx) => idx.name === 'expires_1'))
+
+  await t.notThrowsAsync(() => storePromise.clear())
+})
+
 test.serial('test destory event', async (t) => {
   ;({ store, storePromise } = createStoreHelper())
   const orgSession = makeData()

@@ -19,6 +19,7 @@
 
 - Runtime & API Quality
   - store.clear() issues collection.drop(), which wipes the TTL index required for autoRemove: 'native' and throws NamespaceNotFound for empty stores (src/lib/MongoStore.ts:530-535). Switch to deleteMany({}) (keeping indexes) and swallow the namespace error so clear() is idempotent.
+    - [done 2025-11-18] Swapped drop() for deleteMany(), swallowing NamespaceNotFound and adding coverage to ensure TTL index survives clear() (agent: Codex)
   - Decryption failures call the callback twice because the rejection handler just invokes callback(err) and then execution continues to the success path (src/lib/MongoStore.ts:314-326). Re-throw inside the catch or guard against multiple invocations to avoid “callback was already called” regressions.
   - Session TTL math ignores cookie.maxAge; it only respects cookie.expires or a global default in both set() and touch(), so rolling sessions expire too early (src/lib/MongoStore.ts:355-368, 435-439). Mirror express-session's logic: prefer maxAge, fall back to expires, then to ttl.
   - close() always shuts down the underlying MongoClient, even if the user supplied their own client/promise, which can tear down the rest of the app's DB connections (src/lib/MongoStore.ts:188-210, 541-543). Track whether the store created the client and only close in that case; otherwise just clear timers.

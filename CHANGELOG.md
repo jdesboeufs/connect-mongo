@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Compatibility:** Supported/tested matrix: Node 20/22/24 + MongoDB driver 5.x–7.x + MongoDB server 4.4–8.0 (peer range remains `>=5.0.0`).
 - **Packaging:** npm package now ships dual ESM/CJS bundles via `tsdown`, with an explicit exports map and cleaned type declarations (`.d.ts`/`.d.cts`).
 - **Types:** `MongoStore` and option hooks are strongly typed to avoid `any` leaks.
+- **Fixed:** `store.clear()` now uses `deleteMany({})` instead of `collection.drop()`, preserving TTL indexes and treating `NamespaceNotFound` as success so clears are idempotent.
 
 ## [5.1.0] - 2023-10-14
 

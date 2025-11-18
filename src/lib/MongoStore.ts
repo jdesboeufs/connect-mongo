@@ -530,9 +530,25 @@ export default class MongoStore<
   clear(callback: (err: any) => void = noop): void {
     debug('MongoStore#clear()')
     this.collectionP
-      .then((collection) => collection.drop())
+      .then((collection) =>
+        collection.deleteMany(
+          {},
+          { writeConcern: this.options.writeOperationOptions }
+        )
+      )
       .then(() => callback(null))
-      .catch((err) => callback(err))
+      .catch((err: unknown) => {
+        const message = (err as Error | undefined)?.message ?? ''
+        // NamespaceNotFound (code 26) occurs if the collection was dropped earlier; treat as success to keep clear() idempotent.
+        if (
+          (err as { code?: number })?.code === 26 ||
+          /ns not found/i.test(message)
+        ) {
+          callback(null)
+          return
+        }
+        callback(err)
+      })
   }
 
   /**
