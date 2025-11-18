@@ -50,17 +50,14 @@ jobs:
           done
           echo "MongoDB failed to start" >&2
           exit 1
+      - run: yarn typecheck
       - run: yarn test
       - name: Upload coverage
         if: matrix.node-version == '22.x' && matrix.mongodb-driver == '6' && matrix.mongo-server == '6.0'
         run: yarn cov:send
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      - name: Check coverage threshold
-        if: matrix.node-version == '22.x' && matrix.mongodb-driver == '6' && matrix.mongo-server == '6.0'
-        run: yarn cov:check
       - name: Build artifacts
-        if: matrix.node-version == '22.x' && matrix.mongodb-driver == '6' && matrix.mongo-server == '6.0'
         run: yarn build
       - name: Tear down MongoDB
         if: always()

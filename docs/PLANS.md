@@ -14,6 +14,8 @@
     - TODO(agent): add a local SRV/DNS helper once we can run a lightweight resolver inside docker compose.
   - Modernize packaging: you only emit CommonJS (main + typings) yet advertise a non-existent build/module artifact and lack an exports map or dual entry points (package.json:5-8, 28-33, 109-118). Add a build:module/Rollup step (or at least exports: { ".": { "require": "./build/main/index.js", "import": "./build/main/
     index.mjs", "types": "./build/main/index.d.ts" } }) and fix the repository/bugs URLs which still point at jdesboeufs (package.json:20-26).
+    - [done 2025-11-16] Add dual CJS/ESM artifacts + exports map with tsdown bundling to dist/ and package type: module retained (agent: Codex)
+    - Note: repository/bugs URLs already intentionally point to jdesboeufs/connect-mongo; no change needed.
 
 - Runtime & API Quality
   - store.clear() issues collection.drop(), which wipes the TTL index required for autoRemove: 'native' and throws NamespaceNotFound for empty stores (src/lib/MongoStore.ts:530-535). Switch to deleteMany({}) (keeping indexes) and swallow the namespace error so clear() is idempotent.

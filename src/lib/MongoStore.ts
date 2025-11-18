@@ -8,7 +8,9 @@ import {
   WriteConcernSettings,
 } from 'mongodb'
 import Debug from 'debug'
-import Kruptein from 'kruptein'
+import kruptein from 'kruptein'
+
+type Kruptein = ReturnType<typeof kruptein>
 
 const debug = Debug('connect-mongo')
 
@@ -141,7 +143,7 @@ export default class MongoStore<
   T extends session.SessionData = session.SessionData,
 > extends session.Store {
   private clientP: Promise<MongoClient>
-  private crypto: Kruptein | null = null
+  private readonly crypto: Kruptein | null = null
   private timer?: NodeJS.Timeout
   collectionP: Promise<Collection<InternalSessionType<T>>>
   private options: ConcretConnectMongoOptions<T>
@@ -218,7 +220,7 @@ export default class MongoStore<
       return collection
     })
     if (options.crypto.secret) {
-      this.crypto = require('kruptein')(options.crypto)
+      this.crypto = kruptein(options.crypto)
     }
   }
 

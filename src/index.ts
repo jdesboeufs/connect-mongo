@@ -1,2 +1,4 @@
-import MongoStore from './lib/MongoStore'
-export = MongoStore
+import MongoStore from './lib/MongoStore.js'
+
+export default MongoStore
+export { MongoStore }

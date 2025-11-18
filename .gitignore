@@ -1,6 +1,7 @@
 .idea/*
 .nyc_output
 build
+dist
 node_modules
 src/**.js
 coverage
@@ -10,3 +11,4 @@ package-lock.json
 example/.env
 docker/tls/*
 !docker/tls/.gitignore
+tsconfig.tsbuildinfo

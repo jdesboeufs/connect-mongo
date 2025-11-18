@@ -2,8 +2,8 @@ import test from 'ava'
 import request from 'supertest'
 import express from 'express'
 import session, { SessionOptions } from 'express-session'
-import MongoStore from '../'
-import { ConnectMongoOptions } from '../lib/MongoStore'
+import MongoStore from '../lib/MongoStore.js'
+import { ConnectMongoOptions } from '../lib/MongoStore.js'
 
 declare module 'express-session' {
   interface SessionData {

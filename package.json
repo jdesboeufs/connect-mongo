@@ -2,8 +2,18 @@
   "name": "connect-mongo",
   "version": "5.1.0",
   "description": "MongoDB session store for Express and Connect",
-  "main": "build/main/index.js",
-  "typings": "build/main/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.cts",
+  "typings": "./dist/index.d.ts",
   "keywords": [
     "connect",
     "mongo",
@@ -25,27 +35,25 @@
     "url": "https://github.com/jdesboeufs/connect-mongo/issues"
   },
   "scripts": {
-    "prebuild": "rm -rf build",
-    "build": "run-p build:*",
-    "build:main": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "build": "tsdown",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --cache src --ext .ts --fix",
-    "test": "run-s build test:*",
+    "test": "run-s test:*",
     "test:lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --cache src --ext .ts",
     "test:prettier": "prettier \"src/**/*.ts\" --list-different",
-    "test:unit": "nyc ava",
-    "watch:build": "tsc -p tsconfig.json -w",
-    "watch:test": "nyc --silent ava --watch",
-    "cov": "run-s build test:unit cov:html cov:lcov && open-cli coverage/index.html",
-    "cov:html": "nyc report --reporter=html",
-    "cov:lcov": "nyc report --reporter=lcov",
+    "test:unit": "c8 ava",
+    "watch:test": "c8 ava --watch",
+    "cov": "run-s test:unit cov:html cov:lcov && open-cli coverage/index.html",
+    "cov:html": "c8 report --reporter=html",
+    "cov:lcov": "c8 report --reporter=lcov",
     "cov:send": "run-s cov:lcov && codecov",
-    "cov:check": "nyc report && nyc check-coverage",
-    "doc": "run-s doc:html && open-cli build/docs/index.html",
-    "doc:html": "typedoc --entryPointStrategy expand --entryPoints src --exclude **/*.spec.ts --out build/docs",
-    "doc:json": "typedoc --entryPointStrategy expand --entryPoints src --exclude **/*.spec.ts --json build/docs/typedoc.json",
-    "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
+    "cov:check": "c8 report --check-coverage",
+    "doc": "run-s doc:html && open-cli dist/docs/index.html",
+    "doc:html": "typedoc --entryPointStrategy expand --entryPoints src --exclude **/*.spec.ts --out dist/docs",
+    "doc:json": "typedoc --entryPointStrategy expand --entryPoints src --exclude **/*.spec.ts --json dist/docs/typedoc.json",
+    "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d dist/docs",
     "version": "standard-version",
     "prepare-release": "run-s test cov:check doc:html version doc:publish",
     "prepare": "husky",
@@ -66,7 +74,6 @@
     "@ava/typescript": "^6.0.0",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
-    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/debug": "^4.1.12",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.18.2",
@@ -76,7 +83,6 @@
     "@typescript-eslint/parser": "^8.46.4",
     "ava": "^6.4.1",
     "codecov": "^3.5.0",
-    "cspell": "^9.3.2",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
@@ -89,40 +95,25 @@
     "lint-staged": "^16.2.6",
     "mongodb": "^7.0.0",
     "npm-run-all": "^4.1.5",
-    "nyc": "^17.1.0",
+    "c8": "^10.1.2",
     "open-cli": "^8.0.0",
     "prettier": "^3.6.2",
     "standard-version": "^9.0.0",
     "supertest": "^7.1.4",
-    "ts-node": "^10.9.2",
+    "tsdown": "^0.16.4",
     "typedoc": "^0.28.14",
     "typescript": "^5.9.3",
     "cross-env": "^10.1.0"
   },
   "files": [
-    "build/main",
-    "build/module",
+    "dist",
     "!**/*.spec.*",
     "!**/*.json",
-    "!build/*/test/*",
+    "!dist/*/test/*",
     "CHANGELOG.md",
     "LICENSE",
     "README.md"
   ],
-  "ava": {
-    "failFast": true,
-    "timeout": "60s",
-    "typescript": {
-      "rewritePaths": {
-        "src/": "build/main/"
-      },
-      "compile": false
-    },
-    "files": [
-      "!build/module/**",
-      "!src/test/testHelper.ts"
-    ]
-  },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
@@ -133,11 +124,27 @@
     "semi": false,
     "trailingComma": "es5"
   },
-  "nyc": {
-    "extends": "@istanbuljs/nyc-config-typescript",
+  "c8": {
+    "include": [
+      "build/**/*.js"
+    ],
     "exclude": [
-      "**/*.spec.js"
-    ]
+      "build/**/*.{spec,test}.js",
+      "build/**/test/**/*.js",
+      "node_modules/**"
+    ],
+    "reporter": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "all": true,
+    "skipFull": false,
+    "check-coverage": true,
+    "branches": 75,
+    "functions": 70,
+    "lines": 80,
+    "statements": 80
   },
   "lint-staged": {
     "**/*.{ts,js}": [

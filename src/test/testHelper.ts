@@ -3,7 +3,7 @@
 import util from 'util'
 import ExpressSession from 'express-session'
 
-import MongoStore, { ConnectMongoOptions } from '../lib/MongoStore'
+import MongoStore, { ConnectMongoOptions } from '../lib/MongoStore.js'
 
 // Create a connect cookie instance
 export const makeCookie = () => {

@@ -2,18 +2,18 @@ import test from 'ava'
 import { SessionData } from 'express-session'
 import { MongoClient } from 'mongodb'
 
-import MongoStore from './MongoStore'
+import MongoStore from './MongoStore.js'
 import {
   createStoreHelper,
   makeData,
   makeDataNoCookie,
-} from '../test/testHelper'
+} from '../test/testHelper.js'
 
 let { store, storePromise } = createStoreHelper()
 
 test.before(async () => {
-  await storePromise.clear().catch((err) => {
-    if (err.message.match(/ns not found/)) {
+  await storePromise.clear().catch((err: unknown) => {
+    if (err instanceof Error && err.message.match(/ns not found/)) {
       return null
     } else {
       throw err
@@ -94,7 +94,7 @@ test.serial('set and listen to event', async (t) => {
   const expectedSession = JSON.parse(JSON.stringify(orgSession))
 
   const waitForSet = new Promise<void>((resolve, reject) => {
-    store.once('set', async (sessionId) => {
+    store.once('set', async (sessionId: string) => {
       try {
         t.is(sessionId, sid)
         const session = await storePromise.get(sid)
@@ -118,7 +118,7 @@ test.serial('set and listen to create event', async (t) => {
   const orgSession = makeData()
 
   const waitForCreate = new Promise<void>((resolve, reject) => {
-    store.once('create', (sessionId) => {
+    store.once('create', (sessionId: string) => {
       try {
         t.is(sessionId, sid)
         resolve()
@@ -140,7 +140,7 @@ test.serial('set and listen to update event', async (t) => {
   await storePromise.set(sid, orgSession)
 
   const waitForUpdate = new Promise<void>((resolve, reject) => {
-    store.once('update', (sessionId) => {
+    store.once('update', (sessionId: string) => {
       try {
         t.is(sessionId, sid)
         resolve()
@@ -179,7 +179,7 @@ test.serial('test destory event', async (t) => {
   const sid = 'test-destory-event'
 
   const waitForDestroy = new Promise<void>((resolve, reject) => {
-    store.once('destroy', (sessionId) => {
+    store.once('destroy', (sessionId: string) => {
       try {
         t.is(sessionId, sid)
         resolve()
@@ -236,7 +236,7 @@ test.serial('test default TTL', async (t) => {
 
 test.serial('test custom serializer', async (t) => {
   ;({ store, storePromise } = createStoreHelper({
-    serialize: (obj) => {
+    serialize: (obj: any) => {
       obj.ice = 'test-ice-serializer'
       return JSON.stringify(obj)
     },
@@ -255,7 +255,7 @@ test.serial('test custom serializer', async (t) => {
 
 test.serial('test custom deserializer', async (t) => {
   ;({ store, storePromise } = createStoreHelper({
-    unserialize: (obj) => {
+    unserialize: (obj: any) => {
       const materialized =
         typeof obj === 'string'
           ? (JSON.parse(obj) as unknown as SessionData)
@@ -366,7 +366,6 @@ test.serial('basic operation flow with crypto', async (t) => {
   t.is(res, undefined)
   const session = await storePromise.get(sid)
   orgSession = JSON.parse(JSON.stringify(orgSession))
-  // @ts-ignore
   t.deepEqual(session, orgSession)
   const sessions = await storePromise.all()
   t.not(sessions, undefined)

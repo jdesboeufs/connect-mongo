@@ -8,6 +8,7 @@ ignorePatterns:
   - build/*
   - coverage/*
   - example/*
+  - tsdown.config.ts
 
 parser: '@typescript-eslint/parser'
 
@@ -44,6 +45,5 @@ rules:
   '@typescript-eslint/consistent-type-definitions': off
   '@typescript-eslint/consistent-indexed-object-style': off
   '@typescript-eslint/no-require-imports': off
-
 # TODO(agent): migrate to the flat eslint.config.js format so we can drop the
 # ESLINT_USE_FLAT_CONFIG shim once TypeScript rules are fully modernized.

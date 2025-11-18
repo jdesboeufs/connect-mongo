@@ -310,8 +310,6 @@ One of the following options should be provided. If more than one option are pro
 ```
 yarn install
 docker compose up -d
-# Run these 2 lines in two shells
-yarn watch:build
 yarn watch:test
 ```
 
