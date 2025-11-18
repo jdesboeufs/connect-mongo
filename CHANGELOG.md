@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Packaging:** npm package now ships dual ESM/CJS bundles via `tsdown`, with an explicit exports map and cleaned type declarations (`.d.ts`/`.d.cts`).
 - **Types:** `MongoStore` and option hooks are strongly typed to avoid `any` leaks.
 - **Fixed:** `store.clear()` now uses `deleteMany({})` instead of `collection.drop()`, preserving TTL indexes and treating `NamespaceNotFound` as success so clears are idempotent.
+- **Fixed:** Decryption failures in `get()` now short-circuit after the first callback, preventing double-callback regressions when the crypto secret is wrong.
 
 ## [5.1.0] - 2023-10-14
 

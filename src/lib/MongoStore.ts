@@ -300,9 +300,7 @@ export default class MongoStore<
       const plaintext = (await this.cryptoGet(
         this.options.crypto.secret as string,
         sessionDoc.session
-      ).catch((err) => {
-        throw new Error(err)
-      })) as string
+      )) as string
       sessionDoc.session = JSON.parse(plaintext) as StoredSessionValue
     }
   }
@@ -324,7 +322,12 @@ export default class MongoStore<
           ],
         })
         if (this.crypto && sessionDoc) {
-          await this.decryptSession(sessionDoc).catch((err) => callback(err))
+          try {
+            await this.decryptSession(sessionDoc)
+          } catch (error) {
+            callback(error)
+            return
+          }
         }
         let result: T | undefined
         if (sessionDoc) {

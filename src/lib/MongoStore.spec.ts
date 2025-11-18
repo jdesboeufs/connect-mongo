@@ -192,6 +192,29 @@ test.serial('clear preserves TTL index and is idempotent', async (t) => {
   await t.notThrowsAsync(() => storePromise.clear())
 })
 
+test.serial('decrypt failure only calls callback once', async (t) => {
+  ;({ store, storePromise } = createStoreHelper({
+    crypto: {
+      secret: 'right-secret',
+    },
+  }))
+  const sid = 'decrypt-failure'
+  await storePromise.set(sid, makeData())
+  // Tamper with the secret so decryption fails
+  ;(store as any).options.crypto.secret = 'wrong-secret'
+
+  await new Promise<void>((resolve) => {
+    let calls = 0
+    store.get(sid, (err, session) => {
+      calls += 1
+      t.truthy(err)
+      t.is(session, undefined)
+      t.is(calls, 1)
+      resolve()
+    })
+  })
+})
+
 test.serial('test destory event', async (t) => {
   ;({ store, storePromise } = createStoreHelper())
   const orgSession = makeData()
