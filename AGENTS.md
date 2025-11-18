@@ -6,7 +6,7 @@ Welcome! This file keeps lightweight coordination notes for anyone (human or AI)
 
 1. Follow `docs/PLANS.md` for the prioritized maintenance backlog.
 2. When picking up a task, append a short status note under the relevant section in `docs/PLANS.md` (e.g. `- [started YYYY-MM-DD] <task>`), then remove or update it when you finish.
-3. Build pipeline now uses `tsdown` for dual ESM/CJS bundles into `dist/` plus `tsc` for typed transpilation (`yarn build` runs both). Local sanity checks confirm `yarn build`, `yarn test:lint`, and `yarn test:prettier` pass (lint only warns on crypto key_size/iv_size/at_size camelCase). Full `yarn test` should be run from a host environment with MongoDB (e.g., docker compose up) until tests are migrated to mongodb-memory-server.
+3. Build pipeline now uses `tsdown` for dual ESM/CJS bundles into `dist/` plus `tsc` for typed transpilation (`yarn build` and `yarn typecheck`). Local sanity checks confirm `yarn build`, `yarn test:lint`, and `yarn test:prettier` pass (lint only warns on crypto key_size/iv_size/at_size camelCase). Full `yarn test` still needs a running MongoDB (e.g., docker compose up) until tests migrate to mongodb-memory-server.
 
 ## Workflow Expectations
 

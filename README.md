@@ -5,7 +5,7 @@ MongoDB session store for [Connect](https://github.com/senchalabs/connect) and [
 [![npm version](https://img.shields.io/npm/v/connect-mongo.svg)](https://www.npmjs.com/package/connect-mongo)
 [![downloads](https://img.shields.io/npm/dm/connect-mongo.svg)](https://www.npmjs.com/package/connect-mongo)
 [![Sanity check](https://github.com/jdesboeufs/connect-mongo/actions/workflows/sanity.yml/badge.svg)](https://github.com/jdesboeufs/connect-mongo/actions/workflows/sanity.yml)
-[![Coverage Status](https://coveralls.io/repos/jdesboeufs/connect-mongo/badge.svg?branch=master&service=github)](https://coveralls.io/github/jdesboeufs/connect-mongo?branch=master)
+[![coverage](https://codecov.io/gh/jdesboeufs/connect-mongo/branch/master/graph/badge.svg)](https://app.codecov.io/gh/jdesboeufs/connect-mongo)
 
 > Breaking change in V4 and rewritten the whole project using Typescript. Please checkout the [migration guide](MIGRATION_V4.md) and [changelog](CHANGELOG.md) for details.
 
@@ -49,8 +49,8 @@ yarn add connect-mongo
 ## Compatibility
 
 * Support Express up to `5.0`
-* Support [native MongoDB driver](http://mongodb.github.io/node-mongodb-native/) `5.x` - `7.x` (peer dependency range `>=5 <8`)
-* Support Node.js 20 LTS, 22 LTS and 24 (Current)
+* Support [native MongoDB driver](https://www.mongodb.com/docs/drivers/node/current/) `>= 5.x`  (peer dependency range `>=5.0.0`, tested in CI with 5.x, 6.x, and 7.x)
+* Support Node.js 20 LTS, 22 LTS and 24 (Current LTS)
 * Support [MongoDB](https://www.mongodb.com/) server versions `4.4` - `8.0`
 
 We follow MongoDB's official [Node.js driver compatibility tables](https://www.mongodb.com/docs/drivers/compatibility/?driver-language=javascript&javascript-driver-framework=nodejs) and exercise **every** combination of the versions above (3 Node releases × 3 driver majors × 5 server tags) in CI so that mismatches surface quickly. Note that driver 5.x officially supports Node 20, while Node 22/24 coverage relies on driver 6.x/7.x, matching the upstream guidance.
@@ -279,7 +279,7 @@ One of the following options should be provided. If more than one option are pro
 
 |Option|Default|Description|
 |------|:-----:|-----------|
-|`mongoOptions`|`{ useUnifiedTopology: true }`|Options object for [`MongoClient.connect()`](https://mongodb.github.io/node-mongodb-native/3.3/api/MongoClient.html#.connect) method. Can be used with `mongoUrl` option.|
+|`mongoOptions`|`{}`|Options object forwarded to [`MongoClient.connect`](https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/#mongodb-uri-connection-string), e.g. TLS/SRV settings. Can be used with `mongoUrl` option.|
 |`dbName`||A name of database used for storing sessions. Can be used with `mongoUrl`, or `clientPromise` options. Takes precedence over database name present in the connection string.|
 |`collectionName`|`'sessions'`|A name of collection used for storing sessions.|
 |`ttl`|`1209600`|The maximum lifetime (in seconds) of the session which will be used to set `session.cookie.expires` if it is not yet set. Default is 14 days.|
@@ -337,11 +337,12 @@ After the first run you can edit `example/.env` to swap between the local docker
 
 ### Release
 
-Since I cannot access the setting page. I can only do it manually.
+Until the GitHub release workflow lands, do the manual flow:
 
 1. Bump version, update `CHANGELOG.md` and README. Commit and push.
-2. Run `yarn build && yarn test && npm publish`
-3. `git tag vX.Y.Z && git push --tags`
+2. Run `yarn test && yarn build` (build uses `tsdown` to emit dual ESM/CJS bundles to `dist/`).
+3. Publish: `npm publish`
+4. Tag: `git tag vX.Y.Z && git push --tags`
 
 ## License
 

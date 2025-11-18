@@ -6,9 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- **Breaking:** Drop Node <= 18; require Node.js >= 20.8 for builds, tests, and runtime.
-- **Compatibility:** Still targets MongoDB driver >= 5.x and server 4.4–8.0 (peer range `>=5` unchanged).
-- **Upgrades:** Library + tooling refreshed (Ava 6, @ava/typescript 6, TypeScript 5.9, ESLint 9, Prettier 3, mongodb dev 7.0, express 4.21/express-session 1.18, and related utilities).
+- **Breaking:** Requires Node.js 20.8+ (aligns with MongoDB driver 5–7 support).
+- **Compatibility:** Supported/tested matrix: Node 20/22/24 + MongoDB driver 5.x–7.x + MongoDB server 4.4–8.0 (peer range remains `>=5.0.0`).
+- **Packaging:** npm package now ships dual ESM/CJS bundles via `tsdown`, with an explicit exports map and cleaned type declarations (`.d.ts`/`.d.cts`).
+- **Types:** `MongoStore` and option hooks are strongly typed to avoid `any` leaks.
 
 ## [5.1.0] - 2023-10-14
 
