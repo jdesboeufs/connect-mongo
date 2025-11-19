@@ -7,7 +7,7 @@
   - Refresh the tooling stack: virtually every dev dependency is from 2020 (TypeScript 4.0, Ava 3, ESLint 7, Husky 4, Prettier 2, commitlint 11, etc.), which misses hundreds of bug fixes and no longer understands Node 20/22 typings (package.json:67-107). Plan an across-the-board upgrade (TS ≥5.6, Ava 6, ESLint 9,
     Prettier 3, Husky 9/Lint‑Staged 15, latest @types/*) and run yarn dedupe afterwards.
     - [done 2025-11-15] Upgrade TS/AVA/ESLint/prettier/husky stacks while keeping Node 18 compatibility (agent: Codex)
-    - TODO(agent): migrate from .eslintrc.yml to an eslint.config.js flat config so ESLINT_USE_FLAT_CONFIG shim can be removed.
+    - [done 2025-11-19] Migrated to flat eslint.config.mjs + removed ESLINT_USE_FLAT_CONFIG shim (agent: Codex)
   - Examples and fixtures lag far behind: the sample app still consumes connect-mongo@^4.4.0, forces MongoDB 3.6 via Yarn resolutions, and docker-compose.yaml spins up Mongo 4.4 (example/package.json:12-23, docker-compose.yaml:1-11). Update those to your current major, exercise Mongo server 7+, and document SRV/TLS
     flows so contributors can reproduce issues without pinning to obsolete builds.
     - [done 2025-11-16] Refresh example deps/fixtures, add TLS profile + docs for SRV/TLS workflows (agent: Codex)

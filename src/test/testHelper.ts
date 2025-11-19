@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import util from 'util'
 import ExpressSession from 'express-session'
 

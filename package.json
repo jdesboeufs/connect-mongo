@@ -39,9 +39,9 @@
     "build": "tsdown",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
-    "fix:lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --cache src --ext .ts --fix",
+    "fix:lint": "eslint --cache src --ext .ts --fix",
     "test": "run-s test:*",
-    "test:lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --cache src --ext .ts",
+    "test:lint": "eslint --cache src --ext .ts",
     "test:prettier": "prettier \"src/**/*.ts\" --list-different",
     "test:unit": "c8 ava",
     "watch:test": "c8 ava --watch",
@@ -103,7 +103,8 @@
     "tsdown": "^0.16.4",
     "typedoc": "^0.28.14",
     "typescript": "^5.9.3",
-    "cross-env": "^10.1.0"
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.39.1"
   },
   "files": [
     "dist",
@@ -148,7 +149,7 @@
   },
   "lint-staged": {
     "**/*.{ts,js}": [
-      "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --cache --fix"
+      "eslint --cache --fix"
     ]
   },
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
