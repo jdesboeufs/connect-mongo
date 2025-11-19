@@ -1,4 +1,4 @@
-import { assert } from 'console'
+import assert from 'node:assert/strict'
 import util from 'util'
 import * as session from 'express-session'
 import {

@@ -27,8 +27,31 @@ test.afterEach.always(async () => {
 
 test.serial('create store w/o provide required options', (t) => {
   t.throws(() => MongoStore.create({}), {
-    message: /Cannot init client/,
+    message: /You must provide either mongoUrl\|clientPromise\|client/,
   })
+})
+
+test.serial(
+  'create store with explicit undefined clientPromise still errors',
+  (t) => {
+    t.throws(
+      () =>
+        MongoStore.create({
+          clientPromise: undefined as unknown as Promise<MongoClient>,
+        }),
+      { message: /You must provide either mongoUrl\|clientPromise\|client/ }
+    )
+  }
+)
+
+test.serial('create store with explicit undefined client still errors', (t) => {
+  t.throws(
+    () =>
+      MongoStore.create({
+        client: undefined as unknown as MongoClient,
+      }),
+    { message: /You must provide either mongoUrl\|clientPromise\|client/ }
+  )
 })
 
 test.serial('create store with clientPromise', async (t) => {

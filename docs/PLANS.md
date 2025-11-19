@@ -29,6 +29,8 @@
   - Type safety is paper-thin: option hooks (serialize, transformId, crypto) stay typed as any and defaultSerializeFunction is littered with @ts-ignore (src/lib/MongoStore.ts:61-124). Once you enable the stricter compiler flags below, refactor this class into generics (MongoStore<T extends SessionData>) so public
     types match reality.
     - [done 2025-11-16] Improve type safety with generics/typed hooks (agent: Codex)
+  - Replace console.assert with real assertions: current guards in the constructor use import { assert } from 'console', which only logs and does not throw, so bad options still proceed and fail later. Switch to node:assert/strict to enforce required inputs. src/lib/MongoStore.ts:1,200-214
+    - [done 2025-11-19] Replace console.assert with node:assert/strict and add tests for missing mongoUrl/client options (agent: Codex)
 
 - Tooling & CI
   - Tighten the compiler and target modern runtimes: tsconfig.json still emits ES2018/CommonJS, disables strictFunctionTypes, noImplicitAny, and noUnused*, and forces inline source maps that bloat npm tarballs (tsconfig.json:2-44). Move to target: es2022, enable the strict diagnostics, emit external .map files, and
