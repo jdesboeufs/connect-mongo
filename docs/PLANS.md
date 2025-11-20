@@ -26,6 +26,7 @@
   - close() always shuts down the underlying MongoClient, even if the user supplied their own client/promise, which can tear down the rest of the app's DB connections (src/lib/MongoStore.ts:188-210, 541-543). Track whether the store created the client and only close in that case; otherwise just clear timers.
   - Interval-based cleanup leaks and relies on deprecated write concern: the timer created in setAutoRemove() is never cleared on shutdown and writes with w:0/j:false, which newer clusters reject (src/lib/MongoStore.ts:217-247). Store the handle, clearInterval it in close(), and use the configured write concern or
     default majority-safe options.
+    - [done 2025-11-19] Guard interval cleanup errors and clear timers in close(); added regression test to prove timer cleanup (agent: Codex)
   - Type safety is paper-thin: option hooks (serialize, transformId, crypto) stay typed as any and defaultSerializeFunction is littered with @ts-ignore (src/lib/MongoStore.ts:61-124). Once you enable the stricter compiler flags below, refactor this class into generics (MongoStore<T extends SessionData>) so public
     types match reality.
     - [done 2025-11-16] Improve type safety with generics/typed hooks (agent: Codex)

@@ -238,6 +238,76 @@ test.serial('decrypt failure only calls callback once', async (t) => {
   })
 })
 
+test.serial(
+  'interval autoRemove suppresses rejections and clears timer on close',
+  async (t) => {
+    const originalSetInterval = global.setInterval
+    const originalClearInterval = global.clearInterval
+    const callbacks: (() => void)[] = []
+    const fakeTimer = {
+      ref() {
+        return this
+      },
+      unref() {
+        return this
+      },
+    } as unknown as NodeJS.Timeout
+    let cleared = false
+    ;(global as typeof globalThis).setInterval = ((fn: () => void) => {
+      callbacks.push(fn)
+      return fakeTimer
+    }) as typeof setInterval
+    ;(global as typeof globalThis).clearInterval = ((
+      handle: NodeJS.Timeout
+    ) => {
+      if (handle === fakeTimer) {
+        cleared = true
+      }
+    }) as typeof clearInterval
+
+    const fakeCollection = {
+      deleteMany: () => Promise.reject(new Error('interval failure')),
+    }
+    const fakeClient = {
+      db: () => ({
+        collection: () => fakeCollection,
+      }),
+      close: () => Promise.resolve(),
+    }
+    const unhandled: unknown[] = []
+    const onUnhandled = (reason: unknown) => {
+      unhandled.push(reason)
+    }
+    process.on('unhandledRejection', onUnhandled)
+
+    let intervalStore: MongoStore | undefined
+    try {
+      intervalStore = MongoStore.create({
+        clientPromise: Promise.resolve(fakeClient as unknown as MongoClient),
+        autoRemove: 'interval',
+        autoRemoveInterval: 1,
+        collectionName: 'interval-test',
+        dbName: 'interval-db',
+      })
+      await intervalStore.collectionP
+      t.is(callbacks.length, 1)
+      callbacks[0]?.()
+      await new Promise((resolve) => setImmediate(resolve))
+      t.is(unhandled.length, 0)
+      await intervalStore.close()
+      t.true(cleared)
+      t.is(
+        (intervalStore as unknown as { timer?: NodeJS.Timeout }).timer,
+        undefined
+      )
+    } finally {
+      process.off('unhandledRejection', onUnhandled)
+      global.setInterval = originalSetInterval
+      global.clearInterval = originalClearInterval
+    }
+  }
+)
+
 test.serial('test destory event', async (t) => {
   ;({ store, storePromise } = createStoreHelper())
   const orgSession = makeData()

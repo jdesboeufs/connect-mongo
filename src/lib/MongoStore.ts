@@ -248,20 +248,30 @@ export default class MongoStore<
             expireAfterSeconds: 0,
           }
         )
-      case 'interval':
+      case 'interval': {
         debug('create Timer to remove expired sessions')
-        this.timer = setInterval(
-          () =>
-            collection.deleteMany(removeQuery(), {
+        const runIntervalRemove = () =>
+          collection
+            .deleteMany(removeQuery(), {
               writeConcern: {
                 w: 0,
-                j: false,
               },
-            }),
+            })
+            .catch((err) => {
+              debug(
+                'autoRemove interval cleanup failed: %s',
+                (err as Error)?.message ?? err
+              )
+            })
+        this.timer = setInterval(
+          () => {
+            void runIntervalRemove()
+          },
           this.options.autoRemoveInterval * 1000 * 60
         )
         this.timer.unref()
         return Promise.resolve()
+      }
       case 'disabled':
       default:
         return Promise.resolve()
@@ -559,6 +569,10 @@ export default class MongoStore<
    */
   close(): Promise<void> {
     debug('MongoStore#close()')
+    if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = undefined
+    }
     return this.clientP.then((c) => c.close())
   }
 }
