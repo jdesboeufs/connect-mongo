@@ -32,13 +32,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
+          cache: 'npm'
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
       - name: Install MongoDB driver ${{ matrix.mongodb-driver }}
         run: |
-          npm install mongodb@${MONGODB_DRIVER_VERSION} --no-save --no-audit --legacy-peer-deps
-          rm -f package-lock.json npm-shrinkwrap.json
+          npm install mongodb@${MONGODB_DRIVER_VERSION} --no-save --no-package-lock --no-audit --legacy-peer-deps
       - name: Start MongoDB ${{ matrix.mongo-server }}
         run: docker compose up -d
       - name: Wait for MongoDB to accept connections
@@ -51,15 +50,15 @@ jobs:
           done
           echo "MongoDB failed to start" >&2
           exit 1
-      - run: yarn typecheck
-      - run: yarn test
+      - run: npm run typecheck
+      - run: npm test
       - name: Upload coverage
         if: matrix.node-version == '22.x' && matrix.mongodb-driver == '6' && matrix.mongo-server == '6.0'
-        run: yarn cov:send
+        run: npm run cov:send
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Build artifacts
-        run: yarn build
+        run: npm run build
       - name: Tear down MongoDB
         if: always()
         run: docker compose down -v

@@ -6,7 +6,6 @@ node_modules
 src/**.js
 coverage
 *.log
-package-lock.json
 .eslintcache
 example/.env
 docker/tls/*
