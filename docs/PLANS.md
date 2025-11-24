@@ -45,6 +45,7 @@
     mongodb@x in a temporary workspace, waits for Mongo 7.x containers to report ready, and always runs docker compose down in a finally step.
   - Critical behaviors lack automated coverage: the unit/integration suites don't cover crypto, autoRemove, touchAfter, or transformId at all—only the happy-path AVA specs exist (src/lib/MongoStore.spec.ts:1-154, src/test/integration.spec.ts:1-72). Add targeted tests using mongodb-memory-server to keep CI fast and
     remove the hard-coded mongodb://root:example@127.0.0.1 dependency.
+    - [started 2025-11-24] Add live-Mongo upgrade compat test (5.1.0 ➜ current) covering crypto/non-crypto sessions, rolling/touchAfter with cookie.maxAge, TTL index stability (autoRemove: 'native'), and client ownership; expose via `yarn test:compat` (manual run).
   - Publishing still relies on humans running yarn build && yarn test && npm publish; there's no prepublishOnly hook or release workflow (README.md:318-336). Wire up standard-version + GitHub Actions to cut releases, publish to npm, upload coverage (since you already call codecov), and tag automatically.
 
 - Docs & Community
