@@ -23,5 +23,3 @@ Welcome! This file keeps lightweight coordination notes for anyone (human or AI)
 - For complex changes, request a human review to ensure the change aligns with project goals and also ask for clarification on any ambiguous points in the plan.
 
 Thanks for helping keep the project healthy!
-
-// TODO(agent): Husky install failed in this sandbox because `.git/config` was not writable; rerun `npm install` in a normal checkout to populate hooks.
