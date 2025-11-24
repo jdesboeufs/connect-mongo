@@ -394,9 +394,7 @@ export default class MongoStore<
           const data = await cryptoSet(
             this.options.crypto.secret as string,
             s.session
-          ).catch((err) => {
-            throw new Error(err)
-          })
+          )
           s.session = data as StoredSessionValue
         }
         const collection = await this.collectionP

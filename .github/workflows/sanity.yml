@@ -12,6 +12,7 @@ on:
 
 jobs:
   build:
+    name: Build with Node ${{ matrix.node-version }} | Mongo ${{ matrix.mongo-server }} | Driver ${{ matrix.mongodb-driver }}
     runs-on: ubuntu-latest
 
     strategy:
