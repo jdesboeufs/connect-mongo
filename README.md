@@ -285,12 +285,15 @@ One of the following options should be provided. If more than one option are pro
 |`autoRemove`|`'native'`|Behavior for removing expired sessions. Possible values: `'native'`, `'interval'` and `'disabled'`.|
 |`autoRemoveInterval`|`10`|Interval (in minutes) used when `autoRemove` option is set to `interval`.|
 |`touchAfter`|`0`|Interval (in seconds) between session updates.|
+|`timestamps`|`false`|When `true`, stores `createdAt` (on insert) and `updatedAt` (on every write/touch) fields on each session document for auditing. Disabled by default to preserve existing schemas.|
 |`stringify`|`true`|If `true`, connect-mongo will serialize sessions using `JSON.stringify` before setting them, and deserialize them with `JSON.parse` when getting them. This is useful if you are using types that MongoDB doesn't support.|
 |`serialize`||Custom hook for serializing sessions to MongoDB. This is helpful if you need to modify the session before writing it out.|
 |`unserialize`||Custom hook for unserializing sessions from MongoDB. This can be used in scenarios where you need to support different types of serializations (e.g., objects and JSON strings) or need to modify the session before using it in your app.|
 |`writeOperationOptions`||Options object to pass to every MongoDB write operation call that supports it (e.g. `update`, `remove`). Useful for adjusting the write concern. Only exception: If `autoRemove` is set to `'interval'`, the write concern from the `writeOperationOptions` object will get overwritten.|
 |`transformId`||Transform original `sessionId` in whatever you want to use as storage key.|
 |`crypto`||Crypto related options. See below.|
+
+If you enable `timestamps`, each session document will include `createdAt` (first insert) and `updatedAt` (every subsequent `set`/`touch`) fields. These fields are informational only and do not change TTL behavior.
 
 ### Crypto-related options
 

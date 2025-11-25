@@ -56,6 +56,7 @@ export type ConnectMongoOptions<
   writeOperationOptions?: WriteConcernSettings
   transformId?: (sid: string) => string
   crypto?: CryptoOptions
+  timestamps?: boolean
 }
 
 type ConcretCryptoOptions = Required<CryptoOptions>
@@ -75,6 +76,7 @@ type ConcretConnectMongoOptions<
   autoRemoveInterval: number
   touchAfter: number
   stringify: boolean
+  timestamps: boolean
   serialize?: Serialize<T>
   unserialize?: Unserialize<T>
   writeOperationOptions?: WriteConcernSettings
@@ -87,6 +89,8 @@ type InternalSessionType<T extends session.SessionData> = {
   session: StoredSessionValue | T
   expires?: Date
   lastModified?: Date
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -157,6 +161,7 @@ export default class MongoStore<
     autoRemoveInterval = 10,
     touchAfter = 0,
     stringify = true,
+    timestamps = false,
     crypto,
     ...required
   }: ConnectMongoOptions<T>) {
@@ -170,6 +175,7 @@ export default class MongoStore<
       autoRemoveInterval,
       touchAfter,
       stringify,
+      timestamps,
       crypto: {
         ...{
           secret: false,
@@ -398,14 +404,15 @@ export default class MongoStore<
           s.session = data as StoredSessionValue
         }
         const collection = await this.collectionP
-        const rawResp = await collection.updateOne(
-          { _id: s._id },
-          { $set: s },
-          {
-            upsert: true,
-            writeConcern: this.options.writeOperationOptions,
-          }
-        )
+        const update: Record<string, unknown> = { $set: s }
+        if (this.options.timestamps) {
+          update.$setOnInsert = { createdAt: new Date() }
+          update.$currentDate = { updatedAt: true }
+        }
+        const rawResp = await collection.updateOne({ _id: s._id }, update, {
+          upsert: true,
+          writeConcern: this.options.writeOperationOptions,
+        })
         if (rawResp.upsertedCount > 0) {
           this.emit('create', sid)
         } else {
@@ -456,9 +463,13 @@ export default class MongoStore<
           updateFields.expires = new Date(Date.now() + this.options.ttl * 1000)
         }
         const collection = await this.collectionP
+        const updateQuery: Record<string, unknown> = { $set: updateFields }
+        if (this.options.timestamps) {
+          updateQuery.$currentDate = { updatedAt: true }
+        }
         const rawResp = await collection.updateOne(
           { _id: this.computeStorageId(sid) },
-          { $set: updateFields },
+          updateQuery,
           { writeConcern: this.options.writeOperationOptions }
         )
         if (rawResp.matchedCount === 0) {

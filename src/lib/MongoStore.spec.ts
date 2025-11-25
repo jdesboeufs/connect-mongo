@@ -135,6 +135,43 @@ test.serial('set and listen to event', async (t) => {
   await waitForSet
 })
 
+test.serial('timestamps are disabled by default', async (t) => {
+  ;({ store, storePromise } = createStoreHelper())
+  const sid = 'timestamps-disabled'
+  await storePromise.set(sid, makeData())
+  const collection = await store.collectionP
+  const sessionDoc = await collection.findOne({ _id: sid })
+
+  t.truthy(sessionDoc)
+  t.is(sessionDoc?.createdAt, undefined)
+  t.is(sessionDoc?.updatedAt, undefined)
+})
+
+test.serial(
+  'timestamps opt-in sets createdAt once and updates updatedAt',
+  async (t) => {
+    ;({ store, storePromise } = createStoreHelper({ timestamps: true }))
+    const sid = 'timestamps-enabled'
+    await storePromise.set(sid, makeData())
+    const collection = await store.collectionP
+    const first = await collection.findOne({ _id: sid })
+
+    t.truthy(first?.createdAt)
+    t.truthy(first?.updatedAt)
+    const createdAtMs = first?.createdAt?.getTime()
+    const updatedAtMs = first?.updatedAt?.getTime()
+    t.truthy(createdAtMs)
+    t.truthy(updatedAtMs)
+
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    await storePromise.set(sid, { ...makeData(), fizz: 'buzz' } as SessionData)
+    const second = await collection.findOne({ _id: sid })
+
+    t.is(second?.createdAt?.getTime(), createdAtMs)
+    t.truthy((second?.updatedAt?.getTime() ?? 0) > (updatedAtMs ?? 0))
+  }
+)
+
 test.serial('set and listen to create event', async (t) => {
   ;({ store, storePromise } = createStoreHelper())
   const sid = 'test-create-event'
@@ -445,6 +482,28 @@ test.serial('touch ops', async (t) => {
   t.truthy(session?.expires?.getTime())
   if (session?.expires?.getTime() && session2?.expires?.getTime()) {
     t.truthy(session2?.expires.getTime() > session?.expires.getTime())
+  }
+})
+
+test.serial('touch updates updatedAt when timestamps enabled', async (t) => {
+  ;({ store, storePromise } = createStoreHelper({ timestamps: true }))
+  const orgSession = makeDataNoCookie()
+  const sid = 'test-touch-timestamps'
+  // @ts-ignore
+  await storePromise.set(sid, orgSession)
+  const collection = await store.collectionP
+  const session = await collection.findOne({ _id: sid })
+  const initialUpdatedAt = session?.updatedAt?.getTime()
+
+  await new Promise((resolve) => setTimeout(resolve, 20))
+  await storePromise.touch(sid, session?.session as SessionData)
+  const touched = await collection.findOne({ _id: sid })
+  const touchedUpdatedAt = touched?.updatedAt?.getTime()
+
+  t.truthy(initialUpdatedAt)
+  t.truthy(touchedUpdatedAt)
+  if (initialUpdatedAt && touchedUpdatedAt) {
+    t.true(touchedUpdatedAt > initialUpdatedAt)
   }
 })
 
