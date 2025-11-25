@@ -143,6 +143,18 @@ function computeTransformFunctions<T extends session.SessionData>(
   }
 }
 
+function computeExpires(
+  session: session.SessionData | undefined,
+  fallbackTtlSeconds: number
+): Date {
+  const cookie = session?.cookie as session.Cookie | undefined
+  if (cookie?.expires) {
+    return new Date(cookie.expires)
+  }
+  const now = Date.now()
+  return new Date(now + fallbackTtlSeconds * 1000)
+}
+
 export default class MongoStore<
   T extends session.SessionData = session.SessionData,
 > extends session.Store {
@@ -379,18 +391,7 @@ export default class MongoStore<
           session: this.transformFunctions.serialize(session),
         }
         // Expire handling
-        if (session?.cookie?.expires) {
-          s.expires = new Date(session.cookie.expires)
-        } else {
-          // If there's no expiration date specified, it is
-          // browser-session cookie or there is no cookie at all,
-          // as per the connect docs.
-          //
-          // So we set the expiration to two-weeks from now
-          // - as is common practice in the industry (e.g Django) -
-          // or the default specified in the options.
-          s.expires = new Date(Date.now() + this.options.ttl * 1000)
-        }
+        s.expires = computeExpires(session, this.options.ttl)
         // Last modify handling
         if (this.options.touchAfter > 0) {
           s.lastModified = new Date()
@@ -457,11 +458,7 @@ export default class MongoStore<
           updateFields.lastModified = currentDate
         }
 
-        if (session?.cookie?.expires) {
-          updateFields.expires = new Date(session.cookie.expires)
-        } else {
-          updateFields.expires = new Date(Date.now() + this.options.ttl * 1000)
-        }
+        updateFields.expires = computeExpires(session, this.options.ttl)
         const collection = await this.collectionP
         const updateQuery: Record<string, unknown> = { $set: updateFields }
         if (this.options.timestamps) {

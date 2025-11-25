@@ -14,6 +14,7 @@ declare module 'express-session' {
 type AgentWithCleanup = {
   agent: ReturnType<typeof request.agent>
   cleanup: () => Promise<void>
+  store: MongoStore
 }
 
 function createSupertestAgent(
@@ -42,6 +43,7 @@ function createSupertestAgent(
   const agent = request.agent(app)
   return {
     agent,
+    store,
     cleanup: async () => {
       await store.close()
     },
@@ -91,3 +93,29 @@ test.serial('simple case with touch after', async (t) => {
     await cleanup()
   }
 })
+
+test.serial(
+  'timestamps option adds createdAt/updatedAt in integration flow',
+  async (t) => {
+    const { agent, cleanup, store } = createSupertestAgentWithDefault(
+      { resave: false, saveUninitialized: false, rolling: true },
+      { timestamps: true, collectionName: 'integration-timestamps' }
+    )
+
+    try {
+      await agent.get('/').expect(200)
+      const collection = await store.collectionP
+      const doc = await collection.findOne({})
+      t.truthy(doc?.createdAt)
+      t.truthy(doc?.updatedAt)
+
+      const firstUpdated = doc?.updatedAt?.getTime()
+      await new Promise((resolve) => setTimeout(resolve, 20))
+      await agent.get('/ping').expect(200)
+      const doc2 = await collection.findOne({ _id: doc?._id })
+      t.truthy((doc2?.updatedAt?.getTime() ?? 0) >= (firstUpdated ?? 0))
+    } finally {
+      await cleanup()
+    }
+  }
+)

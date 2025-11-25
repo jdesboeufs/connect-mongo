@@ -7,6 +7,7 @@ import {
   createStoreHelper,
   makeData,
   makeDataNoCookie,
+  makeCookie,
 } from '../test/testHelper.js'
 
 let { store, storePromise } = createStoreHelper()
@@ -232,6 +233,48 @@ test.serial('set with no stringify', async (t) => {
   t.is(err, undefined)
   t.is(await storePromise.length(), 0)
 })
+
+test.serial(
+  'ttl uses cookie.maxAge before cookie.expires and ttl fallback',
+  async (t) => {
+    // Choose distinct magnitudes so ordering is unambiguous: 2s < 30s < 90s
+    const defaultTtl = 30_000
+    ;({ store, storePromise } = createStoreHelper({ ttl: defaultTtl / 1000 }))
+    const cookieMaxAge = makeCookie()
+    const sid = 'ttl-precedence'
+    cookieMaxAge.maxAge = 2_000
+    const sessionData = { foo: 'ttl', cookie: cookieMaxAge }
+
+    // @ts-ignore
+    await storePromise.set(sid, sessionData)
+    const collection = await store.collectionP
+    const doc = await collection.findOne({ _id: sid })
+
+    // separate cookie with only expires set to test precedence
+    const cookieExpires = makeCookie()
+    cookieExpires.maxAge = undefined
+    cookieExpires.expires = new Date(Date.now() + 90_000)
+    const sid2 = 'ttl-precedence-expires'
+    // @ts-ignore
+    await storePromise.set(sid2, { foo: 'ttl2', cookie: cookieExpires })
+    const doc2 = await collection.findOne({ _id: sid2 })
+
+    // remove both to test ttl fallback
+    const sid3 = 'ttl-precedence-ttl'
+    // @ts-ignore
+    await storePromise.set(sid3, { foo: 'ttl3' })
+    const doc3 = await collection.findOne({ _id: sid3 })
+
+    const expMs = doc?.expires?.getTime() ?? 0
+    const expMs2 = doc2?.expires?.getTime() ?? 0
+    const expMs3 = doc3?.expires?.getTime() ?? 0
+
+    t.true(expMs > 0 && expMs2 > 0 && expMs3 > 0)
+    // ordering: maxAge (2s) < ttl fallback (30s) < cookie.expires (90s)
+    t.true(expMs < expMs3)
+    t.true(expMs3 < expMs2)
+  }
+)
 
 test.serial('clear preserves TTL index and is idempotent', async (t) => {
   ;({ store, storePromise } = createStoreHelper({ autoRemove: 'native' }))
@@ -548,6 +591,33 @@ test.serial('touch ops with touchAfter with touch', async (t) => {
   }
 })
 
+test.serial(
+  'touchAfter throttle keeps updatedAt unchanged until threshold when timestamps on',
+  async (t) => {
+    ;({ store, storePromise } = createStoreHelper({
+      touchAfter: 1,
+      timestamps: true,
+    }))
+    const sid = 'touchAfter-timestamps'
+    // @ts-ignore
+    await storePromise.set(sid, makeDataNoCookie())
+    const collection = await store.collectionP
+    const doc = await collection.findOne({ _id: sid })
+    const initialUpdated = doc?.updatedAt?.getTime()
+
+    const sessionWithMeta = await storePromise.get(sid)
+    await storePromise.touch(sid, sessionWithMeta as SessionData)
+    const docNoUpdate = await collection.findOne({ _id: sid })
+    t.is(docNoUpdate?.updatedAt?.getTime(), initialUpdated)
+
+    await new Promise((resolve) => setTimeout(resolve, 1100))
+    const sessionWithMetaAfterWait = await storePromise.get(sid)
+    await storePromise.touch(sid, sessionWithMetaAfterWait as SessionData)
+    const docUpdated = await collection.findOne({ _id: sid })
+    t.truthy((docUpdated?.updatedAt?.getTime() ?? 0) > (initialUpdated ?? 0))
+  }
+)
+
 test.serial('basic operation flow with crypto', async (t) => {
   ;({ store, storePromise } = createStoreHelper({
     crypto: { secret: 'secret' },
@@ -565,6 +635,90 @@ test.serial('basic operation flow with crypto', async (t) => {
   t.not(sessions, undefined)
   t.not(sessions, null)
   t.is(sessions?.length, 1)
+})
+
+test.serial('crypto with stringify=false roundtrips raw objects', async (t) => {
+  ;({ store, storePromise } = createStoreHelper({
+    crypto: { secret: 'secret' },
+    stringify: false,
+    collectionName: 'crypto-no-stringify',
+  }))
+  const sid = 'crypto-no-stringify'
+  const payload = makeDataNoCookie()
+  // @ts-ignore
+  await storePromise.set(sid, payload)
+  const session = await storePromise.get(sid)
+  t.deepEqual(session, payload)
+})
+
+test.serial(
+  'transformId stores and retrieves using transformed key',
+  async (t) => {
+    const transformId = (sid: string) => `t-${sid}`
+    ;({ store, storePromise } = createStoreHelper({ transformId }))
+    const sid = 'transform-id'
+    await storePromise.set(sid, makeData())
+    const collection = await store.collectionP
+    const doc = await collection.findOne({ _id: transformId(sid) })
+    t.truthy(doc)
+    const session = await storePromise.get(sid)
+    t.truthy(session)
+  }
+)
+
+test.serial('writeOperationOptions forwarded to updateOne', async (t) => {
+  const calls: any[] = []
+  const fakeCollection = {
+    createIndex: () => Promise.resolve(),
+    updateOne: (...args: any[]) => {
+      calls.push(args)
+      return Promise.resolve({ upsertedCount: 1 })
+    },
+  }
+  const fakeClient = {
+    db: () => ({ collection: () => fakeCollection }),
+    close: () => Promise.resolve(),
+  }
+
+  const writeConcern = { w: 0 as const }
+  const localStore = MongoStore.create({
+    clientPromise: Promise.resolve(fakeClient as unknown as MongoClient),
+    writeOperationOptions: writeConcern,
+    collectionName: 'wopts',
+    dbName: 'wopts-db',
+  })
+  await new Promise<void>((resolve, reject) =>
+    localStore.set('wopts', makeData(), (err) =>
+      err ? reject(err) : resolve()
+    )
+  )
+  t.true(calls.length > 0)
+  const opts = calls[0]?.[2]
+  t.deepEqual(opts?.writeConcern, writeConcern)
+  await localStore.close()
+})
+
+test.serial('custom serializer error surfaces from set()', async (t) => {
+  const boom = new Error('serialize-fail')
+  ;({ store, storePromise } = createStoreHelper({
+    serialize: () => {
+      throw boom
+    },
+  }))
+  const sid = 'serializer-error'
+  await t.throwsAsync(() => storePromise.set(sid, makeData()), {
+    message: boom.message,
+  })
+})
+
+test.serial('corrupted JSON payload bubbles error on get', async (t) => {
+  ;({ store, storePromise } = createStoreHelper())
+  const collection = await store.collectionP
+  await collection.insertOne({
+    _id: 'corrupt-json',
+    session: '{bad json',
+  })
+  await t.throwsAsync(() => storePromise.get('corrupt-json'))
 })
 
 test.serial('with touch after and get non-exist session', async (t) => {

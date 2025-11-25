@@ -45,6 +45,7 @@ export const createStoreHelper = (opt: Partial<ConnectMongoOptions> = {}) => {
     mongoOptions: {},
     dbName: 'testDb',
     collectionName: 'test-collection',
+    autoRemove: 'disabled',
     ...opt,
   })
 
