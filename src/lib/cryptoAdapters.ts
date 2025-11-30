@@ -19,6 +19,7 @@ export type CryptoOptions = {
 
 export type ConcretCryptoOptions = Required<CryptoOptions>
 
+/* eslint-disable camelcase */
 export const defaultCryptoOptions: ConcretCryptoOptions = {
   secret: false,
   algorithm: 'aes-256-gcm',
@@ -28,6 +29,7 @@ export const defaultCryptoOptions: ConcretCryptoOptions = {
   iv_size: 16,
   at_size: 16,
 }
+/* eslint-enable camelcase */
 
 export const createKrupteinAdapter = (
   options: CryptoOptions

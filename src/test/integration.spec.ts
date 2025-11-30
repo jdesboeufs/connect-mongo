@@ -58,7 +58,7 @@ function createSupertestAgentWithDefault(
     { secret: 'foo', ...sessionOpts },
     {
       mongoUrl: 'mongodb://root:example@127.0.0.1:27017',
-      dbName: 'itegration-test-db',
+      dbName: 'integration-test-db',
       stringify: false,
       ...mongoStoreOpts,
     }

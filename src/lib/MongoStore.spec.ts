@@ -815,6 +815,7 @@ test.serial(
       marker: true,
     })
     const unserialize = (payload: unknown) => {
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       const { marker, ...rest } = payload as Record<string, unknown>
       return rest as SessionData
     }
