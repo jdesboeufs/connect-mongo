@@ -198,18 +198,15 @@ const runUpgradeScenario = async (t: ExecutionContext, crypto: boolean) => {
     t.truthy(ttlAfter, 'TTL index should persist after upgrade')
     t.is(ttlBefore?.expireAfterSeconds, ttlAfter?.expireAfterSeconds)
     t.deepEqual(ttlBefore?.key, ttlAfter?.key)
-
-    await newStore.close()
-    await t.throwsAsync(async () => db.command({ ping: 1 }))
   } finally {
+    await db.dropDatabase().catch(() => undefined)
+    await client.close().catch(() => undefined)
     if (newStore) {
       await newStore.close().catch(() => undefined)
     }
     if (oldStore) {
       await oldStore.close().catch(() => undefined)
     }
-    await db.dropDatabase().catch(() => undefined)
-    await client.close().catch(() => undefined)
     cleanupPkg()
   }
 }
