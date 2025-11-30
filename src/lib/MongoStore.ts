@@ -154,7 +154,9 @@ function computeExpires(
 
 export default class MongoStore<
   T extends session.SessionData = session.SessionData,
-> extends session.Store {
+>
+  extends session.Store
+{
   private clientP: Promise<MongoClient>
   private readonly cryptoAdapter: CryptoAdapter | null = null
   private timer?: NodeJS.Timeout
