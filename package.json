@@ -53,7 +53,6 @@
     "doc:html": "typedoc --entryPointStrategy expand --entryPoints src --exclude **/*.spec.ts --out dist/docs",
     "doc:json": "typedoc --entryPointStrategy expand --entryPoints src --exclude **/*.spec.ts --json dist/docs/typedoc.json",
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d dist/docs",
-    "version": "standard-version",
     "prepare-release": "run-s test cov:check doc:html version doc:publish",
     "prepare": "husky",
     "tls:setup": "bash ./scripts/generate-mongo-tls.sh"
@@ -144,6 +143,11 @@
     "**/*.{ts,js}": [
       "eslint --cache --fix"
     ]
+  },
+  "standard-version": {
+    "skip": {
+      "changelog": true
+    }
   },
   "packageManager": "npm@11.6.2"
 }
