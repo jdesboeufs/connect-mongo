@@ -6,14 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.0] - 2025-12-01
+
 - **Breaking:** Requires Node.js 20.8+ (aligns with MongoDB driver 5–7 support).
 - **Compatibility:** Supported/tested matrix: Node 20/22/24 + MongoDB driver 5.x–7.x + MongoDB server 4.4–8.0 (peer range remains `>=5.0.0`).
-- **Packaging:** npm package now ships dual ESM/CJS bundles via `tsdown`, with an explicit exports map and cleaned type declarations (`.d.ts`/`.d.cts`).
-- **Types:** `MongoStore` and option hooks are strongly typed to avoid `any` leaks.
+- **Added:** Optional `timestamps` flag to record `createdAt`/`updatedAt` on session documents for auditing while keeping the default schema unchanged.
+- **Added:** Pluggable `cryptoAdapter` interface with helpers `createWebCryptoAdapter` (AES-GCM via Web Crypto API) and `createKrupteinAdapter`; legacy `crypto` options are auto-wrapped and mutually exclusive with `cryptoAdapter` to avoid ambiguity.
 - **Fixed:** `store.clear()` now uses `deleteMany({})` instead of `collection.drop()`, preserving TTL indexes and treating `NamespaceNotFound` as success so clears are idempotent.
 - **Fixed:** Decryption failures in `get()` now short-circuit after the first callback, preventing double-callback regressions when the crypto secret is wrong.
-- **Added:** Pluggable `cryptoAdapter` interface with helpers `createWebCryptoAdapter` (AES-GCM via Web Crypto API) and `createKrupteinAdapter`; legacy `crypto` options are auto-wrapped and mutually exclusive with `cryptoAdapter` to avoid ambiguity.
-- **Added:** Optional `timestamps` flag to record `createdAt`/`updatedAt` on session documents for auditing while keeping the default schema unchanged.
+- **Packaging:** npm package now ships dual ESM/CJS bundles via `tsdown`, with an explicit exports map and cleaned type declarations (`.d.mts`/`.d.cts`).
+- **Types:** `MongoStore` and option hooks are strongly typed to avoid `any` leaks.
 
 ## [5.1.0] - 2023-10-14
 
