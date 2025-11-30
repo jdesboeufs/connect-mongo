@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Types:** `MongoStore` and option hooks are strongly typed to avoid `any` leaks.
 - **Fixed:** `store.clear()` now uses `deleteMany({})` instead of `collection.drop()`, preserving TTL indexes and treating `NamespaceNotFound` as success so clears are idempotent.
 - **Fixed:** Decryption failures in `get()` now short-circuit after the first callback, preventing double-callback regressions when the crypto secret is wrong.
+- **Added:** Pluggable `cryptoAdapter` interface with helpers `createWebCryptoAdapter` (AES-GCM via Web Crypto API) and `createKrupteinAdapter`; legacy `crypto` options are auto-wrapped and mutually exclusive with `cryptoAdapter` to avoid ambiguity.
 - **Added:** Optional `timestamps` flag to record `createdAt`/`updatedAt` on session documents for auditing while keeping the default schema unchanged.
 
 ## [5.1.0] - 2023-10-14

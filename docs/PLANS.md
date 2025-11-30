@@ -6,6 +6,8 @@
   - Align session TTL math with express-session: prefer `cookie.maxAge`, then `cookie.expires`, then `ttl` in both `set()` and `touch()` so rolling sessions retain their intended lifetime.
   - Avoid closing user-supplied MongoClient instances in `close()`; only shut down clients created by the store and always clear timers.
   - [done 2025-11-25] Add optional createdAt/updatedAt timestamps on session documents, disabled by default.
+  - [started 2025-11-30] Add CryptoAdapter interface for pluggable encryption (wrap legacy crypto option, prefer Web Crypto helper, document usage, add tests).
+  - [done 2025-11-30] Rewrite decrypt failure callback test for cryptoAdapter (agent).
 
 - Tooling & CI
   - Rework integration helpers: replace the broken `check-cli`/`diff-integration-tests`, document a safe reset workflow, and migrate `test:integration` to mongodb-memory-server.

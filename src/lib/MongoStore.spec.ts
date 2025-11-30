@@ -2,7 +2,11 @@ import test from 'ava'
 import { SessionData } from 'express-session'
 import { MongoClient } from 'mongodb'
 
-import MongoStore from './MongoStore.js'
+import MongoStore, {
+  createWebCryptoAdapter,
+  createKrupteinAdapter,
+  type CryptoAdapter,
+} from './MongoStore.js'
 import {
   createStoreHelper,
   makeData,
@@ -296,15 +300,26 @@ test.serial('clear preserves TTL index and is idempotent', async (t) => {
 })
 
 test.serial('decrypt failure only calls callback once', async (t) => {
-  ;({ store, storePromise } = createStoreHelper({
-    crypto: {
-      secret: 'right-secret',
+  let secret = 'right-secret'
+  const adapter: CryptoAdapter = {
+    async encrypt(plaintext) {
+      return `${secret}:${plaintext}`
     },
-  }))
+    async decrypt(ciphertext) {
+      const prefix = `${secret}:`
+      if (!ciphertext.startsWith(prefix)) {
+        throw new Error('bad secret')
+      }
+      return ciphertext.slice(prefix.length)
+    },
+  }
+
+  ;({ store, storePromise } = createStoreHelper({ cryptoAdapter: adapter }))
   const sid = 'decrypt-failure'
   await storePromise.set(sid, makeData())
+
   // Tamper with the secret so decryption fails
-  ;(store as any).options.crypto.secret = 'wrong-secret'
+  secret = 'wrong-secret'
 
   await new Promise<void>((resolve) => {
     let calls = 0
@@ -388,10 +403,10 @@ test.serial(
   }
 )
 
-test.serial('test destory event', async (t) => {
+test.serial('test destroy event', async (t) => {
   ;({ store, storePromise } = createStoreHelper())
   const orgSession = makeData()
-  const sid = 'test-destory-event'
+  const sid = 'test-destroy-event'
 
   const waitForDestroy = new Promise<void>((resolve, reject) => {
     store.once('destroy', (sessionId: string) => {
@@ -615,6 +630,206 @@ test.serial(
     await storePromise.touch(sid, sessionWithMetaAfterWait as SessionData)
     const docUpdated = await collection.findOne({ _id: sid })
     t.truthy((docUpdated?.updatedAt?.getTime() ?? 0) > (initialUpdated ?? 0))
+  }
+)
+
+test.serial('cryptoAdapter conflicts with legacy crypto option', (t) => {
+  const adapter: CryptoAdapter = {
+    encrypt: async (payload) => payload,
+    decrypt: async (payload) => payload,
+  }
+  t.throws(
+    () =>
+      MongoStore.create({
+        mongoUrl: 'mongodb://root:example@127.0.0.1:27017',
+        crypto: { secret: 'secret' },
+        cryptoAdapter: adapter,
+      }),
+    { message: /legacy crypto option or cryptoAdapter/ }
+  )
+})
+
+test.serial('custom cryptoAdapter roundtrips session data', async (t) => {
+  const adapter: CryptoAdapter = {
+    encrypt: async (payload) => `enc:${payload}`,
+    decrypt: async (payload) => payload.replace(/^enc:/, ''),
+  }
+  ;({ store, storePromise } = createStoreHelper({
+    cryptoAdapter: adapter,
+    collectionName: 'custom-adapter',
+  }))
+  const sid = 'adapter-roundtrip'
+  const original = makeData()
+  await storePromise.set(sid, original)
+  const session = await storePromise.get(sid)
+  t.deepEqual(session, JSON.parse(JSON.stringify(original)))
+})
+
+test.serial(
+  'kruptein adapter helper merges defaults and works with only secret',
+  async (t) => {
+    ;({ store, storePromise } = createStoreHelper({
+      cryptoAdapter: createKrupteinAdapter({ secret: 'secret' }),
+      collectionName: 'kruptein-adapter',
+    }))
+    const sid = 'kruptein-adapter'
+    const original = makeData()
+    await storePromise.set(sid, original)
+    const session = await storePromise.get(sid)
+    t.deepEqual(session, JSON.parse(JSON.stringify(original)))
+  }
+)
+
+test.serial('web crypto adapter encrypts and decrypts sessions', async (t) => {
+  const adapter = createWebCryptoAdapter({ secret: 'sup3r-secr3t' })
+  ;({ store, storePromise } = createStoreHelper({
+    cryptoAdapter: adapter,
+    collectionName: 'webcrypto-adapter',
+  }))
+  const sid = 'webcrypto-session'
+  const original = makeData()
+  await storePromise.set(sid, original)
+  const session = await storePromise.get(sid)
+  t.deepEqual(session, JSON.parse(JSON.stringify(original)))
+})
+
+test.serial('web crypto adapter supports base64url encoding', async (t) => {
+  const adapter = createWebCryptoAdapter({
+    secret: 'sup3r-secr3t',
+    encoding: 'base64url',
+  })
+  ;({ store, storePromise } = createStoreHelper({
+    cryptoAdapter: adapter,
+    collectionName: 'webcrypto-base64url',
+  }))
+  const sid = 'webcrypto-base64url'
+  const original = makeData()
+  await storePromise.set(sid, original)
+  const session = await storePromise.get(sid)
+  t.deepEqual(session, JSON.parse(JSON.stringify(original)))
+})
+
+test.serial('web crypto adapter supports hex encoding', async (t) => {
+  const adapter = createWebCryptoAdapter({
+    secret: 'sup3r-secr3t',
+    encoding: 'hex',
+  })
+  ;({ store, storePromise } = createStoreHelper({
+    cryptoAdapter: adapter,
+    collectionName: 'webcrypto-hex',
+  }))
+  const sid = 'webcrypto-hex'
+  const original = makeData()
+  await storePromise.set(sid, original)
+  const session = await storePromise.get(sid)
+  t.deepEqual(session, JSON.parse(JSON.stringify(original)))
+})
+
+test.serial(
+  'web crypto adapter derives key with PBKDF2 salt/iterations overrides',
+  async (t) => {
+    const adapter = createWebCryptoAdapter({
+      secret: 'sup3r-secr3t',
+      encoding: 'base64url',
+      salt: 'custom-salt',
+      iterations: 100_000,
+    })
+    ;({ store, storePromise } = createStoreHelper({
+      cryptoAdapter: adapter,
+      collectionName: 'webcrypto-pbkdf2',
+    }))
+    const sid = 'webcrypto-pbkdf2'
+    const original = makeData()
+    await storePromise.set(sid, original)
+    const session = await storePromise.get(sid)
+    t.deepEqual(session, JSON.parse(JSON.stringify(original)))
+  }
+)
+
+test.serial('web crypto adapter supports AES-CBC algorithm', async (t) => {
+  const adapter = createWebCryptoAdapter({
+    secret: 'sup3r-secr3t',
+    algorithm: 'AES-CBC',
+    ivLength: 16,
+  })
+  ;({ store, storePromise } = createStoreHelper({
+    cryptoAdapter: adapter,
+    collectionName: 'webcrypto-aes-cbc',
+  }))
+  const sid = 'webcrypto-aes-cbc'
+  const original = makeData()
+  await storePromise.set(sid, original)
+  const session = await storePromise.get(sid)
+  t.deepEqual(session, JSON.parse(JSON.stringify(original)))
+})
+
+test.serial(
+  'cryptoAdapter works with default stringify (string payload)',
+  async (t) => {
+    const adapter: CryptoAdapter = {
+      encrypt: async (payload) => `enc:${payload}`,
+      decrypt: async (payload) => payload.replace(/^enc:/, ''),
+    }
+    ;({ store, storePromise } = createStoreHelper({
+      cryptoAdapter: adapter,
+      collectionName: 'crypto-default-stringify',
+    }))
+    const sid = 'crypto-default-stringify'
+    const original = makeData()
+    await storePromise.set(sid, original)
+    const session = await storePromise.get(sid)
+    t.deepEqual(session, JSON.parse(JSON.stringify(original)))
+  }
+)
+
+test.serial(
+  'cryptoAdapter works with stringify=false (raw object path)',
+  async (t) => {
+    const adapter: CryptoAdapter = {
+      encrypt: async (payload) => `enc:${payload}`,
+      decrypt: async (payload) => payload.replace(/^enc:/, ''),
+    }
+    ;({ store, storePromise } = createStoreHelper({
+      cryptoAdapter: adapter,
+      stringify: false,
+      collectionName: 'crypto-stringify-false',
+    }))
+    const sid = 'crypto-stringify-false'
+    const original = makeDataNoCookie()
+    // @ts-ignore
+    await storePromise.set(sid, original)
+    const session = await storePromise.get(sid)
+    t.deepEqual(session, original)
+  }
+)
+
+test.serial(
+  'cryptoAdapter works with custom serialize/unserialize functions',
+  async (t) => {
+    const adapter: CryptoAdapter = {
+      encrypt: async (payload) => `enc:${payload}`,
+      decrypt: async (payload) => payload.replace(/^enc:/, ''),
+    }
+    const serialize = (session: SessionData) => ({
+      ...session,
+      marker: true,
+    })
+    const unserialize = (payload: unknown) => {
+      const { marker, ...rest } = payload as Record<string, unknown>
+      return rest as SessionData
+    }
+
+    ;({ store, storePromise } = createStoreHelper({
+      cryptoAdapter: adapter,
+      serialize,
+      unserialize,
+      collectionName: 'crypto-custom-serialize',
+    }))
+    const sid = 'crypto-custom-serialize'
+    const original = makeData()
+    await storePromise.set(sid, original)
+    const session = await storePromise.get(sid)
+    t.deepEqual(session, JSON.parse(JSON.stringify(original)))
   }
 )
 

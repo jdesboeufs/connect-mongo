@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict'
-import util from 'util'
 import * as session from 'express-session'
 import {
   Collection,
@@ -8,21 +7,19 @@ import {
   WriteConcernSettings,
 } from 'mongodb'
 import Debug from 'debug'
-import kruptein from 'kruptein'
-
-type Kruptein = ReturnType<typeof kruptein>
+import { createKrupteinAdapter } from './cryptoAdapters.js'
+import type { CryptoAdapter, CryptoOptions } from './cryptoAdapters.js'
+export type {
+  CryptoAdapter,
+  CryptoOptions,
+  WebCryptoAdapterOptions,
+} from './cryptoAdapters.js'
+export {
+  createKrupteinAdapter,
+  createWebCryptoAdapter,
+} from './cryptoAdapters.js'
 
 const debug = Debug('connect-mongo')
-
-export type CryptoOptions = {
-  secret: false | string
-  algorithm?: string
-  hashing?: string
-  encodeas?: string
-  key_size?: number
-  iv_size?: number
-  at_size?: number
-}
 
 type StoredSessionValue = session.SessionData | string
 type Serialize<T extends session.SessionData> = (
@@ -56,10 +53,9 @@ export type ConnectMongoOptions<
   writeOperationOptions?: WriteConcernSettings
   transformId?: (sid: string) => string
   crypto?: CryptoOptions
+  cryptoAdapter?: CryptoAdapter
   timestamps?: boolean
 }
-
-type ConcretCryptoOptions = Required<CryptoOptions>
 
 type ConcretConnectMongoOptions<
   T extends session.SessionData = session.SessionData,
@@ -81,7 +77,8 @@ type ConcretConnectMongoOptions<
   unserialize?: Unserialize<T>
   writeOperationOptions?: WriteConcernSettings
   transformId?: (sid: string) => string
-  crypto: ConcretCryptoOptions
+  crypto?: CryptoOptions
+  cryptoAdapter?: CryptoAdapter | null
 }
 
 type InternalSessionType<T extends session.SessionData> = {
@@ -159,7 +156,7 @@ export default class MongoStore<
   T extends session.SessionData = session.SessionData,
 > extends session.Store {
   private clientP: Promise<MongoClient>
-  private readonly crypto: Kruptein | null = null
+  private readonly cryptoAdapter: CryptoAdapter | null = null
   private timer?: NodeJS.Timeout
   collectionP: Promise<Collection<InternalSessionType<T>>>
   private options: ConcretConnectMongoOptions<T>
@@ -175,6 +172,7 @@ export default class MongoStore<
     stringify = true,
     timestamps = false,
     crypto,
+    cryptoAdapter,
     ...required
   }: ConnectMongoOptions<T>) {
     super()
@@ -188,18 +186,8 @@ export default class MongoStore<
       touchAfter,
       stringify,
       timestamps,
-      crypto: {
-        ...{
-          secret: false,
-          algorithm: 'aes-256-gcm',
-          hashing: 'sha512',
-          encodeas: 'base64',
-          key_size: 32,
-          iv_size: 16,
-          at_size: 16,
-        },
-        ...crypto,
-      },
+      crypto,
+      cryptoAdapter: cryptoAdapter ?? null,
       ...required,
     }
     // Check params
@@ -216,6 +204,21 @@ export default class MongoStore<
       !options.autoRemoveInterval || options.autoRemoveInterval <= 71582,
       /* (Math.pow(2, 32) - 1) / (1000 * 60) */ 'autoRemoveInterval is too large. options.autoRemoveInterval is in minutes but not seconds nor mills'
     )
+    if (crypto !== undefined && cryptoAdapter !== undefined) {
+      throw new Error(
+        'Provide either the legacy crypto option or cryptoAdapter, not both'
+      )
+    }
+
+    const legacyCryptoRequested =
+      crypto !== undefined && crypto.secret !== false
+    if (options.cryptoAdapter) {
+      this.cryptoAdapter = options.cryptoAdapter
+    } else if (legacyCryptoRequested) {
+      this.cryptoAdapter = createKrupteinAdapter(options.crypto!)
+    }
+    options.cryptoAdapter = this.cryptoAdapter
+
     this.transformFunctions = computeTransformFunctions(options)
     let _clientP: Promise<MongoClient>
     if (options.mongoUrl) {
@@ -237,9 +240,6 @@ export default class MongoStore<
       await this.setAutoRemove(collection)
       return collection
     })
-    if (options.crypto.secret) {
-      this.crypto = kruptein(options.crypto)
-    }
   }
 
   static create<U extends session.SessionData = session.SessionData>(
@@ -307,14 +307,51 @@ export default class MongoStore<
   }
 
   /**
-   * promisify and bind the `this.crypto.get` function.
-   * Please check !!this.crypto === true before using this getter!
+   * Normalize payload before encryption so decrypt can restore the original
+   * serialized session value.
    */
-  private get cryptoGet() {
-    if (!this.crypto) {
-      throw new Error('Check this.crypto before calling this.cryptoGet!')
+  private serializeForCrypto(payload: StoredSessionValue): string {
+    if (typeof payload === 'string') {
+      return payload
     }
-    return util.promisify(this.crypto.get).bind(this.crypto)
+    try {
+      return JSON.stringify(payload)
+    } catch (error) {
+      debug(
+        'Falling back to string serialization for crypto payload: %O',
+        error
+      )
+      return String(payload)
+    }
+  }
+
+  private parseDecryptedPayload(plaintext: string): StoredSessionValue {
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(plaintext)
+    } catch {
+      parsed = plaintext
+    }
+
+    if (this.options.stringify === false) {
+      if (typeof parsed === 'string') {
+        try {
+          return JSON.parse(parsed) as StoredSessionValue
+        } catch {
+          return parsed as StoredSessionValue
+        }
+      }
+      return parsed as StoredSessionValue
+    }
+
+    // Default stringify path expects a string for unserialize(JSON.parse)
+    if (!this.options.serialize && !this.options.unserialize) {
+      return typeof parsed === 'string'
+        ? (parsed as StoredSessionValue)
+        : (JSON.stringify(parsed) as StoredSessionValue)
+    }
+
+    return parsed as StoredSessionValue
   }
 
   /**
@@ -324,12 +361,13 @@ export default class MongoStore<
   private async decryptSession(
     sessionDoc: InternalSessionType<T> | undefined | null
   ) {
-    if (this.crypto && sessionDoc && typeof sessionDoc.session === 'string') {
-      const plaintext = (await this.cryptoGet(
-        this.options.crypto.secret as string,
-        sessionDoc.session
-      )) as string
-      sessionDoc.session = JSON.parse(plaintext) as StoredSessionValue
+    if (
+      this.cryptoAdapter &&
+      sessionDoc &&
+      typeof sessionDoc.session === 'string'
+    ) {
+      const plaintext = await this.cryptoAdapter.decrypt(sessionDoc.session)
+      sessionDoc.session = this.parseDecryptedPayload(plaintext)
     }
   }
 
@@ -349,7 +387,7 @@ export default class MongoStore<
             { expires: { $gt: new Date() } },
           ],
         })
-        if (this.crypto && sessionDoc) {
+        if (this.cryptoAdapter && sessionDoc) {
           try {
             await this.decryptSession(sessionDoc)
           } catch (error) {
@@ -396,13 +434,10 @@ export default class MongoStore<
         if (this.options.touchAfter > 0) {
           s.lastModified = new Date()
         }
-        if (this.crypto) {
-          const cryptoSet = util.promisify(this.crypto.set).bind(this.crypto)
-          const data = await cryptoSet(
-            this.options.crypto.secret as string,
-            s.session
-          )
-          s.session = data as StoredSessionValue
+        if (this.cryptoAdapter) {
+          const plaintext = this.serializeForCrypto(s.session)
+          const encrypted = await this.cryptoAdapter.encrypt(plaintext)
+          s.session = encrypted as StoredSessionValue
         }
         const collection = await this.collectionP
         const update: Record<string, unknown> = { $set: s }
@@ -499,7 +534,7 @@ export default class MongoStore<
         })
         const results: T[] = []
         for await (const sessionDoc of sessions) {
-          if (this.crypto && sessionDoc) {
+          if (this.cryptoAdapter && sessionDoc) {
             await this.decryptSession(sessionDoc)
           }
           results.push(this.transformFunctions.unserialize(sessionDoc.session))

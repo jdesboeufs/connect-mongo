@@ -2,7 +2,7 @@ export default {
   files: [
     'src/**/*.{test,spec}.ts'
   ],
-  failFast: true,
+  failFast: false,
   typescript: {
     // map TS paths -> compiled JS paths
     rewritePaths: {

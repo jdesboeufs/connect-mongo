@@ -251,16 +251,32 @@ by doing this, setting `touchAfter: 24 * 3600` you are saying to the session be 
 
 ## Transparent encryption/decryption of session data
 
-When working with sensitive session data it is [recommended](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Session_Management_Cheat_Sheet.md) to use encryption
+When working with sensitive session data it is [recommended](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Session_Management_Cheat_Sheet.md) to use encryption.  
+Use the new `cryptoAdapter` option to plug in your encryption strategy. The preferred helper uses the Web Crypto API (AES-GCM):
 
-```js
+```ts
+import MongoStore, { createWebCryptoAdapter } from 'connect-mongo'
+
 const store = MongoStore.create({
   mongoUrl: 'mongodb://localhost/test-app',
-  crypto: {
-    secret: 'squirrel'
-  }
+  cryptoAdapter: createWebCryptoAdapter({
+    secret: process.env.SESSION_SECRET!,
+  }),
 })
 ```
+
+If you need the legacy [kruptein](https://www.npmjs.com/package/kruptein) behavior, wrap it explicitly:
+
+```ts
+import { createKrupteinAdapter } from 'connect-mongo'
+
+const store = MongoStore.create({
+  mongoUrl: 'mongodb://localhost/test-app',
+  cryptoAdapter: createKrupteinAdapter({ secret: 'squirrel' }),
+})
+```
+
+The legacy `crypto` option still works for backwards compatibility; it is automatically wrapped into a kruptein-based adapter. Supplying both `crypto` and `cryptoAdapter` throws an error so it is clear which path is used.
 
 ## Options
 
@@ -291,11 +307,14 @@ One of the following options should be provided. If more than one option are pro
 |`unserialize`||Custom hook for unserializing sessions from MongoDB. This can be used in scenarios where you need to support different types of serializations (e.g., objects and JSON strings) or need to modify the session before using it in your app.|
 |`writeOperationOptions`||Options object to pass to every MongoDB write operation call that supports it (e.g. `update`, `remove`). Useful for adjusting the write concern. Only exception: If `autoRemove` is set to `'interval'`, the write concern from the `writeOperationOptions` object will get overwritten.|
 |`transformId`||Transform original `sessionId` in whatever you want to use as storage key.|
+|`cryptoAdapter`||Preferred hook for encrypting/decrypting session payloads. Accepts any object with async `encrypt`/`decrypt` functions; helpers `createWebCryptoAdapter` (AES-GCM via Web Crypto API) and `createKrupteinAdapter` are provided.|
 |`crypto`||Crypto related options. See below.|
 
 If you enable `timestamps`, each session document will include `createdAt` (first insert) and `updatedAt` (every subsequent `set`/`touch`) fields. These fields are informational only and do not change TTL behavior.
 
-### Crypto-related options
+### Crypto-related options (legacy)
+
+Prefer `cryptoAdapter` for new integrations. The legacy `crypto` options are wrapped internally into a kruptein adapter to preserve backwards compatibility:
 
 |Option|Default|Description|
 |------|:-----:|-----------|
