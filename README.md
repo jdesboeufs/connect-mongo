@@ -61,11 +61,10 @@ But please note that we are not maintaining v3.x anymore.
 
 ### Express or Connect integration
 
-Express `4.x`, `5.0` and Connect `3.x`:
-
 ```js
+// CJS
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
+const { MongoStore } = require('connect-mongo');
 
 app.use(session({
   secret: 'foo',
@@ -74,6 +73,7 @@ app.use(session({
 ```
 
 ```ts
+// ESM or TS
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
 
